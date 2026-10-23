@@ -5,7 +5,15 @@ let index=null,data=null,current='',positions=[],observer=null,active=0,category
 const nick=()=>get('nickname','교수')||'교수';
 const applySettings=()=>{const t=get('theme','dim');document.body.className=t;document.documentElement.style.setProperty('--fs',get('fontSize',16)+'px');document.documentElement.style.setProperty('--lh',get('lineHeight',160)/100);document.documentElement.style.setProperty('--letter-space',get('letterSpacing',0)+'px');document.documentElement.style.setProperty('--paragraph-gap',get('readingMode','accessible')==='accessible'?'12px':'0px');};
 
-async function fetchJSON(path){let r=await fetch(path,{cache:'no-store'});if(!r.ok)throw Error(path+' (HTTP '+r.status+')');return r.json()}
+// 네트워크가 잠깐 끊겨도 실패하지 않게 최대 3번 시도 (모바일 "Failed to fetch" 대응)
+async function fetchJSON(path,tries=3){
+ let last;
+ for(let i=0;i<tries;i++){
+  try{const r=await fetch(path,{cache:'no-cache'});if(!r.ok){const e=Error('HTTP '+r.status);e.status=r.status;throw e}return await r.json()}
+  catch(e){last=e;if(e.status&&e.status<500)break;await new Promise(res=>setTimeout(res,500*(i+1)))}
+ }
+ throw last;
+}
 function error(msg){let box=el('div','group');box.style.padding='24px';box.textContent=msg;return box}
 function sortedEpisodes(g){return [...(g.episodes||[])].sort((a,b)=>(a.order??999999)-(b.order??999999))}
 // Display numbering is provided by Cherry's v0.3.8 index.json. Never renumber from UI position.
@@ -188,7 +196,7 @@ function renderSearch(q,host){
  const tags=(index.tagList||[]).filter(t=>[t.name,...(t.aliases||[])].some(a=>{const na=norm(a);return na.includes(nq)||(nq.length>=2&&nq.includes(na))}));
  for(const t of tags){
   const groups=displayGroups.filter(g=>(g.tags||[]).includes(t.id));if(!groups.length)continue;any=true;
-  const sec=searchSection(host,'#'+t.name,groups.length);const grid=el('div','search-grid');groups.forEach(g=>grid.append(searchCard(g)));sec.append(grid);
+  const sec=searchSection(host,t.name+' 관련 스토리',groups.length);const grid=el('div','search-grid');groups.forEach(g=>grid.append(searchCard(g)));sec.append(grid);
  }
  // 2. 캐릭터 → 챕터 추천 (비중 순)
  if(!cast){ensureCast();host.append(el('p','search-loading','캐릭터 정보를 불러오는 중…'))}
@@ -228,7 +236,6 @@ function renderSearch(q,host){
 function drawLibrary(){
  $('#library').classList.remove('hidden');$('#reader').classList.add('hidden');$('#crumb').textContent='';
  const q=$('#search').value.trim().toLowerCase(), host=$('#groups');host.replaceChildren();
- renderTagChips(q);
  if(q){renderSearch(q,host);return}
  const visible=displayGroups.filter(g=>categoryMatches(g,category)).map(g=>({g,episodes:sortedEpisodes(g).filter(e=>!q||[e.title,e.description,e.id,g.title,chapterDisplayTitle(g)].some(v=>(v||'').toLowerCase().includes(q)))})).filter(x=>x.episodes.length);
  if(!visible.length){host.append(error('검색 결과가 없습니다.'));return}
@@ -576,8 +583,17 @@ async function openEpisode(id,{push=true}={}){
   if(push)saveRoute({type:'episode',id});
   window.scrollTo(0,0);observe();
  }catch(e){
-  if(token===routeToken)alert('에피소드를 열 수 없습니다: '+e.message);
+  if(token===routeToken)showOpenError(id,e);
  }
+}
+function showOpenError(id,e){
+ $('#library').classList.add('hidden');$('#reader').classList.remove('hidden');current=id;
+ const found=findEpisode(id);$('#epTitle').textContent=found?episodeTitle(found.e):'기록 열람';$('#epId').textContent=found?chapterDisplayTitle(found.g)+(episodeNumber(found.e)?' · '+episodeNumber(found.e):''):'';$('#epDesc').textContent='';
+ $('#ending').classList.add('hidden');const box=el('div','open-error');
+ const offline=!e?.status;
+ box.append(el('strong','',offline?'기록을 불러오지 못했어요':'기록 파일을 찾을 수 없어요'),el('p','',offline?'인터넷 연결이 잠시 불안정했을 수 있어요. 잠시 후 다시 시도해 주세요.':'사이트에 이 기록 파일이 없거나 주소가 바뀌었어요. ('+(e?.message||'')+')'));
+ const retry=el('button','open-retry','다시 시도');retry.type='button';retry.onclick=()=>openEpisode(id,{push:false});box.append(retry);
+ $('#stream').replaceChildren(box);updateEpisodeNav();
 }
 function goHome(){showHome(category)}
 window.addEventListener('popstate',()=>{if(index)restoreRoute()});
