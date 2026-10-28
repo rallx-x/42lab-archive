@@ -11,7 +11,12 @@ const uiLang=()=>{const v=get('lang','ko');return LANGS.some(([id])=>id===v)?v:'
 const dataLang=()=>readyLangs.includes(uiLang())?uiLang():'ko';
 const dataPath=p=>'./data/'+dataLang()+'/'+p;
 document.documentElement.lang=dataLang();
-const applySettings=()=>{const t=get('theme','dim');document.body.className=t;document.documentElement.style.setProperty('--fs',get('fontSize',16)+'px');document.documentElement.style.setProperty('--lh',get('lineHeight',160)/100);document.documentElement.style.setProperty('--letter-space',get('letterSpacing',0)+'px');document.documentElement.style.setProperty('--paragraph-gap',get('readingMode','accessible')==='accessible'?'12px':'0px');};
+// v0.9.1 밝기: 시스템(기본) · 라이트 · 딤 · 다크. 시스템이면 기기 설정을 계속 따라간다.
+const BRIGHT=['light','dim','dark'];
+const osDark=()=>matchMedia('(prefers-color-scheme: dark)').matches;
+function brightnessMode(){const b=get('brightness',null);if(b)return b;const t=get('theme',null);return t?(BRIGHT.includes(t)?t:'custom'):'system'}
+const currentTheme=()=>brightnessMode()==='system'?(osDark()?'dark':'light'):get('theme','dim');
+const applySettings=()=>{const t=currentTheme();document.body.className=t;document.documentElement.style.setProperty('--fs',get('fontSize',16)+'px');document.documentElement.style.setProperty('--lh',get('lineHeight',160)/100);document.documentElement.style.setProperty('--letter-space',get('letterSpacing',0)+'px');document.documentElement.style.setProperty('--paragraph-gap',get('readingMode','accessible')==='accessible'?'12px':'0px');};
 
 // 네트워크가 잠깐 끊겨도 실패하지 않게 최대 3번 시도 (모바일 "Failed to fetch" 대응)
 async function fetchJSON(path,tries=3){
@@ -29,6 +34,7 @@ function episodeNumber(ep){
  if(!Number.isInteger(ep.no))return '';
  return String(ep.no).padStart(2,'0')+(Number.isInteger(ep.sub)?'.'+ep.sub:'');
 }
+function episodeLabel(ep){const n=episodeNumber(ep);if(!n)return '';return ep.kind==='battleDialog'?'전투 '+n:ep.kind==='tutorial'?'튜토리얼 '+n:n}
 function episodeTitle(ep){
  const title=(ep.title||'').trim()||(ep.kind==='battleDialog'?'전투 중 대사':'(제목 없음)');
  return (ep.kind==='battleDialog'&&title!=='전투 중 대사'&&!title.startsWith('전투 중 대사 · ')?'전투 중 대사 · ':'')+title;
@@ -144,6 +150,20 @@ function buildChapterSections(group,episodes){
  });
  return out;
 }
+// v0.9.1 챕터 안 묶음: 본편 구역별 → 종류별(전투 중 대사 · 노드 대사 · 튜토리얼)
+const chapterTabMemory=new Map();
+const kindOf=ep=>ep.kind||'story';
+function chapterTabs(g,eps){
+ const defs=sectionDefs(g),out=[],byKey=new Map();
+ const add=(id,title,style,ep)=>{let t=byKey.get(id);if(!t){t={id,title,style,eps:[]};byKey.set(id,t);out.push(t)}t.eps.push(ep)};
+ for(const ep of eps){
+  const k=kindOf(ep);
+  if(k==='story'){const s=String(ep.section??'');const def=defs.get(s)||{};add('s:'+s,def.title||'본편',def.style||s||'standard',ep)}
+  else add('k:'+k,(index?.kinds||{})[k]||k,'kind-'+k,ep);
+ }
+ return [...out.filter(t=>t.id.startsWith('s:')),...out.filter(t=>t.id.startsWith('k:'))];
+}
+function tabIdFor(g,ep){const k=kindOf(ep);return k==='story'?'s:'+String(ep.section??''):'k:'+k}
 // ---------- v0.8.0 북마크 ----------
 function bookmarks(){const v=get('bookmarks',[]);return Array.isArray(v)?v.filter(x=>x&&typeof x.id==='string'):[]}
 function isBookmarked(id){return bookmarks().some(x=>x.id===id)}
@@ -159,7 +179,7 @@ function bookmarkRow(id,{at,last}={}){
  const found=findEpisode(id),row=el('div','bm-row'+(found?'':' missing'));
  const info=el('div','bm-info');
  if(found){
-  const ctx=chapterDisplayTitle(found.g)+(episodeNumber(found.e)?' · '+episodeNumber(found.e):'');
+  const ctx=chapterDisplayTitle(found.g)+(episodeLabel(found.e)?' · '+episodeLabel(found.e):'');
   info.append(el('small','',ctx),el('strong','',episodeTitle(found.e)));
  }else info.append(el('small','','기록을 찾을 수 없음'),el('strong','','데이터에서 사라진 기록입니다'));
  if(at)info.append(el('span','bm-date',new Date(at).toLocaleDateString('ko-KR')+' 저장'));
@@ -249,7 +269,7 @@ function renderSearch(q,host){
  // 4. 에피소드 제목
  const eps=[];for(const g of displayGroups)for(const e of sortedEpisodes(g))if(norm(e.title).includes(nq))eps.push({g,e});
  if(eps.length){any=true;const sec=searchSection(host,'에피소드',eps.length);const list=el('div','search-episodes');
-  eps.slice(0,60).forEach(({g,e})=>{const b=el('button','search-ep');b.type='button';b.append(el('small','',chapterDisplayTitle(g)+(episodeNumber(e)?' · '+episodeNumber(e):'')),el('strong','',episodeTitle(e)));b.onclick=()=>openEpisode(e.id);list.append(b)});
+  eps.slice(0,60).forEach(({g,e})=>{const b=el('button','search-ep');b.type='button';b.append(el('small','',chapterDisplayTitle(g)+(episodeLabel(e)?' · '+episodeLabel(e):'')),el('strong','',episodeTitle(e)));b.onclick=()=>openEpisode(e.id);list.append(b)});
   if(eps.length>60)list.append(el('p','search-hint','앞의 60건만 보여 줍니다. 검색어를 더 자세히 입력해 보세요.'));sec.append(list)}
  if(!any&&cast)host.append(error('검색 결과가 없습니다.'));
 }
@@ -276,71 +296,30 @@ function drawLibrary(){
   const heading=el('div','folder-episodes-title');
   heading.append(el('div','eyebrow','EPISODE INDEX'),el('h2','',chapterDisplayTitle(selected.g)));if(selected.g.subtitle)heading.append(el('p','chapter-subtitle',selected.g.subtitle));if(selected.g.note)heading.append(el('p','chapter-note',selected.g.note));
   header.append(heading);
-  // Use Cherry's explicit section metadata where present. For legacy indexes,
-  // infer ONLY boundaries identified by known episode IDs/titles (without editing data).
-  const sections=buildChapterSections(selected.g,selected.episodes);
-  const anchors=new Map(),buttons=new Map(),hubOpen=new Map();
-  const reducedMotion=()=>window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const relativeTop=target=>target.getBoundingClientRect().top-episodeScroll.getBoundingClientRect().top+episodeScroll.scrollTop;
-  function setActiveSection(id){
-   for(const [key,button] of buttons){
-    const active=key===id;button.classList.toggle('active',active);
-    if(active)button.setAttribute('aria-current','location');else button.removeAttribute('aria-current');
-   }
-  }
-  if(sections.length>1){
-   const nav=el('nav','chapter-section-nav');nav.setAttribute('aria-label','챕터 구역 바로가기');
-   for(const sec of sections){
-    const button=el('button','chapter-section-jump',sec.title);
-    button.type='button';button.onclick=()=>{
-     if(sec.hub)hubOpen.get(sec.id)?.(true);
-     const target=anchors.get(sec.id);if(!target)return;
-     episodeScroll.scrollTo({top:Math.max(0,relativeTop(target)-12),behavior:reducedMotion()?'auto':'smooth'});
-     setActiveSection(sec.id);
-    };
-    nav.append(button);buttons.set(sec.id,button);
-   }
+  // v0.9.1: 구역(본편·다크존·메모리…)과 종류(전투 중 대사…) 버튼은 「골라 보기」. 누른 묶음만 목록에 남긴다.
+  const tabs=chapterTabs(selected.g,selected.episodes),gid=groupKey(selected.g);
+  let tabId=chapterTabMemory.get(gid);if(!tabs.some(t=>t.id===tabId))tabId=tabs[0]?.id;
+  if(tabs.length>1){
+   const nav=el('nav','chapter-section-nav');nav.setAttribute('aria-label','챕터 안 골라 보기');
+   for(const t of tabs){const b=el('button','chapter-section-jump'+(t.id===tabId?' active':''));b.type='button';b.dataset.tab=t.id;b.append(el('span','',t.title),el('small','tab-count',String(t.eps.length)));b.setAttribute('aria-pressed',String(t.id===tabId));b.onclick=()=>{chapterTabMemory.set(gid,t.id);drawLibrary()};nav.append(b)}
    header.append(nav);
   }
   side.append(header,episodeScroll);
-  const starts=new Map(sections.map(sec=>[sec.start,sec]));
-  let rowHost=episodeScroll,curSec=null;
-  selected.episodes.forEach((ep,i)=>{
-   const sec=starts.get(i);
-   if(sec){
-    curSec=sec;rowHost=episodeScroll;
-    const title=el('h3','folder-section-title chapter-section-boundary section-head-'+sec.style,sec.title);
-    title.dataset.sectionId=sec.id;
-    if(i>0)title.classList.add('is-followup-section');
-    episodeScroll.append(title);anchors.set(sec.id,title);
-    if(sec.hub){
-     // Hub section (e.g. 13장 메모리): entered only through the hub button.
-     const hubBtn=el('button','memory-hub-button',(sec.hubLabel||sec.title)+' 열기 · '+(sec.count??'')+'편');hubBtn.type='button';hubBtn.setAttribute('aria-expanded','false');
-     const box=el('div','memory-hub-list');box.hidden=true;
-     const toggle=(force)=>{const open=force===true?true:box.hidden;box.hidden=!open;hubBtn.setAttribute('aria-expanded',String(open));hubBtn.textContent=(sec.hubLabel||sec.title)+(open?' 닫기':' 열기 · '+(sec.count??'')+'편')};
-     hubBtn.onclick=()=>toggle();hubOpen.set(sec.id,toggle);
-     episodeScroll.append(hubBtn,box);rowHost=box;
-    }
-   }
-   const row=el('button','folder-episode'+(curSec?' section-'+curSec.style:''));
+  const tab=tabs.find(t=>t.id===tabId);
+  let prevDesc=null;
+  for(const ep of tab?.eps||[]){
+   const battle=ep.kind==='battleDialog';
+   const row=el('button','folder-episode section-'+(tab.style||'standard'));
    const num=el('span','folder-episode-num',episodeNumber(ep));
-   const txt=el('span','folder-episode-text');txt.append(el('strong','',episodeTitle(ep)));
-   if(ep.description)txt.append(el('small','',ep.description));
+   const txt=el('span','folder-episode-text');
+   txt.append(el('strong','',battle?(ep.battle?.stageName||episodeTitle(ep).replace(/^전투 중 대사 · /,'')):episodeTitle(ep)));
+   if(battle&&ep.follows){const f=findEpisode(ep.follows);if(f)txt.append(el('small','follows-note','본편 '+episodeNumber(f.e)+' 「'+episodeTitle(f.e)+'」 다음'))}
+   if(ep.map)txt.append(el('small','follows-note',ep.map.num+'번 맵 · '+ep.map.name));
+   // 같은 스테이지 전투 대사는 소개 문구가 같으므로 처음 한 번만
+   if(ep.description&&!(battle&&ep.description===prevDesc))txt.append(el('small','',ep.description));prevDesc=ep.description;
    if(ep.part?.number&&ep.part?.total)txt.append(el('small','',ep.part.number+'/'+ep.part.total));
    row.append(num,txt,el('span','folder-episode-arrow','›'));
-   row.onclick=()=>openEpisode(ep.id);rowHost.append(row);
-  });
-  if(buttons.size){
-   const sync=()=>{
-    const inset=24;
-    let active=sections[0].id;
-    for(const sec of sections){
-     const target=anchors.get(sec.id);
-     if(target&&relativeTop(target)<=episodeScroll.scrollTop+inset+2)active=sec.id;
-    }
-    setActiveSection(active);
-   };
-   episodeScroll.addEventListener('scroll',sync,{passive:true});requestAnimationFrame(sync);
+   row.onclick=()=>openEpisode(ep.id);episodeScroll.append(row);
   }
   panel.append(art,side);host.append(panel);
  }else{
@@ -365,7 +344,7 @@ function drawLibrary(){
    return b;
   };
   // Keep main story's chronology as a continuous list; group special stories into shelves.
-  if(category==='special'){
+  if(category==='special'||visible.some(x=>shelfFor(x.g))){
    host.append(renderShelfSections(visible,makeCard));
   }else{
    const grid=el('div',viewMode==='folder'?'drive-grid':viewMode==='list'?'chapter-list':'folder-grid');
@@ -433,7 +412,14 @@ function renderLanding(host){
  const other=landingCard('home-other','Other');
  for(const s of home.otherSites||[]){const a=el(s.url?'a':'div','home-link'+(s.url?'':' disabled'));if(s.url){a.href=s.url;a.target='_blank';a.rel='noopener'}a.append(el('strong','',s.name),el('small','',s.url?(s.desc||''):(s.desc?s.desc+' · ':'')+'준비 중'));other.append(a)}
  if(!(home.otherSites||[]).length)other.append(el('p','bm-empty','준비 중'));
- side.append(fbCard,other);
+ side.append(other,fbCard);
+ // 모바일: 작은 단추 바(옆으로 밀기) — 다른 사이트 │ 피드백 · X
+ const chips=el('nav','home-chips');chips.setAttribute('aria-label','바로가기');
+ const chip=(label,href,cls='')=>{const a=el(href?'a':'span','home-chip'+(cls?' '+cls:'')+(href?'':' disabled'),label);if(href){a.href=href;a.target='_blank';a.rel='noopener'}chips.append(a)};
+ for(const s of home.otherSites||[])chip(s.name+(s.url?'':' · 준비 중'),s.url||'');
+ chips.append(el('span','home-chip-sep','│'));
+ chip('피드백 폼',feedbackURL()||fb.form||'','primary');chip('X '+(fb.xHandle||''),fb.x||'');
+ host.append(chips);
  wrap.append(notice,art,side);host.append(wrap);
 }
 // Hierarchical navigation: category label navigates, chevron expands chapter links.
@@ -481,6 +467,7 @@ function spans(parent,unit){
 }
 function showLore(id){let record=(data.worldRecords||{})[String(id)]||{};$('#loreTitle').textContent=record.name||'세계기록 '+id;$('#loreText').textContent=record.description||'설명 정보가 없습니다.';$('#lore').showModal()}
 let imageMap={},speakerAliases={};
+const SYSTEM_SPEAKERS=new Set(['시스템','시스템 음성','통신 시스템']);
 function isProfessor(who){return who?.isProfessor===true}
 function avatarFor(who,entry){
  const av=el('div','avatar');av.setAttribute('aria-label',(who.name||'알 수 없음')+' 프로필');
@@ -497,6 +484,9 @@ function createUnit(block,unit,entry,context=''){
  if(unit.kind==='action'||unit.isAction===true||unit.style==='action'||kind==='action'){
   // Only explicitly classified stage directions are rendered without a speech bubble.
   const action=el('div','center-item action-direction');spans(action,unit);outer.append(action);
+ }else if(kind==='dialogue'&&!isProfessor(block.speaker)&&SYSTEM_SPEAKERS.has(String(block.speaker?.name||'').trim())){
+  // v0.9.1: 「시스템」 계열은 말풍선 대신 안내 상자
+  const box=el('div','center-item system-box');box.append(el('span','system-tag','SYSTEM ›'));const body=el('span','system-text');spans(body,unit);box.append(body);outer.append(box);
  }else if(kind==='dialogue'){
   let who=block.speaker||{},right=isProfessor(who),first=entry.group?.first!==false,chat=el('div','chat'+(right?' right':''));
   if(!right){chat.append(first?avatarFor(who,entry):el('div','avatar-spacer'))}
@@ -559,7 +549,7 @@ function showChoice(node,target){
   if(box.dataset.resumed)return;
   if(area.querySelector('.nested-choice[data-pending="true"]'))return;
   box.dataset.resumed='true';cursor++;
-  if(node.continueAt===null){$('#ending').classList.remove('hidden');refreshPositions();return}
+  if(node.continueAt===null){$('#ending').classList.remove('hidden');refreshPositions();requestAnimationFrame(checkBottom);return}
   pump();
  }
  opts.forEach((opt,i)=>{
@@ -609,36 +599,77 @@ function showChoice(node,target){
  target.append(box,area,gate);
 }
 function refreshPositions(){positions=[...document.querySelectorAll('#stream > .entry, #stream > .choice-output .entry')];if(observer)observer.disconnect();observe()}
-function pump(){while(cursor<flowNodes.length){let node=flowNodes[cursor];if(node.choice){showChoice(node,$('#stream'));refreshPositions();return}if(node.ref){let b=data.blocks[node.ref];if(b){for(let unit of b.units||[])$('#stream').append(createUnit(b,unit,node))}}cursor++}$('#ending').classList.remove('hidden');refreshPositions()}
-function observe(){if(observer)observer.disconnect();positions=[...document.querySelectorAll('#stream > .entry, #stream > .choice-output .entry')];observer=new IntersectionObserver(entries=>{let visible=entries.filter(e=>e.isIntersecting).sort((a,b)=>a.boundingClientRect.top-b.boundingClientRect.top);if(!visible.length)return;let n=visible[0].target;positions.forEach(x=>x.classList.remove('active'));n.classList.add('active');active=positions.indexOf(n);const pct=Math.round((active+1)/Math.max(1,positions.length)*100);$('#trackFill').style.width=pct+'%';$('#readingProgress').textContent='읽기 진행률 '+pct+'%';set('position.'+current,n.dataset.uid);let max=get('farthest.'+current,0);if(active>max)set('farthest.'+current,active);if(cursor>=flowNodes.length&&active>=positions.length-1&& !$('#ending').classList.contains('hidden')){set('completed.'+current,true)}},{rootMargin:'-110px 0px -60% 0px',threshold:0});positions.forEach(x=>observer.observe(x))}
+function pump(){while(cursor<flowNodes.length){let node=flowNodes[cursor];if(node.choice){showChoice(node,$('#stream'));refreshPositions();return}if(node.ref){let b=data.blocks[node.ref];maybeCG(node,$('#stream'));if(b){for(let unit of b.units||[])$('#stream').append(createUnit(b,unit,node))}}cursor++}$('#ending').classList.remove('hidden');refreshPositions();requestAnimationFrame(checkBottom)}
+// ---------- v0.9.1 CG ----------
+// 장면 배경 중 이름에 cg가 든 것 = CG. assets/cg/manifest.json에 있는 파일만 보여 준다 (없는 파일 요청을 만들지 않기 위해).
+let cgSet=new Set(),lastCG=null;
+fetchJSON('./assets/cg/manifest.json',1).then(m=>{cgSet=new Set(Array.isArray(m)?m:(m.files||[]))}).catch(()=>{});
+const cgSrc=p=>'./assets/cg/'+p+'.webp';
+function maybeCG(node,target){
+ const p=(node.stage?.backgrounds||[]).find(x=>/cg/i.test(String(x).split('/').pop()));
+ if(!p||p===lastCG)return;lastCG=p;
+ if(!get('showCG',true)||!cgSet.has(p))return;
+ const fig=el('figure','entry cg-figure');fig.dataset.uid=(node.ref||'')+'.cg';
+ const img=document.createElement('img');img.src=cgSrc(p);img.alt='CG';img.loading='lazy';img.decoding='async';img.onerror=()=>fig.remove();
+ const btn=el('button','cg-thumb');btn.type='button';btn.setAttribute('aria-label','CG 크게 보기');btn.append(img);btn.onclick=()=>{$('#cgViewImg').src=cgSrc(p);$('#cgView').showModal()};
+ fig.append(btn);target.append(fig);
+}
+// ---------- v0.9.1 끝까지 읽음 = 100% · 맨 위로 ----------
+function checkBottom(){
+ if($('#reader').classList.contains('hidden')||!positions.length||$('#ending').classList.contains('hidden'))return;
+ if(window.innerHeight+window.scrollY<document.documentElement.scrollHeight-8)return;
+ positions.forEach(x=>x.classList.remove('active'));const n=positions[positions.length-1];n.classList.add('active');active=positions.length-1;
+ $('#trackFill').style.width='100%';$('#readingProgress').textContent='읽기 진행률 100%';set('position.'+current,n.dataset.uid);set('completed.'+current,true);
+}
+window.addEventListener('scroll',()=>{$('#toTop').classList.toggle('hidden',window.scrollY<500);checkBottom()},{passive:true});
+$('#toTop').onclick=()=>window.scrollTo({top:0,behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'});
+function observe(){if(observer)observer.disconnect();positions=[...document.querySelectorAll('#stream > .entry, #stream > .choice-output .entry')];observer=new IntersectionObserver(entries=>{let visible=entries.filter(e=>e.isIntersecting).sort((a,b)=>a.boundingClientRect.top-b.boundingClientRect.top);if(!visible.length)return;let n=visible[0].target;positions.forEach(x=>x.classList.remove('active'));n.classList.add('active');active=positions.indexOf(n);const pct=Math.round((active+1)/Math.max(1,positions.length)*100);$('#trackFill').style.width=pct+'%';$('#readingProgress').textContent='읽기 진행률 '+pct+'%';set('position.'+current,n.dataset.uid);let max=get('farthest.'+current,0);if(active>max)set('farthest.'+current,active);if(cursor>=flowNodes.length&&active>=positions.length-1&& !$('#ending').classList.contains('hidden')){set('completed.'+current,true)}checkBottom()},{rootMargin:'-110px 0px -60% 0px',threshold:0});positions.forEach(x=>observer.observe(x))}
 function resume(){let uid=get('position.'+current,null);let target=positions.find(x=>x.dataset.uid===uid);(target||positions[0])?.scrollIntoView({behavior:'smooth',block:'start'})}
 // Presentation metadata is resolved from the visible index, never from raw file IDs.
 function episodeDisplayContext(id){
  const group=displayGroups.find(g=>(g.episodes||[]).some(e=>e.id===id));
  const ep=group?.episodes?.find(e=>e.id===id);
  if(!group||!ep)return {breadcrumb:'기록 열람',number:'',title:'기록 열람'};
- const number=episodeNumber(ep);
+ const number=episodeLabel(ep);
  const groupTitle=chapterDisplayTitle(group);
  return {breadcrumb:groupTitle+(number?' · '+number:''),number,title:episodeTitle(ep)};
 }
 // Reading flow: hub sections (메모리) are separate; main chapters continue into the next chapter.
-function flowOf(group){const defs=sectionDefs(group);return sortedEpisodes(group).filter(e=>!defs.get(String(e.section))?.hub)}
+// v0.9.1: 「다음 회차」는 메인 스토리 본편에만. 그 외(이벤트·전속·메모리·전투 중 대사·튜토리얼…)는 목록으로 돌아가기만.
+function flowOf(group){const defs=sectionDefs(group);return sortedEpisodes(group).filter(e=>kindOf(e)==='story'&&!defs.get(String(e.section))?.hub)}
 function episodeNeighbors(id){
  for(const group of displayGroups){
   const all=sortedEpisodes(group),ep=all.find(e=>e.id===id);if(!ep)continue;
+  const res={prev:null,next:null,groupId:groupKey(group),category:group.category,tab:tabIdFor(group,ep),linear:false};
   const hub=sectionDefs(group).get(String(ep.section))?.hub===true;
-  const seq=hub?all.filter(e=>e.section===ep.section):flowOf(group),at=seq.findIndex(e=>e.id===id);
-  let prev=seq[at-1]?.id||null,next=seq[at+1]?.id||null;
-  if(!hub&&group.category==='main'){
-   const mains=displayGroups.filter(g=>g.category==='main'),mi=mains.indexOf(group);
-   if(!next&&mains[mi+1])next=flowOf(mains[mi+1])[0]?.id||null;
-   if(!prev&&mains[mi-1]){const f=flowOf(mains[mi-1]);prev=f[f.length-1]?.id||null}
-  }
-  return {prev,next,groupId:groupKey(group),category:group.category};
+  if(group.category!=='main'||hub||kindOf(ep)!=='story')return res;
+  res.linear=true;
+  const seq=flowOf(group),at=seq.findIndex(e=>e.id===id);
+  res.prev=seq[at-1]?.id||null;res.next=seq[at+1]?.id||null;
+  const mains=displayGroups.filter(g=>g.category==='main'),mi=mains.indexOf(group);
+  if(!res.next&&mains[mi+1])res.next=flowOf(mains[mi+1])[0]?.id||null;
+  if(!res.prev&&mains[mi-1]){const f=flowOf(mains[mi-1]);res.prev=f[f.length-1]?.id||null}
+  return res;
  }
- return {prev:null,next:null,groupId:null,category:null};
+ return {prev:null,next:null,groupId:null,category:null,tab:null,linear:false};
 }
-function updateEpisodeNav(){const n=episodeNeighbors(current);$('#prevEpisode').disabled=!n.prev;$('#nextEpisode').disabled=!n.next;$('#prevEpisode').onclick=()=>n.prev&&openEpisode(n.prev);$('#nextEpisode').onclick=()=>n.next&&openEpisode(n.next);$('#toLibrary').onclick=()=>{if(n.groupId)showChapter(n.groupId,n.category);else showHome(category)}}
+function backToChapter(n){if(n.groupId){if(n.tab)chapterTabMemory.set(n.groupId,n.tab);showChapter(n.groupId,n.category)}else showHome(category)}
+function updateEpisodeNav(){
+ const n=episodeNeighbors(current);
+ $('#prevEpisode').hidden=$('#nextEpisode').hidden=!n.linear;
+ $('#prevEpisode').disabled=!n.prev;$('#nextEpisode').disabled=!n.next;
+ $('#prevEpisode').onclick=()=>n.prev&&openEpisode(n.prev);$('#nextEpisode').onclick=()=>n.next&&openEpisode(n.next);
+ $('#toLibrary').onclick=()=>backToChapter(n);
+ // 메인 본편 끝: 이 회차 뒤에 나오는 전투 중 대사
+ const host=$('#afterLinks');host.replaceChildren();
+ if(n.linear){
+  const g=displayGroups.find(x=>groupKey(x)===n.groupId);
+  const battles=sortedEpisodes(g).filter(e=>e.kind==='battleDialog'&&e.follows===current);
+  if(battles.length){host.append(el('p','after-head','이 회차의 전투 중 대사 '+battles.length+'편'));const row=el('div','after-row');
+   for(const e of battles){const b=el('button','after-link');b.type='button';b.append(el('span','after-num','전투 '+episodeNumber(e)),el('span','',e.battle?.stageName||episodeTitle(e)));b.onclick=()=>openEpisode(e.id);row.append(b)}
+   host.append(row)}
+ }
+}
 async function openEpisode(id,{push=true}={}){
  const token=++routeToken;
  try{
@@ -650,7 +681,7 @@ async function openEpisode(id,{push=true}={}){
   $('#epTitle').textContent=context.title;$('#epDesc').textContent=d.meta?.description||'';
   $('#epId').textContent=context.breadcrumb;$('#crumb').textContent=context.breadcrumb;
   $('#stream').replaceChildren();$('#ending').classList.add('hidden');
-  updateEpisodeNav();set('lastEpisode',id);updateBookmarkToggle();flowNodes=d.timeline||[];cursor=0;pump();
+  updateEpisodeNav();set('lastEpisode',id);updateBookmarkToggle();flowNodes=d.timeline||[];cursor=0;lastCG=null;pump();
   if(push)saveRoute({type:'episode',id});
   window.scrollTo(0,0);observe();
  }catch(e){
@@ -659,7 +690,7 @@ async function openEpisode(id,{push=true}={}){
 }
 function showOpenError(id,e){
  $('#library').classList.add('hidden');$('#reader').classList.remove('hidden');current=id;
- const found=findEpisode(id);$('#epTitle').textContent=found?episodeTitle(found.e):'기록 열람';$('#epId').textContent=found?chapterDisplayTitle(found.g)+(episodeNumber(found.e)?' · '+episodeNumber(found.e):''):'';$('#epDesc').textContent='';
+ const found=findEpisode(id);$('#epTitle').textContent=found?episodeTitle(found.e):'기록 열람';$('#epId').textContent=found?chapterDisplayTitle(found.g)+(episodeLabel(found.e)?' · '+episodeLabel(found.e):''):'';$('#epDesc').textContent='';
  $('#ending').classList.add('hidden');const box=el('div','open-error');
  const offline=!e?.status;
  box.append(el('strong','',offline?'기록을 불러오지 못했어요':'기록 파일을 찾을 수 없어요'),el('p','',offline?'인터넷 연결이 잠시 불안정했을 수 있어요. 잠시 후 다시 시도해 주세요.':'사이트에 이 기록 파일이 없거나 주소가 바뀌었어요. ('+(e?.message||'')+')'));
@@ -669,20 +700,22 @@ function showOpenError(id,e){
 function goHome(){$('#search').value='';showHome(null)}
 window.addEventListener('popstate',()=>{if(index)restoreRoute()});
 window.addEventListener('hashchange',()=>{if(index)restoreRoute()});
-$('#home').onclick=goHome;$('#back').onclick=()=>{const n=episodeNeighbors(current);if(n.groupId)showChapter(n.groupId,n.category);else goHome()};$('#resumeBtn').onclick=resume;$('#userBtn').onclick=openUser;$('#userClose').onclick=()=>$('#userDialog').close();$('#userBack').onclick=()=>selectUserPage('root');document.querySelectorAll('[data-user-page]').forEach(b=>b.onclick=()=>selectUserPage(b.dataset.userPage));$('#bmToggle').onclick=()=>{if(current)toggleBookmark(current)};
+$('#home').onclick=goHome;$('#back').onclick=()=>{const n=episodeNeighbors(current);if(n.groupId)backToChapter(n);else goHome()};$('#resumeBtn').onclick=resume;$('#userBtn').onclick=openUser;$('#userClose').onclick=()=>$('#userDialog').close();$('#userBack').onclick=()=>selectUserPage('root');document.querySelectorAll('[data-user-page]').forEach(b=>b.onclick=()=>selectUserPage(b.dataset.userPage));$('#bmToggle').onclick=()=>{if(current)toggleBookmark(current)};
 // Settings: quick controls and independent subpages.
 const settings=$('#settings');let settingsPage='root';
 const fontValues={fontSize:[14,16,18,20,22,24],letterSpacing:[0,.5,1,1.5,2],lineHeight:[140,160,180,200]};
 const themeNames={light:'라이트',dim:'딤',dark:'다크',persica:'페르시카',entropics:'엔트로피'};
 function selectPage(page){settingsPage=page;$('#settingsRoot').hidden=page!=='root';$('#settingsFont').hidden=page!=='font';$('#settingsTheme').hidden=page!=='theme';$('#settingsBack').hidden=page==='root';$('#settingsTitle').textContent=page==='font'?'글꼴':page==='theme'?'테마':'설정';if(page==='theme')renderThemeList();if(page==='font')renderFontControls()}
-function setTheme(t){set('theme',t);applySettings();renderThemeList();renderQuick()}
-function renderQuick(){const brightness=get('brightness','system');document.querySelectorAll('[data-brightness]').forEach(b=>b.classList.toggle('selected',b.dataset.brightness===brightness));const reading=get('readingMode','accessible');document.querySelectorAll('[data-reading]').forEach(b=>b.classList.toggle('selected',b.dataset.reading===reading))}
+function setTheme(t){set('theme',t);set('brightness',BRIGHT.includes(t)?t:'custom');applySettings();renderThemeList();renderQuick()}
+function renderQuick(){const brightness=brightnessMode();document.querySelectorAll('[data-cg]').forEach(b=>b.classList.toggle('selected',String(get('showCG',true))===b.dataset.cg));document.querySelectorAll('[data-brightness]').forEach(b=>b.classList.toggle('selected',b.dataset.brightness===brightness));const reading=get('readingMode','accessible');document.querySelectorAll('[data-reading]').forEach(b=>b.classList.toggle('selected',b.dataset.reading===reading))}
 function renderFontControls(){let host=$('#fontControls');host.replaceChildren();for(const [field,values] of Object.entries(fontValues)){const wrap=el('div','setting-block');const title=el('strong','',field==='fontSize'?'글자 크기':field==='letterSpacing'?'자간':'줄 간격');wrap.append(title);const options=el('div','setting-options font-options');let current=get(field,field==='fontSize'?16:field==='letterSpacing'?0:160);for(let v of values){let label=field==='lineHeight'?(v/100).toFixed(1):v+(field==='fontSize'||field==='letterSpacing'?'px':'');let b=el('button',current===v?'selected':'',label);b.onclick=()=>{set(field,v);applySettings();renderFontControls()};options.append(b)}wrap.append(options);host.append(wrap)}$('#settingsFont').style.setProperty('--preview-size',get('fontSize',16)+'px');$('#settingsFont').style.setProperty('--preview-spacing',get('letterSpacing',0)+'px');$('#settingsFont').style.setProperty('--preview-line',get('lineHeight',160)/100)}
-function renderThemeList(){const host=$('#themeList');host.replaceChildren();for(const [id,name] of Object.entries(themeNames)){let locked=['persica','entropics'].includes(id)&&!get('unlocked.'+id,false);let row=el('div','theme-option');let b=el('button','theme-pick'+(get('theme','dim')===id?' selected':''));b.disabled=locked;b.append(el('span','theme-swatch swatch-'+id),el('span','', (locked?'🔒 ':'')+name));if(get('theme','dim')===id)b.append(el('span','theme-current','✓'));b.onclick=()=>setTheme(id);row.append(b);if(!locked&&['persica','entropics'].includes(id)){let replay=el('button','theme-replay','↻ 재생');replay.onclick=()=>runUnlock(id,true);row.append(replay)}host.append(row)}}
+function renderThemeList(){const host=$('#themeList');host.replaceChildren();for(const [id,name] of Object.entries(themeNames)){let locked=['persica','entropics'].includes(id)&&!get('unlocked.'+id,false);let row=el('div','theme-option');let b=el('button','theme-pick'+(currentTheme()===id?' selected':''));b.disabled=locked;b.append(el('span','theme-swatch swatch-'+id),el('span','', (locked?'🔒 ':'')+name));if(currentTheme()===id)b.append(el('span','theme-current','✓'));b.onclick=()=>setTheme(id);row.append(b);if(!locked&&['persica','entropics'].includes(id)){let replay=el('button','theme-replay','↻ 재생');replay.onclick=()=>runUnlock(id,true);row.append(replay)}host.append(row)}}
 function renderLang(){const host=$('#langOptions');host.replaceChildren();const cur=uiLang();for(const [id,name] of LANGS){const ready=readyLangs.includes(id);const b=el('button',cur===id?'selected':'',name+(ready?'':' · 준비 중'));b.type='button';b.dataset.lang=id;b.disabled=!ready;b.onclick=()=>{if(uiLang()===id)return;set('lang',id);location.reload()};host.append(b)}}
 $('#settingsBtn').onclick=()=>{selectPage('root');renderQuick();renderLang();settings.showModal()};$('#settingsClose').onclick=()=>settings.close();$('#settingsBack').onclick=()=>selectPage('root');document.querySelectorAll('[data-page]').forEach(b=>b.onclick=()=>selectPage(b.dataset.page));
 $('#nickname').onchange=e=>{set('nickname',e.target.value.trim()||'교수');if(data&&current)openEpisode(current,{push:false})};
-document.querySelectorAll('[data-brightness]').forEach(b=>b.onclick=()=>{let value=b.dataset.brightness;set('brightness',value);setTheme(value==='system'?(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'):value);renderQuick()});
+document.querySelectorAll('[data-brightness]').forEach(b=>b.onclick=()=>{const v=b.dataset.brightness;if(v==='system')set('brightness','system');else setTheme(v);applySettings();renderThemeList();renderQuick()});
+document.querySelectorAll('[data-cg]').forEach(b=>b.onclick=()=>{set('showCG',b.dataset.cg==='true');renderQuick()});
+try{matchMedia('(prefers-color-scheme: dark)').addEventListener('change',()=>{if(brightnessMode()==='system')applySettings()})}catch(e){}
 document.querySelectorAll('[data-reading]').forEach(b=>b.onclick=()=>{set('readingMode',b.dataset.reading);applySettings();renderQuick()});
 // Hidden theme unlock. Trigger is recognized only in find/search, never nickname.
 let unlockTimer=null,unlockTarget=null,unlockWasUnlocked=false;const unlock=$('#unlockDialog');
