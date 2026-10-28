@@ -682,7 +682,7 @@ let cgSet=new Set(),lastCG=null;
 let folderArt=null;
 function applyFolderArt(node){const slug=folderArt?.[node.dataset.gid];if(!slug||node.classList.contains('has-art'))return;
  const big=node.classList.contains('folder-art'),img=document.createElement('img');img.className='folder-art-img';img.alt='';img.decoding='async';if(!big)img.loading='lazy';
- img.src='./assets/folder/'+(big?'':'s/')+slug+'.webp';img.onload=()=>node.classList.add('art-ready');img.onerror=()=>{img.remove();node.classList.remove('has-art')};
+ img.src='./assets/folder/'+(big?'':'s/')+slug+'.webp';{const ps=folderArt?._pos?.[node.dataset.gid];if(ps&&!big)img.style.objectPosition=({top:'50% 0%',upper:'50% 15%',center:'50% 50%',lower:'50% 75%',bottom:'50% 100%'})[ps]||ps}img.onload=()=>node.classList.add('art-ready');img.onerror=()=>{img.remove();node.classList.remove('has-art')};
  node.classList.add('has-art');node.prepend(img)}
 fetchJSON('./assets/folder/manifest.json',1).then(m=>{folderArt=m||{};document.querySelectorAll('[data-gid]').forEach(applyFolderArt)}).catch(()=>{folderArt={}});
 fetchJSON('./assets/cg/manifest.json',1).then(m=>{cgSet=new Set(Array.isArray(m)?m:(m.files||[]))}).catch(()=>{});
