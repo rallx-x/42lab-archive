@@ -457,37 +457,47 @@ function gameToday(){const t=new Date(Date.now()+(9-5)*3600e3);return {y:t.getUT
 let dolls=null;
 let calShift=0; // 0 = 이번 달, -1 = 지난달, +1 = 다음 달
 function renderBirthday(card){
- const T=gameToday();
+ const T=gameToday(),todayKey=String(T.m).padStart(2,'0')+String(T.d).padStart(2,'0');
  const box=el('div','cal-box');const cards=el('div','bday-list');
+ let picked=null; // 달력에서 누른 날 (MMDD). 없으면 오늘
+ const showCards=()=>{
+  cards.replaceChildren();const key=picked||todayKey,isToday=key===todayKey;
+  const who=(dolls?.dolls||[]).filter(x=>x.birthday===key);
+  if(!dolls){cards.append(el('p','bm-empty','생일 정보를 불러오는 중…'));return}
+  if(!isToday){const h=el('div','bday-pick-head');const back=el('button','bday-back','오늘로');back.type='button';back.onclick=()=>{picked=null;draw();showCards()};h.append(el('span','',key.slice(0,2)+'.'+key.slice(2)+' 생일'),back);cards.append(h)}
+  if(!who.length)cards.append(el('p','bm-empty',isToday?'오늘 생일인 인형이 없어요.':'이날 생일인 인형이 없어요.'));
+  for(const x of who){
+   const c=el('div','bday-card'+(isToday?' today':''));
+   const face=el('div','avatar bday-face');const url=(x.portrait&&imageMap[x.portrait])||imageMap[x.name];
+   if(url){const im=document.createElement('img');im.src=url.startsWith('./')?url:'./'+url;im.alt='';im.onerror=()=>{im.remove();face.classList.add('fallback')};face.append(im)}else face.classList.add('fallback');
+   const t=el('div','bday-text');t.append(el('strong','',x.birthday+'. Happy Birthday!'),el('span','',x.name));
+   c.append(face,t);cards.append(c);
+  }
+ };
  const draw=()=>{
   const v=new Date(Date.UTC(T.y,T.m-1+calShift,1)),Y=v.getUTCFullYear(),M=v.getUTCMonth()+1,mm=String(M).padStart(2,'0');
   const head=el('div','cal-head');
   const prev=el('button','cal-nav');prev.append(ic('left'));prev.type='button';prev.setAttribute('aria-label','이전 달');prev.onclick=()=>{calShift--;draw()};
   const next=el('button','cal-nav');next.append(ic('right'));next.type='button';next.setAttribute('aria-label','다음 달');next.onclick=()=>{calShift++;draw()};
-  const title=el('button','cal-title',Y+'.'+mm);title.type='button';title.title='이번 달로';title.onclick=()=>{calShift=0;draw()};
+  const title=el('button','cal-title',Y+'.'+mm);title.type='button';title.title='이번 달로';title.onclick=()=>{calShift=0;picked=null;draw();showCards()};
   head.append(prev,title,next);
   const grid=el('div','cal-grid');['일','월','화','수','목','금','토'].forEach(w=>grid.append(el('span','cal-w',w)));
   const list=(dolls?.dolls||[]).filter(x=>x.birthday&&x.birthday.slice(0,2)===mm);
   const days=new Set(list.map(x=>+x.birthday.slice(2)));
   const first=v.getUTCDay(),last=new Date(Date.UTC(Y,M,0)).getUTCDate();
   for(let i=0;i<first;i++)grid.append(el('span','cal-d blank',''));
-  for(let d=1;d<=last;d++){const c=el('span','cal-d'+(days.has(d)?' bday':'')+(calShift===0&&d===T.d?' today':''),String(d));if(days.has(d))c.title=list.filter(x=>+x.birthday.slice(2)===d).map(x=>x.name).join(', ');grid.append(c)}
+  for(let d=1;d<=last;d++){
+   const key=mm+String(d).padStart(2,'0'),cls='cal-d'+(days.has(d)?' bday':'')+(calShift===0&&d===T.d?' today':'')+(picked===key?' picked':'');
+   // v0.9.12 생일 동그라미는 눌러서 그날 생일인 인형을 아래에 보여줌
+   const c=days.has(d)?el('button',cls,String(d)):el('span',cls,String(d));
+   if(days.has(d)){const names=list.filter(x=>+x.birthday.slice(2)===d).map(x=>x.name).join(', ');c.type='button';c.title=names;c.setAttribute('aria-label',M+'월 '+d+'일 생일: '+names);c.setAttribute('aria-pressed',String(picked===key));
+    c.onclick=()=>{picked=(picked===key||key===todayKey)?null:key;draw();showCards()}}
+   grid.append(c);
+  }
   box.replaceChildren(head,grid);
  };
- draw();card.append(box);
- // 아래 카드는 오늘 생일인 인형만
- const key=String(T.m).padStart(2,'0')+String(T.d).padStart(2,'0');
- const todays=(dolls?.dolls||[]).filter(x=>x.birthday===key);
- if(!dolls)cards.append(el('p','bm-empty','생일 정보를 불러오는 중…'));
- else if(!todays.length)cards.append(el('p','bm-empty','오늘 생일인 인형이 없어요.'));
- for(const x of todays){
-  const c=el('div','bday-card today');
-  const face=el('div','avatar bday-face');const url=(x.portrait&&imageMap[x.portrait])||imageMap[x.name];
-  if(url){const im=document.createElement('img');im.src=url.startsWith('./')?url:'./'+url;im.alt='';im.onerror=()=>{im.remove();face.classList.add('fallback')};face.append(im)}else face.classList.add('fallback');
-  const t=el('div','bday-text');t.append(el('strong','',x.birthday+'. Happy Birthday!'),el('span','',x.name));
-  c.append(face,t);cards.append(c);
- }
- card.append(cards,el('p','cal-note','매일 오전 5시(KST)에 갱신됩니다.'));
+ draw();card.append(box);showCards();
+ card.append(cards,el('p','cal-note','동그라미를 누르면 그날 생일인 인형을 볼 수 있어요. 매일 오전 5시(KST)에 갱신됩니다.'));
 }
 // Hierarchical navigation: category label navigates, chevron expands chapter links.
 function closeArchiveMenu(){const menu=$('#archiveMenu');menu.classList.remove('open');menu.setAttribute('aria-hidden','true');$('#menuBtn').setAttribute('aria-expanded','false');$('#menuBtn').classList.remove('is-open')}
@@ -541,8 +551,10 @@ function avatarFor(who,entry){
  // v0.9.10 말하는 인물의 그림(무대 위 같은 imgId)을 먼저 → 이름 → 무대에 한 명뿐일 때 그 그림
  const chars=entry.stage?.characters||[],faceIds=new Set((who.faces||[]).map(x=>x.imgId));
  const facePaths=chars.filter(c=>faceIds.has(c.imgId)).map(c=>c.path);const lone=chars.length===1&&!faceIds.size?[chars[0].path]:[];
- const speakerKey=who.heroId!=null?'hero:'+who.heroId:'name:'+(who.rawName||'');const portraitKey=speakerAliases[speakerKey];const ids=[...facePaths,portraitKey,speakerKey,String(who.heroId??''),who.rawName,who.name,...lone].filter(Boolean);
- let url=ids.map(k=>imageMap[k]).find(Boolean);
+ const speakerKey=who.heroId!=null?'hero:'+who.heroId:'name:'+(who.rawName||'');const portraitKey=speakerAliases[speakerKey];const ids=[who.portrait,...facePaths,portraitKey,speakerKey,String(who.heroId??''),who.rawName,who.name,...lone].filter(Boolean);
+ // v0.9.13 회차별 얼굴 바꾸기 (예: 집도 시점의 페르시카)
+ const ov=data?.meta?.portraitOverride;
+ let url=ids.map(k=>imageMap[(ov&&ov[k])||k]).find(Boolean);
  if(url&&typeof url==='string'&&!url.startsWith('http')&&!url.startsWith('//')&&!url.startsWith('data:')){
   const img=document.createElement('img');img.loading='lazy';img.decoding='async';img.alt='';img.src=url.startsWith('/')?'.'+url:url.startsWith('./')?url:'./'+url.replace(/^\/+/, '');img.onerror=()=>{img.remove();av.classList.add('fallback')};av.append(img);
  }else av.classList.add('fallback');
@@ -740,7 +752,16 @@ function episodeNeighbors(id){
   const all=sortedEpisodes(group),ep=all.find(e=>e.id===id);if(!ep)continue;
   const res={prev:null,next:null,groupId:groupKey(group),category:group.category,tab:tabIdFor(group,ep),linear:false};
   const hub=sectionDefs(group).get(String(ep.section))?.hub===true;
-  if(group.category!=='main'||hub||kindOf(ep)!=='story')return res;
+  if(group.category!=='main'||hub||kindOf(ep)!=='story'){
+   // v0.9.11 메인 본편이 아니어도 같은 묶음 안에서 앞뒤로 (같은 종류끼리: 본편 · 전투 대사 · 튜토리얼). 튜토리얼 폴더들은 서로 이어짐
+   const k=kindOf(ep),sec=String(ep.section??'');
+   const same=g=>sortedEpisodes(g).filter(e=>kindOf(e)===k&&(!hub||String(e.section??'')===sec));
+   let seq=same(group);
+   if(group.shelfFolder){const sib=displayGroups.filter(g=>g.shelfFolder&&g.category===group.category&&shelfFor(g)===shelfFor(group));seq=sib.flatMap(same)}
+   const at=seq.findIndex(e=>e.id===id);
+   res.prev=seq[at-1]?.id||null;res.next=seq[at+1]?.id||null;res.linear=seq.length>1;
+   return res;
+  }
   res.linear=true;
   const seq=flowOf(group),at=seq.findIndex(e=>e.id===id);
   res.prev=seq[at-1]?.id||null;res.next=seq[at+1]?.id||null;

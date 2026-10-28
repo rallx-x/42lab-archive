@@ -637,3 +637,17 @@ dialog input.vol-range{border:0;padding:0;background:transparent;margin:0;displa
 @media(max-width:750px){
  .hero::before{background:linear-gradient(90deg,#0b1118d9 0%,#0b1118a6 45%,#0b111833 80%,transparent 100%)}
 }
+
+/* v0.9.12 생일 동그라미 누르기 */
+button.cal-d{border:0;padding:0;background:none;font:inherit;font-size:12px;cursor:pointer;display:block}
+button.cal-d.bday{border:1.5px solid var(--accent)}
+button.cal-d.bday:hover{background:color-mix(in srgb,var(--accent) 22%,transparent)}
+.cal-d.picked{background:var(--accent)!important;color:#fff!important}
+.bday-pick-head{display:flex;align-items:center;justify-content:space-between;font:700 13px ui-monospace,Consolas,"Noto Sans KR",monospace;color:var(--accent-text,var(--accent))}
+.bday-back{font-size:12px;padding:4px 10px;border-radius:999px}
+/* 소개 칸 테두리 없앰 (딤 · 다크에서 밝은 선이 보이던 것) */
+.hero{border:0!important;background-clip:border-box}
+
+/* v0.9.12a 카드 내용이 가운데로 내려가던 것 (부제 없는 카드 위에 틈) → 위에 붙임 */
+.folder-tile{display:flex;flex-direction:column;justify-content:flex-start;align-items:stretch}
+.folder-tile>.folder-tile-visual{flex:none}

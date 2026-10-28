@@ -118,5 +118,9 @@
   "collab:23sg_prologue": "50% 20%",
   "exclusive:taisch": "50% 80%",
   "exclusive:luna": "50% 20%"
- }
+ },
+ "other:tutorial-oasisbuild": "tutorial",
+ "other:tutorial-shop": "tutorial",
+ "other:tutorial-rossumclear": "tutorial",
+ "other:tutorial-pending": "tutorial"
 }
