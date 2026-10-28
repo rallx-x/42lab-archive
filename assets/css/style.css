@@ -456,7 +456,7 @@ html,body{overflow-x:hidden}
 /* v0.9.3 (체리) */
 /* 로고: 문양만, 테마마다 색 */
 :root{--logo:#F1F2F4}body.light{--logo:#25282C}body.persica{--logo:#B95D85}body.entropics{--logo:#B895F2}
-.brand-logo{width:30px;height:34px;flex:none;background:var(--logo);-webkit-mask:url(../img/42lab-emblem.png) center/contain no-repeat;mask:url(../img/42lab-emblem.png) center/contain no-repeat;margin-right:-6px}
+.brand-logo{width:41px;height:52px;flex:none;background:var(--logo);-webkit-mask:url(../img/42lab-logo.png) center/contain no-repeat;mask:url(../img/42lab-logo.png) center/contain no-repeat;margin-right:-6px}
 /* 툴바 이름표 */
 .toolbar{align-items:flex-end}
 .tb-group{display:flex;flex-direction:column;gap:6px;min-width:0}
@@ -467,8 +467,8 @@ html,body{overflow-x:hidden}
 .search-wrap input{width:100%}
 .search-prompt{position:absolute;left:16px;top:50%;transform:translateY(-50%);pointer-events:none;font:600 15px ui-monospace,Consolas,"Noto Sans KR",monospace;color:var(--sub)}
 .search-prompt i{font-style:normal;color:var(--accent);animation:cl-blink 1.05s steps(1) infinite}
-.search-wrap.has-value .search-prompt,.search-wrap:focus-within .search-prompt i{display:none}
-.search-wrap:focus-within.has-value .search-prompt{display:none}
+.search-wrap.has-value .search-prompt i,.search-wrap:focus-within .search-prompt i{display:none}
+.toolbar .search-wrap input{padding-left:calc(16px + var(--prompt-w,40px) + 4px)}
 /* 소개 카드 태그 */
 .hero-tags span:nth-child(2){color:var(--accent-text,var(--accent))}
 /* 생일 달력 */
@@ -525,7 +525,17 @@ html,body{overflow-x:hidden}
  .home-ext .home-chips{display:flex;margin:0}
  .home-chips:not(.home-ext .home-chips){display:none}
  .home-birthday,.home-side{display:none}
- .brand-logo{width:26px;height:30px}
+ .brand-logo{width:36px;height:46px}
  .bgm-vol-pop input{width:120px}
 }
 @media(prefers-reduced-motion:reduce){.search-prompt i{animation:none}.cg-figure .cg-thumb{transition:none}}
+
+/* v0.9.4 첫 화면 그림 · 달력 넘기기 */
+.hero-art.has-img{background:#1a2632 url("../img/hero-42lab.webp") center/cover no-repeat}
+.hero-art.has-img:before{background:linear-gradient(180deg,transparent 55%,#0d141c99)}
+.hero-art.has-img .hero-art-caption{z-index:1;color:#ffffffcc}
+.cal-head{display:flex;align-items:center;justify-content:space-between;padding:4px 6px}
+.cal-nav,.cal-title{border:0;background:none;color:inherit;padding:5px 12px;border-radius:8px}
+.cal-nav{font-size:18px;line-height:1;color:var(--sub)}
+.cal-nav:hover,.cal-title:hover{background:color-mix(in srgb,var(--accent) 12%,transparent);color:var(--ink)}
+.cal-title{font:700 14px ui-monospace,Consolas,monospace;letter-spacing:.08em}

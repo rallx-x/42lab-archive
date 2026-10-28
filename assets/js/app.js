@@ -451,22 +451,33 @@ function feedbackLinks(){
 // 날짜는 한국 시간 새벽 5시에 바뀐다 (게임 서버 갱신 시각)
 function gameToday(){const t=new Date(Date.now()+(9-5)*3600e3);return {y:t.getUTCFullYear(),m:t.getUTCMonth()+1,d:t.getUTCDate()}}
 let dolls=null;
+let calShift=0; // 0 = 이번 달, -1 = 지난달, +1 = 다음 달
 function renderBirthday(card){
- const T=gameToday(),mm=String(T.m).padStart(2,'0');
- const box=el('div','cal-box');box.append(el('div','cal-head',T.y+'.'+mm));
- const grid=el('div','cal-grid');['일','월','화','수','목','금','토'].forEach(w=>grid.append(el('span','cal-w',w)));
- const list=(dolls?.dolls||[]).filter(x=>x.birthday&&x.birthday.slice(0,2)===mm).sort((a,b)=>a.birthday.localeCompare(b.birthday)||0);
- const days=new Set(list.map(x=>+x.birthday.slice(2)));
- const first=new Date(Date.UTC(T.y,T.m-1,1)).getUTCDay(),last=new Date(Date.UTC(T.y,T.m,0)).getUTCDate();
- for(let i=0;i<first;i++)grid.append(el('span','cal-d blank',''));
- for(let d=1;d<=last;d++){const c=el('span','cal-d'+(days.has(d)?' bday':'')+(d===T.d?' today':''),String(d));if(days.has(d))c.title=list.filter(x=>+x.birthday.slice(2)===d).map(x=>x.name).join(', ');grid.append(c)}
- box.append(grid);card.append(box);
- const cards=el('div','bday-list');
+ const T=gameToday();
+ const box=el('div','cal-box');const cards=el('div','bday-list');
+ const draw=()=>{
+  const v=new Date(Date.UTC(T.y,T.m-1+calShift,1)),Y=v.getUTCFullYear(),M=v.getUTCMonth()+1,mm=String(M).padStart(2,'0');
+  const head=el('div','cal-head');
+  const prev=el('button','cal-nav','‹');prev.type='button';prev.setAttribute('aria-label','이전 달');prev.onclick=()=>{calShift--;draw()};
+  const next=el('button','cal-nav','›');next.type='button';next.setAttribute('aria-label','다음 달');next.onclick=()=>{calShift++;draw()};
+  const title=el('button','cal-title',Y+'.'+mm);title.type='button';title.title='이번 달로';title.onclick=()=>{calShift=0;draw()};
+  head.append(prev,title,next);
+  const grid=el('div','cal-grid');['일','월','화','수','목','금','토'].forEach(w=>grid.append(el('span','cal-w',w)));
+  const list=(dolls?.dolls||[]).filter(x=>x.birthday&&x.birthday.slice(0,2)===mm);
+  const days=new Set(list.map(x=>+x.birthday.slice(2)));
+  const first=v.getUTCDay(),last=new Date(Date.UTC(Y,M,0)).getUTCDate();
+  for(let i=0;i<first;i++)grid.append(el('span','cal-d blank',''));
+  for(let d=1;d<=last;d++){const c=el('span','cal-d'+(days.has(d)?' bday':'')+(calShift===0&&d===T.d?' today':''),String(d));if(days.has(d))c.title=list.filter(x=>+x.birthday.slice(2)===d).map(x=>x.name).join(', ');grid.append(c)}
+  box.replaceChildren(head,grid);
+ };
+ draw();card.append(box);
+ // 아래 카드는 오늘 생일인 인형만
+ const key=String(T.m).padStart(2,'0')+String(T.d).padStart(2,'0');
+ const todays=(dolls?.dolls||[]).filter(x=>x.birthday===key);
  if(!dolls)cards.append(el('p','bm-empty','생일 정보를 불러오는 중…'));
- else if(!list.length)cards.append(el('p','bm-empty','이번 달 생일인 인형이 없어요.'));
- for(const x of list){
-  const today=+x.birthday.slice(2)===T.d;
-  const c=el('div','bday-card'+(today?' today':''));
+ else if(!todays.length)cards.append(el('p','bm-empty','오늘 생일인 인형이 없어요.'));
+ for(const x of todays){
+  const c=el('div','bday-card today');
   const face=el('div','avatar bday-face');const url=x.portrait&&(imageMap[x.portrait]||('./assets/portraits/'+x.portrait+'.webp'));
   if(x.portrait){const im=document.createElement('img');im.src=url;im.alt='';im.onerror=()=>{im.remove();face.classList.add('fallback')};face.append(im)}else face.classList.add('fallback');
   const t=el('div','bday-text');t.append(el('strong','',x.birthday+'. Happy Birthday!'),el('span','',x.name));
@@ -774,7 +785,7 @@ function showOpenError(id,e){
 function goHome(){$('#search').value='';showHome(null)}
 window.addEventListener('popstate',()=>{if(index)restoreRoute()});
 window.addEventListener('hashchange',()=>{if(index)restoreRoute()});
-$('#home').onclick=goHome;$('#back').onclick=()=>{const n=episodeNeighbors(current);if(n.groupId)backToChapter(n);else goHome()};$('#resumeBtn').onclick=resume;$('#userBtn').onclick=openUser;$('#userClose').onclick=()=>$('#userDialog').close();$('#userBack').onclick=()=>selectUserPage('root');document.querySelectorAll('[data-user-page]').forEach(b=>b.onclick=()=>selectUserPage(b.dataset.userPage));$('#bmToggle').onclick=()=>{if(current)toggleBookmark(current)};
+$('#homeBtn').onclick=goHome;$('#back').onclick=()=>{const n=episodeNeighbors(current);if(n.groupId)backToChapter(n);else goHome()};$('#resumeBtn').onclick=resume;$('#userBtn').onclick=openUser;$('#userClose').onclick=()=>$('#userDialog').close();$('#userBack').onclick=()=>selectUserPage('root');document.querySelectorAll('[data-user-page]').forEach(b=>b.onclick=()=>selectUserPage(b.dataset.userPage));$('#bmToggle').onclick=()=>{if(current)toggleBookmark(current)};
 // Settings: quick controls and independent subpages.
 const settings=$('#settings');let settingsPage='root';
 const fontValues={fontSize:[14,16,18,20,22,24],letterSpacing:[0,.5,1,1.5,2],lineHeight:[140,160,180,200]};
@@ -817,7 +828,9 @@ function fillHeroTags(){
  if(siteInfo?.updated)$('#tagUpdated').textContent='UPDATED '+String(siteInfo.updated).replaceAll('-','.');
 }
 // ---------- v0.9.3 검색 칸 「//:_▌」 ----------
-{const s=$('#search'),w=s.closest('.search-wrap');const sync=()=>w.classList.toggle('has-value',!!s.value);s.addEventListener('input',sync);sync()}
+{const s=$('#search'),w=s.closest('.search-wrap');const sync=()=>w.classList.toggle('has-value',!!s.value);s.addEventListener('input',sync);sync();
+ // 입력 글씨가 //:_ 바로 뒤에서 시작하도록 앞 글자 폭만큼 띄움
+ const fit=()=>{const p=w.querySelector('.search-prompt');if(!p)return;const r=document.createRange();r.selectNodeContents(p.firstChild);w.style.setProperty('--prompt-w',Math.ceil(r.getBoundingClientRect().width)+'px')};fit();document.fonts?.ready.then(fit)}
 // ---------- v0.9.3 별명 검색: 어떤 이름으로 찾아도 결과는 정식 이름 ----------
 function aliasTargets(nq){
  if(!dolls||!nq)return [];
