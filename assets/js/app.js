@@ -482,8 +482,8 @@ function renderBirthday(card){
  else if(!todays.length)cards.append(el('p','bm-empty','오늘 생일인 인형이 없어요.'));
  for(const x of todays){
   const c=el('div','bday-card today');
-  const face=el('div','avatar bday-face');const url=x.portrait&&(imageMap[x.portrait]||('./assets/portraits/'+x.portrait+'.webp'));
-  if(x.portrait){const im=document.createElement('img');im.src=url;im.alt='';im.onerror=()=>{im.remove();face.classList.add('fallback')};face.append(im)}else face.classList.add('fallback');
+  const face=el('div','avatar bday-face');const url=(x.portrait&&imageMap[x.portrait])||imageMap[x.name];
+  if(url){const im=document.createElement('img');im.src=url.startsWith('./')?url:'./'+url;im.alt='';im.onerror=()=>{im.remove();face.classList.add('fallback')};face.append(im)}else face.classList.add('fallback');
   const t=el('div','bday-text');t.append(el('strong','',x.birthday+'. Happy Birthday!'),el('span','',x.name));
   c.append(face,t);cards.append(c);
  }
@@ -538,8 +538,10 @@ const SYSTEM_SPEAKERS=new Set(['시스템','시스템 음성','통신 시스템'
 function isProfessor(who){return who?.isProfessor===true}
 function avatarFor(who,entry){
  const av=el('div','avatar');av.setAttribute('aria-label',(who.name||'알 수 없음')+' 프로필');
- const paths=[...(entry.stage?.characters||[]).map(x=>x.path),...(who.faces||[]).map(x=>x.path)].filter(Boolean);
- const speakerKey=who.heroId!=null?'hero:'+who.heroId:'name:'+(who.rawName||'');const portraitKey=speakerAliases[speakerKey];const ids=[portraitKey,speakerKey,String(who.heroId??''),who.rawName,who.name,...paths].filter(Boolean);
+ // v0.9.10 말하는 인물의 그림(무대 위 같은 imgId)을 먼저 → 이름 → 무대에 한 명뿐일 때 그 그림
+ const chars=entry.stage?.characters||[],faceIds=new Set((who.faces||[]).map(x=>x.imgId));
+ const facePaths=chars.filter(c=>faceIds.has(c.imgId)).map(c=>c.path);const lone=chars.length===1&&!faceIds.size?[chars[0].path]:[];
+ const speakerKey=who.heroId!=null?'hero:'+who.heroId:'name:'+(who.rawName||'');const portraitKey=speakerAliases[speakerKey];const ids=[...facePaths,portraitKey,speakerKey,String(who.heroId??''),who.rawName,who.name,...lone].filter(Boolean);
  let url=ids.map(k=>imageMap[k]).find(Boolean);
  if(url&&typeof url==='string'&&!url.startsWith('http')&&!url.startsWith('//')&&!url.startsWith('data:')){
   const img=document.createElement('img');img.loading='lazy';img.decoding='async';img.alt='';img.src=url.startsWith('/')?'.'+url:url.startsWith('./')?url:'./'+url.replace(/^\/+/, '');img.onerror=()=>{img.remove();av.classList.add('fallback')};av.append(img);
@@ -921,7 +923,7 @@ function maybeBgmMark(node,target){
  if(bgmPlaying===node.bgm)m.classList.add('playing');target.append(m);
 }
 
-applySettings();fetchJSON(dataPath('speakers.json')).then(m=>speakerAliases=m.aliases||{}).catch(()=>{});fetchJSON('./data/image_map.json',1).then(m=>{imageMap=m.portraits||m}).catch(()=>{});
+applySettings();fetchJSON(dataPath('speakers.json')).then(m=>speakerAliases=m.aliases||{}).catch(()=>{});fetchJSON('./data/image_map.json',1).then(m=>{imageMap=m.portraits||m;const r=parseRoute();if(r.type==='home'&&!r.category&&document.querySelector('.bday-face'))drawLibrary()}).catch(()=>{});
 // v0.9.2a: 느린 연결에서도 첫 화면이 비지 않게, 목록 데이터를 기다리지 않고 먼저 그린다
 {const r=parseRoute();if(r.type==='home'&&!r.category){category=null;drawLibrary()}else{$('#groups').replaceChildren(el('p','loading-note','기록을 불러오는 중…'))}}
 fetchJSON(dataPath('dolls.json')).then(d=>{dolls=d;if(index&&category==null&&!openFolderId&&!$('#search').value.trim()&&!$('#library').classList.contains('hidden'))drawLibrary()}).catch(()=>{dolls={dolls:[]}});
