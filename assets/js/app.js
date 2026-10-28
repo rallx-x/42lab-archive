@@ -872,7 +872,7 @@ const bgmTitle=c=>String(c||'').replace(/^Mus_/,'').replace(/_/g,' ');
 function initBgm(){fetchJSON(bgmBase()+'bgm.json',1).then(m=>{bgmList=m;if(current&&!$('#reader').classList.contains('hidden'))setEpisodeBgm(bgmEpisode)}).catch(()=>{bgmList=null})}
 function setEpisodeBgm(cue){bgmEpisode=cue;const bar=$('#bgmBar');const ok=!!(bgmList&&cue&&bgmList[cue]);bar.classList.toggle('hidden',!ok);if(ok){$('#bgmName').textContent=bgmTitle(cue);syncBgmBar()}}
 function syncBgmBar(){const on=bgmPlaying&&bgmPlaying===bgmEpisode;$('#bgmPlay').replaceChildren(ic(on?'pause':'play'));$('#bgmPlay').dataset.state=on?'playing':'stopped';$('#bgmPlay').setAttribute('aria-label',on?'BGM 멈춤':'BGM 재생');$('#bgmNow').textContent=bgmPlaying&&bgmPlaying!==bgmEpisode?' · 지금: '+bgmTitle(bgmPlaying):'';document.querySelectorAll('.bgm-mark').forEach(m=>m.classList.toggle('playing',m.dataset.cue===bgmPlaying))}
-const bgmVolume=()=>Math.max(0,Math.min(100,+get('bgmVolume',60)));
+const bgmVolume=()=>Math.max(0,Math.min(100,+get('bgmVolume',30)));
 async function bgmPlay(cue){
  const info=bgmList?.[cue];if(!info)return;
  try{

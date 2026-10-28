@@ -564,3 +564,6 @@ html,body{overflow-x:hidden}
 .archive-menu-toggle.is-open .mt-open{opacity:0;transform:rotate(90deg) scale(.6)}
 .archive-menu-toggle.is-open .mt-close{opacity:1;transform:none;font-size:17px!important}
 @media(prefers-reduced-motion:reduce){.archive-menu-toggle .ic{transition:none}}
+/* v0.9.5a 그림만 있는 단추: 아이콘을 정가운데로 */
+.cg-full,.cg-close,.to-top,.icon-btn,.bgm-play,.bgm-vol-btn,.cal-nav,.episode-navigation button,.archive-menu-toggle,#archiveMenuClose,.settings-header button{display:grid;place-items:center}
+.cg-full .ic,.cg-close .ic,.to-top .ic,.icon-btn .ic,.bgm-play .ic,.bgm-vol-btn .ic,.cal-nav .ic,.episode-navigation .ic,#archiveMenuClose .ic,.settings-header button .ic{display:block;vertical-align:0}
