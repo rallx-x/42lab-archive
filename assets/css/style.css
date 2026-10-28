@@ -539,3 +539,28 @@ html,body{overflow-x:hidden}
 .cal-nav{font-size:18px;line-height:1;color:var(--sub)}
 .cal-nav:hover,.cal-title:hover{background:color-mix(in srgb,var(--accent) 12%,transparent);color:var(--ink)}
 .cal-title{font:700 14px ui-monospace,Consolas,monospace;letter-spacing:.08em}
+
+/* v0.9.5 아이콘 (assets/icons, 모양만 따서 글자색으로 칠함) */
+.ic{display:inline-block;width:1em;height:1em;flex:none;vertical-align:-.14em;background:currentColor;-webkit-mask:var(--ic) center/contain no-repeat;mask:var(--ic) center/contain no-repeat}
+.ic-user{--ic:url(../icons/user.png)}.ic-settings{--ic:url(../icons/settings.png)}.ic-volume{--ic:url(../icons/volume.png)}
+.ic-menu{--ic:url(../icons/menu.png)}.ic-close{--ic:url(../icons/close.png)}.ic-check{--ic:url(../icons/check.png)}
+.ic-lock{--ic:url(../icons/lock.png)}.ic-unlock{--ic:url(../icons/unlock.png)}.ic-expand{--ic:url(../icons/expand.png)}
+.ic-music{--ic:url(../icons/music.png)}.ic-play{--ic:url(../icons/play.png)}.ic-pause{--ic:url(../icons/pause.png)}
+.ic-pin{--ic:url(../icons/pin.png)}.ic-replay{--ic:url(../icons/replay.png)}.ic-star{--ic:url(../icons/star.png)}.ic-star-line{--ic:url(../icons/star-line.png)}
+.ic-right,.ic-left,.ic-up,.ic-upright{--ic:url(../icons/arrow.png)}
+.ic-left{transform:scaleX(-1)}.ic-up{transform:rotate(-90deg)}.ic-upright{transform:rotate(-45deg)}
+/* 크기 */
+.icon-btn .ic{font-size:20px}.bgm-vol-btn .ic{font-size:19px}.bgm-play .ic{font-size:13px}.bgm-play .ic-play{margin-left:2px}
+.to-top .ic{font-size:17px}.cg-full .ic{font-size:16px}.cal-nav .ic{font-size:11px;vertical-align:-.05em}
+.episode-navigation .ic{font-size:14px}.settings-header button .ic,.cg-close .ic,dialog .close .ic,dialog form button .ic{font-size:14px}
+.folder-episode-arrow .ic,.chapter-list-arrow .ic,.setting-row b .ic,b .ic-right{font-size:.8em}
+.archive-menu-expand .tri{font-size:9px}.notice-pin .ic{font-size:14px;color:var(--accent)}.home-card-icon .ic{font-size:17px}
+.bgm-mark .ic{font-size:.95em}.completed-mark .ic{font-size:.9em}.theme-current .ic{font-size:13px;color:var(--accent)}
+/* ☰ ↔ ✕ : 그림 두 장을 돌리며 바꿈 */
+.archive-menu-toggle::before,.archive-menu-toggle::after{content:none!important}
+.archive-menu-toggle{display:grid;place-items:center}
+.archive-menu-toggle .ic{grid-area:1/1;font-size:20px!important;transition:transform .26s ease,opacity .2s ease}
+.archive-menu-toggle .mt-close{opacity:0;transform:rotate(-90deg) scale(.6)}
+.archive-menu-toggle.is-open .mt-open{opacity:0;transform:rotate(90deg) scale(.6)}
+.archive-menu-toggle.is-open .mt-close{opacity:1;transform:none;font-size:17px!important}
+@media(prefers-reduced-motion:reduce){.archive-menu-toggle .ic{transition:none}}

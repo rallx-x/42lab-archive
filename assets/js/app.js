@@ -1,5 +1,8 @@
 (() => {
 const $=s=>document.querySelector(s), el=(tag,cls,text)=>{let n=document.createElement(tag);if(cls)n.className=cls;if(text!=null)n.textContent=text;return n};
+// v0.9.5 아이콘: 모양 이미지를 글자색으로 칠함 (assets/icons)
+const ic=(name,cls)=>{const i=el('i','ic ic-'+name+(cls?' '+cls:''));i.setAttribute('aria-hidden','true');return i};
+const withIc=(name,text,cls)=>{const s=el('span',cls||'');s.append(ic(name),document.createTextNode(' '+text));return s};
 const key='42lab.', get=(k,f)=>{try{let v=localStorage.getItem(key+k);return v===null?f:JSON.parse(v)}catch{return f}},set=(k,v)=>{try{localStorage.setItem(key+k,JSON.stringify(v));return true}catch{return false}};
 let index=null,data=null,current='',positions=[],observer=null,active=0,category=null,flowNodes=[],cursor=0,choiceStates={},suspendObserve=false;
 const nick=()=>get('nickname','교수')||'교수';
@@ -39,7 +42,7 @@ function episodeTitle(ep){
  const title=(ep.title||'').trim()||(ep.kind==='battleDialog'?'전투 중 대사':'(제목 없음)');
  return (ep.kind==='battleDialog'&&title!=='전투 중 대사'&&!title.startsWith('전투 중 대사 · ')?'전투 중 대사 · ':'')+title;
 }
-function addEpisodeButton(parent,ep){let b=el('button','episode');if(ep.kind==='battleDialog'){b.classList.add('battle-episode');b.append(el('span','episode-tag','전투 중 대사'))}let heading=el('div','episode-heading');heading.append(el('strong','',(episodeNumber(ep)?episodeNumber(ep)+' ':'')+episodeTitle(ep)));if(ep.part?.number&&ep.part?.total)heading.append(el('span','part-badge',ep.part.number+'/'+ep.part.total));b.append(heading);if(ep.description)b.append(el('small','',ep.description));if(get('completed.'+ep.id,false))b.append(el('span','completed-mark','✓ 열람 완료'));b.onclick=()=>openEpisode(ep.id);parent.append(b)}
+function addEpisodeButton(parent,ep){let b=el('button','episode');if(ep.kind==='battleDialog'){b.classList.add('battle-episode');b.append(el('span','episode-tag','전투 중 대사'))}let heading=el('div','episode-heading');heading.append(el('strong','',(episodeNumber(ep)?episodeNumber(ep)+' ':'')+episodeTitle(ep)));if(ep.part?.number&&ep.part?.total)heading.append(el('span','part-badge',ep.part.number+'/'+ep.part.total));b.append(heading);if(ep.description)b.append(el('small','',ep.description));if(get('completed.'+ep.id,false))b.append(withIc('check','열람 완료','completed-mark'));b.onclick=()=>openEpisode(ep.id);parent.append(b)}
 
 // v0.7.0: Cherry's index (schema 42lab-index/0.4) is already classified. Render it as-is.
 let displayGroups=[];
@@ -168,7 +171,7 @@ function tabIdFor(g,ep){const k=kindOf(ep);return k==='story'?'s:'+String(ep.sec
 function bookmarks(){const v=get('bookmarks',[]);return Array.isArray(v)?v.filter(x=>x&&typeof x.id==='string'):[]}
 function isBookmarked(id){return bookmarks().some(x=>x.id===id)}
 function findEpisode(id){for(const g of displayGroups){const e=(g.episodes||[]).find(x=>x.id===id);if(e)return {g,e}}return null}
-function updateBookmarkToggle(){const b=$('#bmToggle');if(!b)return;const on=!!current&&isBookmarked(current);b.textContent=on?'★ 북마크됨':'☆ 북마크';b.setAttribute('aria-pressed',String(on));b.classList.toggle('selected',on)}
+function updateBookmarkToggle(){const b=$('#bmToggle');if(!b)return;const on=!!current&&isBookmarked(current);b.replaceChildren(ic(on?'star':'star-line'),document.createTextNode(on?' 북마크됨':' 북마크'));b.setAttribute('aria-pressed',String(on));b.classList.toggle('selected',on)}
 function toggleBookmark(id){
  let list=bookmarks();
  if(list.some(x=>x.id===id))list=list.filter(x=>x.id!==id);else list.unshift({id,at:Date.now()});
@@ -198,7 +201,7 @@ function renderUserPanel(){
  const host=$('#userBookmarks');host.replaceChildren();
  const list=bookmarks();
  host.append(el('h3','bm-head','북마크 '+list.length+'개'));
- if(!list.length)host.append(el('p','bm-empty','아직 북마크한 기록이 없습니다. 읽기 화면의 ☆ 북마크 버튼으로 저장할 수 있어요.'));
+ if(!list.length){const p=el('p','bm-empty','아직 북마크한 기록이 없습니다. 읽기 화면의 ');p.append(ic('star-line'),document.createTextNode(' 북마크 버튼으로 저장할 수 있어요.'));host.append(p)};
  for(const b of list)host.append(bookmarkRow(b.id,{at:b.at}));
 }
 function selectUserPage(page){$('#userRoot').hidden=page!=='root';$('#userProgress').hidden=page!=='progress';$('#userBack').hidden=page==='root';$('#userTitle').textContent=page==='progress'?'진척도 코드':'사용자'}
@@ -289,7 +292,7 @@ function drawLibrary(){
  if(!visible.length){host.append(error('검색 결과가 없습니다.'));return}
  const selected=visible.find(x=>x.g.id===openFolderId||x.g.key===openFolderId);
  if(selected){
-  const back=el('button','folder-back',selected.g.shelfFolder?'← '+shelfFor(selected.g):'← 폴더 목록');back.onclick=()=>showHome(category,{shelf:selected.g.shelfFolder?shelfFor(selected.g):null});host.append(back);
+  const back=el('button','folder-back');back.append(ic('left'),document.createTextNode(' '+(selected.g.shelfFolder?shelfFor(selected.g):'폴더 목록')));back.onclick=()=>showHome(category,{shelf:selected.g.shelfFolder?shelfFor(selected.g):null});host.append(back);
   const panel=el('section','folder-detail');const art=el('div','folder-art');art.append(el('div','folder-art-kicker','42LAB / CHAPTER RECORD'),el('div','folder-art-symbol','◇'),el('h2','',chapterDisplayTitle(selected.g)),el('p','','CHAPTER IMAGE PENDING'));
   const side=el('div','folder-episodes');
   const episodeScroll=el('div','folder-episode-scroll');
@@ -319,7 +322,7 @@ function drawLibrary(){
    // 같은 스테이지 전투 대사는 소개 문구가 같으므로 처음 한 번만
    if(ep.description&&!(battle&&ep.description===prevDesc))txt.append(el('small','',ep.description));prevDesc=ep.description;
    if(ep.part?.number&&ep.part?.total)txt.append(el('small','',ep.part.number+'/'+ep.part.total));
-   row.append(num,txt,el('span','folder-episode-arrow','›'));
+   {const a=el('span','folder-episode-arrow');a.append(ic('right'));row.append(num,txt,a)}
    row.onclick=()=>openEpisode(ep.id);episodeScroll.append(row);
   }
   panel.append(art,side);host.append(panel);
@@ -339,7 +342,7 @@ function drawLibrary(){
    }else{
     b.append(el('span','chapter-list-icon','≡'));
     const info=el('span','chapter-list-info');info.append(el('strong','',title));if(g.subtitle)info.append(el('span','chapter-card-subtitle',g.subtitle));info.append(el('small','',episodes.length+'개 기록'));
-    b.append(info,el('span','chapter-list-arrow','›'));
+    {const a=el('span','chapter-list-arrow');a.append(ic('right'));b.append(info,a)}
    }
    b.onclick=()=>g._folder?showHome(category,{shelf:g.shelf}):showChapter(groupKey(g));
    if(g._folder){b.classList.add('shelf-folder-card');const sm=b.querySelector('small');if(sm)sm.textContent=g._count+'개 폴더 · '+episodes.length+'개 기록'}
@@ -350,7 +353,7 @@ function drawLibrary(){
   if(openShelf){
    items=visible.filter(x=>shelfFor(x.g)===openShelf);
    const catName=(storyCategories.find(([id])=>id===category)||[,''])[1];
-   const up=el('button','folder-back','← '+catName);up.onclick=()=>showHome(category);host.append(up);
+   const up=el('button','folder-back');up.append(ic('left'),document.createTextNode(' '+catName));up.onclick=()=>showHome(category);host.append(up);
   }else{
    const folders=new Map();items=[];
    for(const x of visible){
@@ -410,7 +413,7 @@ function feedbackURL({code}={}){
  if(code)p.push([L.type,L.typeError],[L.code,code]);
  return pre.base+'?'+p.map(([k,v])=>k+'='+encodeURIComponent(v)).join('&');
 }
-function landingCard(cls,title,icon){const card=el('section','home-card '+cls);const head=el('div','home-card-head');if(icon)head.append(el('span','home-card-icon',icon));head.append(el('h2','',title));card.append(head);return card}
+function landingCard(cls,title,icon){const card=el('section','home-card '+cls);const head=el('div','home-card-head');if(icon){const s=el('span','home-card-icon');s.append(ic(icon));head.append(s)}head.append(el('h2','',title));card.append(head);return card}
 function noticeDate(n){return n.date?String(n.date).replaceAll('-','.'):''}
 function renderLanding(host){
  const home=siteInfo?.home||{},wrap=el('div','home-grid'),fb=home.feedback||{};
@@ -423,10 +426,10 @@ function renderLanding(host){
  chip('피드백 폼',feedbackURL()||fb.form||'','primary');chip('X '+(fb.xHandle||''),fb.x||'');
  ext.append(chips);host.append(ext);
  // 공지 (리스트)
- const notice=landingCard('home-notice','공지','☰');const list=el('div','notice-list');
+ const notice=landingCard('home-notice','공지','menu');const list=el('div','notice-list');
  const notices=sortedNotices();
  if(!notices.length)list.append(el('p','bm-empty',siteInfo?'등록된 공지가 없습니다.':'공지를 불러오는 중…'));
- for(const n of notices){const b=el('button','notice-row'+(n.pinned?' pinned':''));b.type='button';b.append(el('span','notice-pin',n.pinned?'📌':''),el('span','notice-date',noticeDate(n)),el('span','notice-title',n.title||''));b.onclick=()=>openNotice(n);list.append(b)}
+ for(const n of notices){const b=el('button','notice-row'+(n.pinned?' pinned':''));b.type='button';b.append((()=>{const s=el('span','notice-pin');if(n.pinned)s.append(ic('pin'));return s})(),el('span','notice-date',noticeDate(n)),el('span','notice-title',n.title||''));b.onclick=()=>openNotice(n);list.append(b)}
  notice.append(list);
  // 생일 달력 (PC만)
  const cal=landingCard('home-birthday','생일');renderBirthday(cal);
@@ -458,8 +461,8 @@ function renderBirthday(card){
  const draw=()=>{
   const v=new Date(Date.UTC(T.y,T.m-1+calShift,1)),Y=v.getUTCFullYear(),M=v.getUTCMonth()+1,mm=String(M).padStart(2,'0');
   const head=el('div','cal-head');
-  const prev=el('button','cal-nav','‹');prev.type='button';prev.setAttribute('aria-label','이전 달');prev.onclick=()=>{calShift--;draw()};
-  const next=el('button','cal-nav','›');next.type='button';next.setAttribute('aria-label','다음 달');next.onclick=()=>{calShift++;draw()};
+  const prev=el('button','cal-nav');prev.append(ic('left'));prev.type='button';prev.setAttribute('aria-label','이전 달');prev.onclick=()=>{calShift--;draw()};
+  const next=el('button','cal-nav');next.append(ic('right'));next.type='button';next.setAttribute('aria-label','다음 달');next.onclick=()=>{calShift++;draw()};
   const title=el('button','cal-title',Y+'.'+mm);title.type='button';title.title='이번 달로';title.onclick=()=>{calShift=0;draw()};
   head.append(prev,title,next);
   const grid=el('div','cal-grid');['일','월','화','수','목','금','토'].forEach(w=>grid.append(el('span','cal-w',w)));
@@ -497,7 +500,7 @@ function renderArchiveMenu(){
   label.onclick=()=>{closeArchiveMenu();showHome(id)};
   const groups=displayGroups.filter(g=>categoryMatches(g,id));
   const children=el('div','archive-menu-children');const inner=el('div','archive-menu-children-inner');children.append(inner);
-  const arrow=el('button','archive-menu-expand');arrow.type='button';arrow.append(el('span','tri','▶'));
+  const arrow=el('button','archive-menu-expand');arrow.type='button';arrow.append(ic('right','tri'));
   arrow.setAttribute('aria-label',name+' 챕터 펼치기');arrow.setAttribute('aria-expanded','false');
   arrow.onclick=()=>{const expanded=row.classList.toggle('expanded');arrow.setAttribute('aria-expanded',String(expanded))};
   for(const g of groups){const link=el('button','archive-menu-chapter',chapterDisplayTitle(g));link.type='button';link.onclick=()=>{closeArchiveMenu();showChapter(groupKey(g),id)};inner.append(link)}
@@ -687,7 +690,7 @@ function maybeCG(node,target){
  const fig=el('figure','entry cg-figure');fig.dataset.uid=(node.ref||'')+'.cg';
  const btn=el('button','cg-thumb');btn.type='button';btn.setAttribute('aria-label','CG 펼치기');btn.setAttribute('aria-expanded','false');
  const img=document.createElement('img');img.src=cgSrc(p);img.alt='CG';img.loading='lazy';img.decoding='async';img.onerror=()=>fig.remove();btn.append(img);
- const full=el('button','cg-full','⤢');full.type='button';full.setAttribute('aria-label','전체 화면으로 보기');full.tabIndex=-1;
+ const full=el('button','cg-full');full.append(ic('expand'));full.type='button';full.setAttribute('aria-label','전체 화면으로 보기');full.tabIndex=-1;
  full.onclick=e=>{e.stopPropagation();$('#cgViewImg').src=cgSrc(p);$('#cgView').showModal()};
  btn.onclick=()=>{
   const open=!fig.classList.contains('open'),w=btn.clientWidth;
@@ -794,7 +797,7 @@ function selectPage(page){settingsPage=page;$('#settingsRoot').hidden=page!=='ro
 function setTheme(t){set('theme',t);set('brightness',BRIGHT.includes(t)?t:'custom');applySettings();renderThemeList();renderQuick()}
 function renderQuick(){const brightness=brightnessMode();document.querySelectorAll('[data-cg]').forEach(b=>b.classList.toggle('selected',cgMode()===b.dataset.cg));document.querySelectorAll('[data-prof]').forEach(b=>b.classList.toggle('selected',profGender()===b.dataset.prof));document.querySelectorAll('[data-brightness]').forEach(b=>b.classList.toggle('selected',b.dataset.brightness===brightness));const reading=get('readingMode','accessible');document.querySelectorAll('[data-reading]').forEach(b=>b.classList.toggle('selected',b.dataset.reading===reading))}
 function renderFontControls(){let host=$('#fontControls');host.replaceChildren();for(const [field,values] of Object.entries(fontValues)){const wrap=el('div','setting-block');const title=el('strong','',field==='fontSize'?'글자 크기':field==='letterSpacing'?'자간':'줄 간격');wrap.append(title);const options=el('div','setting-options font-options');let current=get(field,field==='fontSize'?16:field==='letterSpacing'?0:160);for(let v of values){let label=field==='lineHeight'?(v/100).toFixed(1):v+(field==='fontSize'||field==='letterSpacing'?'px':'');let b=el('button',current===v?'selected':'',label);b.onclick=()=>{set(field,v);applySettings();renderFontControls()};options.append(b)}wrap.append(options);host.append(wrap)}$('#settingsFont').style.setProperty('--preview-size',get('fontSize',16)+'px');$('#settingsFont').style.setProperty('--preview-spacing',get('letterSpacing',0)+'px');$('#settingsFont').style.setProperty('--preview-line',get('lineHeight',160)/100)}
-function renderThemeList(){const host=$('#themeList');host.replaceChildren();for(const [id,name] of Object.entries(themeNames)){let locked=['persica','entropics'].includes(id)&&!get('unlocked.'+id,false);let row=el('div','theme-option');let b=el('button','theme-pick'+(currentTheme()===id?' selected':''));b.disabled=locked;b.append(el('span','theme-swatch swatch-'+id),el('span','', (locked?'🔒 ':'')+name));if(currentTheme()===id)b.append(el('span','theme-current','✓'));b.onclick=()=>setTheme(id);row.append(b);if(!locked&&['persica','entropics'].includes(id)){let replay=el('button','theme-replay','↻ 재생');replay.onclick=()=>runUnlock(id,true);row.append(replay)}host.append(row)}}
+function renderThemeList(){const host=$('#themeList');host.replaceChildren();for(const [id,name] of Object.entries(themeNames)){let locked=['persica','entropics'].includes(id)&&!get('unlocked.'+id,false);let row=el('div','theme-option');let b=el('button','theme-pick'+(currentTheme()===id?' selected':''));b.disabled=locked;const hidden=['persica','entropics'].includes(id);b.append(el('span','theme-swatch swatch-'+id),hidden?withIc(locked?'lock':'unlock',name):el('span','',name));if(currentTheme()===id){const c=el('span','theme-current');c.append(ic('check'));b.append(c)}b.onclick=()=>setTheme(id);row.append(b);if(!locked&&['persica','entropics'].includes(id)){let replay=el('button','theme-replay');replay.append(ic('replay'),document.createTextNode(' 재생'));replay.onclick=()=>runUnlock(id,true);row.append(replay)}host.append(row)}}
 function renderLang(){const host=$('#langOptions');host.replaceChildren();const cur=uiLang();for(const [id,name] of LANGS){const ready=readyLangs.includes(id);const b=el('button',cur===id?'selected':'',name+(ready?'':' · 준비 중'));b.type='button';b.dataset.lang=id;b.disabled=!ready;b.onclick=()=>{if(uiLang()===id)return;set('lang',id);location.reload()};host.append(b)}}
 $('#settingsBtn').onclick=()=>{selectPage('root');renderQuick();renderLang();settings.showModal()};$('#settingsClose').onclick=()=>settings.close();$('#settingsBack').onclick=()=>selectPage('root');document.querySelectorAll('[data-page]').forEach(b=>b.onclick=()=>selectPage(b.dataset.page));
 $('#nickname').onchange=e=>{set('nickname',e.target.value.trim()||'교수');if(data&&current)openEpisode(current,{push:false})};
@@ -868,7 +871,7 @@ const bgmBase=()=>siteInfo?.home?.bgmBase||'./assets/bgm/';
 const bgmTitle=c=>String(c||'').replace(/^Mus_/,'').replace(/_/g,' ');
 function initBgm(){fetchJSON(bgmBase()+'bgm.json',1).then(m=>{bgmList=m;if(current&&!$('#reader').classList.contains('hidden'))setEpisodeBgm(bgmEpisode)}).catch(()=>{bgmList=null})}
 function setEpisodeBgm(cue){bgmEpisode=cue;const bar=$('#bgmBar');const ok=!!(bgmList&&cue&&bgmList[cue]);bar.classList.toggle('hidden',!ok);if(ok){$('#bgmName').textContent=bgmTitle(cue);syncBgmBar()}}
-function syncBgmBar(){const on=bgmPlaying&&bgmPlaying===bgmEpisode;$('#bgmPlay').textContent=on?'❚❚':'▶';$('#bgmPlay').setAttribute('aria-label',on?'BGM 멈춤':'BGM 재생');$('#bgmNow').textContent=bgmPlaying&&bgmPlaying!==bgmEpisode?' · 지금: '+bgmTitle(bgmPlaying):'';document.querySelectorAll('.bgm-mark').forEach(m=>m.classList.toggle('playing',m.dataset.cue===bgmPlaying))}
+function syncBgmBar(){const on=bgmPlaying&&bgmPlaying===bgmEpisode;$('#bgmPlay').replaceChildren(ic(on?'pause':'play'));$('#bgmPlay').dataset.state=on?'playing':'stopped';$('#bgmPlay').setAttribute('aria-label',on?'BGM 멈춤':'BGM 재생');$('#bgmNow').textContent=bgmPlaying&&bgmPlaying!==bgmEpisode?' · 지금: '+bgmTitle(bgmPlaying):'';document.querySelectorAll('.bgm-mark').forEach(m=>m.classList.toggle('playing',m.dataset.cue===bgmPlaying))}
 const bgmVolume=()=>Math.max(0,Math.min(100,+get('bgmVolume',60)));
 async function bgmPlay(cue){
  const info=bgmList?.[cue];if(!info)return;
@@ -877,7 +880,7 @@ async function bgmPlay(cue){
   if(!bgmGain){bgmGain=bgmCtx.createGain();bgmGain.connect(bgmCtx.destination)}
   bgmGain.gain.value=(bgmVolume()/100)**2;
   let buf=bgmBuf.get(cue);
-  if(!buf){$('#bgmPlay').textContent='…';const r=await fetch(bgmBase()+encodeURIComponent(info.file||cue+'.m4a'));if(!r.ok)throw Error('HTTP '+r.status);buf=await bgmCtx.decodeAudioData(await r.arrayBuffer());bgmBuf.set(cue,buf);if(bgmBuf.size>4)bgmBuf.delete(bgmBuf.keys().next().value)}
+  if(!buf){$('#bgmPlay').replaceChildren(el('span','bgm-wait','…'));const r=await fetch(bgmBase()+encodeURIComponent(info.file||cue+'.m4a'));if(!r.ok)throw Error('HTTP '+r.status);buf=await bgmCtx.decodeAudioData(await r.arrayBuffer());bgmBuf.set(cue,buf);if(bgmBuf.size>4)bgmBuf.delete(bgmBuf.keys().next().value)}
   bgmStop(false);
   const src=bgmCtx.createBufferSource();src.buffer=buf;src.loop=true;
   const ls=+info.loopStart||0,le=+info.loopEnd||0;if(le>ls&&le<=buf.duration+.05){src.loopStart=ls;src.loopEnd=Math.min(le,buf.duration)}
@@ -897,7 +900,7 @@ function maybeBgmMark(node,target){
  if(!bgmMarkStarted){bgmMarkStarted=true;lastMark=node.bgm;return}
  if(node.bgm===lastMark)return;lastMark=node.bgm;
  if(!bgmList?.[node.bgm])return;
- const m=el('button','bgm-mark','♪ '+bgmTitle(node.bgm));m.type='button';m.dataset.cue=node.bgm;m.onclick=()=>{if(bgmPlaying===node.bgm)bgmStop();else bgmPlay(node.bgm)};
+ const m=el('button','bgm-mark');m.append(ic('music'),document.createTextNode(' '+bgmTitle(node.bgm)));m.type='button';m.dataset.cue=node.bgm;m.onclick=()=>{if(bgmPlaying===node.bgm)bgmStop();else bgmPlay(node.bgm)};
  if(bgmPlaying===node.bgm)m.classList.add('playing');target.append(m);
 }
 
