@@ -451,3 +451,81 @@ html,body{overflow-x:hidden}
  .chapter-line{font-size:15px}
  .chapter-line.is-end{font-size:13px}
 }
+.loading-note{color:var(--sub);font-size:14px;text-align:center;padding:40px 0}
+
+/* v0.9.3 (체리) */
+/* 로고: 문양만, 테마마다 색 */
+:root{--logo:#F1F2F4}body.light{--logo:#25282C}body.persica{--logo:#B95D85}body.entropics{--logo:#B895F2}
+.brand-logo{width:30px;height:34px;flex:none;background:var(--logo);-webkit-mask:url(../img/42lab-emblem.png) center/contain no-repeat;mask:url(../img/42lab-emblem.png) center/contain no-repeat;margin-right:-6px}
+/* 툴바 이름표 */
+.toolbar{align-items:flex-end}
+.tb-group{display:flex;flex-direction:column;gap:6px;min-width:0}
+.tb-search{flex:1}
+.tb-label{font-size:10px;font-weight:800;letter-spacing:.16em;color:var(--accent-text,var(--accent))}
+.tb-label small{font-size:11px;font-weight:500;letter-spacing:.02em;color:var(--sub);margin-left:6px}
+.search-wrap{position:relative}
+.search-wrap input{width:100%}
+.search-prompt{position:absolute;left:16px;top:50%;transform:translateY(-50%);pointer-events:none;font:600 15px ui-monospace,Consolas,"Noto Sans KR",monospace;color:var(--sub)}
+.search-prompt i{font-style:normal;color:var(--accent);animation:cl-blink 1.05s steps(1) infinite}
+.search-wrap.has-value .search-prompt,.search-wrap:focus-within .search-prompt i{display:none}
+.search-wrap:focus-within.has-value .search-prompt{display:none}
+/* 소개 카드 태그 */
+.hero-tags span:nth-child(2){color:var(--accent-text,var(--accent))}
+/* 생일 달력 */
+.home-birthday{min-height:440px}
+.cal-box{border:1px solid var(--line);border-radius:14px;overflow:hidden;margin-top:6px}
+.cal-head{text-align:center;font:700 14px ui-monospace,Consolas,monospace;padding:9px;border-bottom:1px solid var(--line);letter-spacing:.08em}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;padding:8px;text-align:center}
+.cal-w{font-size:11px;color:var(--sub);padding:2px 0}
+.cal-d{font-size:12px;line-height:26px;height:26px;width:26px;margin:0 auto;border-radius:50%;font-variant-numeric:tabular-nums}
+.cal-d.bday{border:1.5px solid var(--accent);color:var(--accent-text,var(--accent));font-weight:700}
+.cal-d.today{background:color-mix(in srgb,var(--accent) 18%,transparent)}
+.bday-list{display:flex;flex-direction:column;gap:8px;margin-top:12px;overflow-y:auto;max-height:230px;padding-right:2px}
+.bday-card{display:flex;align-items:center;gap:12px;padding:10px 12px;border:1px solid var(--line);border-radius:18px;background:var(--bg)}
+.bday-card.today{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 10%,var(--bg))}
+.bday-face{width:40px;height:40px}
+.bday-text{display:flex;flex-direction:column;gap:2px;min-width:0}
+.bday-text strong{font:700 13px ui-monospace,Consolas,"Noto Sans KR",monospace}
+.bday-text span{font-size:13px;color:var(--sub)}
+.cal-note{font-size:11px;color:var(--sub);margin:10px 0 0;text-align:right}
+/* 외부 링크 줄은 모바일에서만 */
+.home-ext{display:none}
+/* CG 접기/펴기 + ⤢ */
+.cg-figure{position:relative;align-self:stretch;max-width:none;width:100%;margin:8px 0}
+.cg-figure .cg-thumb{aspect-ratio:5/1;height:auto;transition:height .32s ease}
+.cg-figure.open .cg-thumb{aspect-ratio:2/1}
+.cg-figure .cg-thumb img{width:100%;height:100%;object-fit:cover;object-position:center}
+.cg-full{position:absolute;top:10px;right:10px;width:36px;height:36px;padding:0;border-radius:10px;background:#000a;color:#fff;border:1px solid #fff4;font-size:18px;opacity:0;pointer-events:none;transition:opacity .2s}
+.cg-figure.open .cg-full{opacity:1;pointer-events:auto}
+/* BGM */
+.bgm-bar{display:flex;align-items:center;gap:12px;margin:16px 0 0;padding:10px 14px;border:1px solid var(--line);border-radius:12px;background:var(--panel)}
+.bgm-play{width:36px;height:36px;padding:0;border-radius:50%;flex:none;font-size:13px}
+.bgm-label{flex:1;min-width:0;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bgm-label small{color:var(--sub);font-size:12px}
+.bgm-vol{position:relative;flex:none}
+.bgm-vol-btn{width:36px;height:36px;padding:0;display:grid;place-items:center}
+.bgm-vol-btn svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.bgm-vol-pop{position:absolute;right:0;top:44px;z-index:6;display:flex;align-items:center;gap:10px;padding:10px 14px;border:1px solid var(--line);border-radius:12px;background:var(--panel);box-shadow:0 10px 30px #0005}
+.bgm-vol-pop[hidden]{display:none}
+.bgm-vol-pop input{width:160px;accent-color:var(--accent)}
+.bgm-vol-pop span{font:12px monospace;color:var(--sub);min-width:24px;text-align:right}
+.bgm-mark{align-self:center;font-size:12px;padding:5px 12px;border-radius:999px;color:var(--sub)}
+.bgm-mark.playing{border-color:var(--accent);color:var(--accent-text,var(--accent))}
+/* 설정 피드백 · 첫 접속 */
+.settings-feedback{display:flex;flex-direction:column}
+.welcome-dialog{max-width:min(460px,92vw)}
+.welcome-q{font-size:16px;font-weight:700;margin:4px 0}
+.welcome-pick button{padding:16px 8px;font-size:15px}
+.welcome-notice-title{font-size:16px;margin:6px 0 10px}
+.welcome-line{margin:0 0 6px;font-size:14px;line-height:1.7}
+.welcome-ok{display:block;width:100%;margin-top:16px;padding:12px;border-color:var(--accent)}
+@media(max-width:750px){
+ .toolbar{align-items:stretch}
+ .home-ext{display:flex;flex-direction:column;gap:6px;margin-bottom:12px}
+ .home-ext .home-chips{display:flex;margin:0}
+ .home-chips:not(.home-ext .home-chips){display:none}
+ .home-birthday,.home-side{display:none}
+ .brand-logo{width:26px;height:30px}
+ .bgm-vol-pop input{width:120px}
+}
+@media(prefers-reduced-motion:reduce){.search-prompt i{animation:none}.cg-figure .cg-thumb{transition:none}}

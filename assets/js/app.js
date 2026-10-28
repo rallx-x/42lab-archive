@@ -202,7 +202,7 @@ function renderUserPanel(){
  for(const b of list)host.append(bookmarkRow(b.id,{at:b.at}));
 }
 function selectUserPage(page){$('#userRoot').hidden=page!=='root';$('#userProgress').hidden=page!=='progress';$('#userBack').hidden=page==='root';$('#userTitle').textContent=page==='progress'?'진척도 코드':'사용자'}
-function openUser(){$('#nickname').value=nick();selectUserPage('root');renderUserPanel();$('#userDialog').showModal()}
+function openUser(){renderQuick();$('#nickname').value=nick();selectUserPage('root');renderUserPanel();$('#userDialog').showModal()}
 
 // ---------- v0.8.0 검색·필터 ----------
 let cast=null,castLoading=false;
@@ -242,11 +242,11 @@ function renderSearch(q,host){
  if(!cast){ensureCast();host.append(el('p','search-loading','캐릭터 정보를 불러오는 중…'))}
  else{
   // 「스에요이?」처럼 물음표만 붙은 이름은 본래 이름에 합치고, 「A & B」 함께 말하기는 따로 띄우지 않는다.
-  const merged=new Map();
+  const merged=new Map(),aliasHits=aliasTargets(nq);
   for(const [key,c] of Object.entries(cast.characters||{})){
    if(/[&＆]/.test(c.name))continue;
    const base=c.name.replace(/[?？]+$/,'').trim()||c.name;
-   if(!norm(base).includes(nq))continue;
+   if(!norm(base).includes(nq)&&!aliasHits.some(a=>norm(base)===a||(a.length>=2&&norm(base).startsWith(a))))continue;
    const m=merged.get(base)||{name:base,lines:0,keys:[]};m.lines+=c.lines;m.keys.push(key);merged.set(base,m);
   }
   const chars=[...merged.values()].sort((a,b)=>b.lines-a.lines).slice(0,6);
@@ -279,6 +279,7 @@ function drawLibrary(){
  $('#listHead').classList.add('hidden');renderCatTabs();
  if(q){renderSearch(q,host);return}
  if(category==null&&!openFolderId){renderLanding(host);return}
+ if(!index){host.append(el('p','loading-note','기록을 불러오는 중…'));return}
  if(!openFolderId){
   const name=(storyCategories.find(([id])=>id===category)||[,'전체 기록'])[1];
   $('#listTitle').textContent=openShelf?name+' › '+openShelf:name;$('#listCount').textContent=displayGroups.filter(g=>categoryMatches(g,category)&&(!openShelf||shelfFor(g)===openShelf)).length+'개 챕터';
@@ -369,7 +370,8 @@ function drawLibrary(){
  }
 }
 // Tab labels are presentation only. Category assignments and chapter order belong to Cherry's index.json.
-let storyCategories=[['all','전체 기록']];
+// 목록 데이터가 오기 전에도 분류 버튼이 보이도록 기본값을 둔다 (데이터가 오면 그 값으로 바뀜)
+let storyCategories=[['main','메인 스토리'],['exclusive','전속 스토리'],['event','이벤트 스토리'],['other','그 외'],['all','전체 기록']];
 // Accept legacy category spellings if they appear in the index, without rewriting the source.
 const categoryAliases={companion:'companionship',accompany:'companionship',courtesy:'companionship',donghaeng:'companionship',misc:'other',etc:'other'};
 const displayCategory=value=>categoryAliases[value]||value;
@@ -387,7 +389,8 @@ function chapterDisplayTitle(group){
 
 function renderCatTabs(){
  const nav=$('#catTabs');if(!nav)return;
- if(!nav.childElementCount){const h=el('button','cat-tab cat-home','홈');h.type='button';h.dataset.category='';h.onclick=()=>{$('#search').value='';showHome(null)};nav.append(h);for(const [id,name] of storyCategories.filter(([id])=>id!=='all')){const b=el('button','cat-tab',name.replace(/\s*스토리$/,''));b.type='button';b.dataset.category=id;b.onclick=()=>{$('#search').value='';showHome(id)};nav.append(b)}}
+ const want=storyCategories.filter(([id])=>id!=='all').length+1;
+ if(nav.childElementCount!==want){nav.replaceChildren();const h=el('button','cat-tab cat-home','홈');h.type='button';h.dataset.category='';h.onclick=()=>{$('#search').value='';showHome(null)};nav.append(h);for(const [id,name] of storyCategories.filter(([id])=>id!=='all')){const b=el('button','cat-tab',name.replace(/\s*스토리$/,''));b.type='button';b.dataset.category=id;b.onclick=()=>{$('#search').value='';showHome(id)};nav.append(b)}}
  nav.querySelectorAll('.cat-tab').forEach(b=>{const on=b.dataset.category===(category??'')&&!openFolderId||(b.dataset.category!==''&&b.dataset.category===category);b.classList.toggle('selected',on);b.setAttribute('aria-pressed',String(on))});
 }
 function initIndex(d){index=d;storyCategories=[...(d.categories||[]).map(c=>[c.id,c.name]),['all','전체 기록']];displayGroups=makeDisplayGroups(d.groups||[]);drawLibrary()}
@@ -410,36 +413,66 @@ function feedbackURL({code}={}){
 function landingCard(cls,title,icon){const card=el('section','home-card '+cls);const head=el('div','home-card-head');if(icon)head.append(el('span','home-card-icon',icon));head.append(el('h2','',title));card.append(head);return card}
 function noticeDate(n){return n.date?String(n.date).replaceAll('-','.'):''}
 function renderLanding(host){
- const home=siteInfo?.home||{},wrap=el('div','home-grid');
- // 공지 (리스트)
- const notice=landingCard('home-notice','공지','☰');const list=el('div','notice-list');
- const notices=[...(siteInfo?.notices||[])].sort((a,b)=>(b.pinned===true)-(a.pinned===true)||String(b.date||'').localeCompare(String(a.date||'')));
- if(!notices.length)list.append(el('p','bm-empty',siteInfo?'등록된 공지가 없습니다.':'공지를 불러오는 중…'));
- for(const n of notices){const b=el('button','notice-row'+(n.pinned?' pinned':''));b.type='button';b.append(el('span','notice-pin',n.pinned?'📌':''),el('span','notice-date',noticeDate(n)),el('span','notice-title',n.title||''));b.onclick=()=>openInfo({title:n.title,items:[{title:noticeDate(n),lines:n.lines||[]}]});list.append(b)}
- notice.append(list);
- // 일러스트 (공지와 같은 크기, 이미지 비율 유지)
- const ill=home.illustration||{},art=landingCard('home-illust','일러스트');const frame=el('div','illust-frame');
- const pending=()=>{frame.replaceChildren();frame.classList.add('empty');frame.append(el('span','illust-symbol','◇'),el('span','illust-note','ILLUSTRATION · 준비 중'))};
- if(ill.src){const img=document.createElement('img');img.src=ill.src;img.alt=ill.alt||'';img.decoding='async';img.onerror=pending;frame.append(img);if(ill.credit)art.append(el('p','illust-credit',ill.credit))}else pending();
- art.insertBefore(frame,art.children[1]||null);
- // 피드백 · 다른 사이트
- const side=el('div','home-side');const fb=home.feedback||{};
- const fbCard=landingCard('home-feedback','피드백');
- const form=el('a','home-link primary');form.href=feedbackURL()||'#';form.target='_blank';form.rel='noopener';form.append(el('strong','','피드백 폼'),el('small','','오류 · 오탈자 · 기능 제안은 폼으로 먼저 보내 주세요.'));
- const x=el('a','home-link');x.href=fb.x||'#';x.target='_blank';x.rel='noopener';x.append(el('strong','','X '+(fb.xHandle||'')),el('small','','개인 연락 · 급한 문의만. 제보는 폼 제출을 우선 부탁드려요.'));
- fbCard.append(form,x);
- const other=landingCard('home-other','Other');
- for(const s of home.otherSites||[]){const a=el(s.url?'a':'div','home-link'+(s.url?'':' disabled'));if(s.url){a.href=s.url;a.target='_blank';a.rel='noopener'}a.append(el('strong','',s.name),el('small','',s.url?(s.desc||''):(s.desc?s.desc+' · ':'')+'준비 중'));other.append(a)}
- if(!(home.otherSites||[]).length)other.append(el('p','bm-empty','준비 중'));
- side.append(other,fbCard);
- // 모바일: 작은 단추 바(옆으로 밀기) — 다른 사이트 │ 피드백 · X
- const chips=el('nav','home-chips');chips.setAttribute('aria-label','바로가기');
+ const home=siteInfo?.home||{},wrap=el('div','home-grid'),fb=home.feedback||{};
+ // 모바일: 「외부 링크」 단추 줄(옆으로 밀기) — PC에서는 숨김
+ const ext=el('section','home-ext');ext.append(el('div','tb-label','외부 링크'));
+ const chips=el('nav','home-chips');chips.setAttribute('aria-label','외부 링크');
  const chip=(label,href,cls='')=>{const a=el(href?'a':'span','home-chip'+(cls?' '+cls:'')+(href?'':' disabled'),label);if(href){a.href=href;a.target='_blank';a.rel='noopener'}chips.append(a)};
  for(const s of home.otherSites||[])chip(s.name+(s.url?'':' · 준비 중'),s.url||'');
  chips.append(el('span','home-chip-sep','│'));
  chip('피드백 폼',feedbackURL()||fb.form||'','primary');chip('X '+(fb.xHandle||''),fb.x||'');
- host.append(chips);
- wrap.append(notice,art,side);host.append(wrap);
+ ext.append(chips);host.append(ext);
+ // 공지 (리스트)
+ const notice=landingCard('home-notice','공지','☰');const list=el('div','notice-list');
+ const notices=sortedNotices();
+ if(!notices.length)list.append(el('p','bm-empty',siteInfo?'등록된 공지가 없습니다.':'공지를 불러오는 중…'));
+ for(const n of notices){const b=el('button','notice-row'+(n.pinned?' pinned':''));b.type='button';b.append(el('span','notice-pin',n.pinned?'📌':''),el('span','notice-date',noticeDate(n)),el('span','notice-title',n.title||''));b.onclick=()=>openNotice(n);list.append(b)}
+ notice.append(list);
+ // 생일 달력 (PC만)
+ const cal=landingCard('home-birthday','생일');renderBirthday(cal);
+ // 다른 사이트 · 피드백 (PC만)
+ const side=el('div','home-side');
+ const other=landingCard('home-other','Other');
+ for(const s of home.otherSites||[]){const a=el(s.url?'a':'div','home-link'+(s.url?'':' disabled'));if(s.url){a.href=s.url;a.target='_blank';a.rel='noopener'}a.append(el('strong','',s.name),el('small','',s.url?(s.desc||''):(s.desc?s.desc+' · ':'')+'준비 중'));other.append(a)}
+ if(!(home.otherSites||[]).length)other.append(el('p','bm-empty','준비 중'));
+ const fbCard=landingCard('home-feedback','피드백');fbCard.append(...feedbackLinks());
+ side.append(other,fbCard);
+ wrap.append(notice,cal,side);host.append(wrap);
+}
+function sortedNotices(){return [...(siteInfo?.notices||[])].sort((a,b)=>(b.pinned===true)-(a.pinned===true)||String(b.date||'').localeCompare(String(a.date||'')))}
+function openNotice(n){openInfo({title:n.title,items:[{title:noticeDate(n),lines:n.lines||[]}]})}
+function feedbackLinks(){
+ const fb=siteInfo?.home?.feedback||{};
+ const form=el('a','home-link primary');form.href=feedbackURL()||fb.form||'#';form.target='_blank';form.rel='noopener';form.append(el('strong','','피드백 폼'),el('small','','오류 · 오탈자 · 기능 제안은 폼으로 먼저 보내 주세요.'));
+ const x=el('a','home-link');x.href=fb.x||'#';x.target='_blank';x.rel='noopener';x.append(el('strong','','X '+(fb.xHandle||'')),el('small','','개인 연락 · 급한 문의만. 제보는 폼 제출을 우선 부탁드려요.'));
+ return [form,x];
+}
+// ---------- v0.9.3 생일 달력 ----------
+// 날짜는 한국 시간 새벽 5시에 바뀐다 (게임 서버 갱신 시각)
+function gameToday(){const t=new Date(Date.now()+(9-5)*3600e3);return {y:t.getUTCFullYear(),m:t.getUTCMonth()+1,d:t.getUTCDate()}}
+let dolls=null;
+function renderBirthday(card){
+ const T=gameToday(),mm=String(T.m).padStart(2,'0');
+ const box=el('div','cal-box');box.append(el('div','cal-head',T.y+'.'+mm));
+ const grid=el('div','cal-grid');['일','월','화','수','목','금','토'].forEach(w=>grid.append(el('span','cal-w',w)));
+ const list=(dolls?.dolls||[]).filter(x=>x.birthday&&x.birthday.slice(0,2)===mm).sort((a,b)=>a.birthday.localeCompare(b.birthday)||0);
+ const days=new Set(list.map(x=>+x.birthday.slice(2)));
+ const first=new Date(Date.UTC(T.y,T.m-1,1)).getUTCDay(),last=new Date(Date.UTC(T.y,T.m,0)).getUTCDate();
+ for(let i=0;i<first;i++)grid.append(el('span','cal-d blank',''));
+ for(let d=1;d<=last;d++){const c=el('span','cal-d'+(days.has(d)?' bday':'')+(d===T.d?' today':''),String(d));if(days.has(d))c.title=list.filter(x=>+x.birthday.slice(2)===d).map(x=>x.name).join(', ');grid.append(c)}
+ box.append(grid);card.append(box);
+ const cards=el('div','bday-list');
+ if(!dolls)cards.append(el('p','bm-empty','생일 정보를 불러오는 중…'));
+ else if(!list.length)cards.append(el('p','bm-empty','이번 달 생일인 인형이 없어요.'));
+ for(const x of list){
+  const today=+x.birthday.slice(2)===T.d;
+  const c=el('div','bday-card'+(today?' today':''));
+  const face=el('div','avatar bday-face');const url=x.portrait&&(imageMap[x.portrait]||('./assets/portraits/'+x.portrait+'.webp'));
+  if(x.portrait){const im=document.createElement('img');im.src=url;im.alt='';im.onerror=()=>{im.remove();face.classList.add('fallback')};face.append(im)}else face.classList.add('fallback');
+  const t=el('div','bday-text');t.append(el('strong','',x.birthday+'. Happy Birthday!'),el('span','',x.name));
+  c.append(face,t);cards.append(c);
+ }
+ card.append(cards,el('p','cal-note','매일 오전 5시(KST)에 갱신됩니다.'));
 }
 // Hierarchical navigation: category label navigates, chevron expands chapter links.
 function closeArchiveMenu(){const menu=$('#archiveMenu');menu.classList.remove('open');menu.setAttribute('aria-hidden','true');$('#menuBtn').setAttribute('aria-expanded','false');$('#menuBtn').classList.remove('is-open')}
@@ -626,21 +659,34 @@ function showChoice(node,target){
  target.append(box,area,gate);
 }
 function refreshPositions(){positions=[...document.querySelectorAll('#stream > .entry, #stream > .choice-output .entry')];if(observer)observer.disconnect();observe()}
-function pump(){while(cursor<flowNodes.length){let node=flowNodes[cursor];if(node.choice){showChoice(node,$('#stream'));refreshPositions();return}if(node.ref){let b=data.blocks[node.ref];maybeCG(node,$('#stream'));if(b){for(let unit of b.units||[])$('#stream').append(createUnit(b,unit,node))}}cursor++}$('#ending').classList.remove('hidden');refreshPositions();requestAnimationFrame(checkBottom)}
+function pump(){while(cursor<flowNodes.length){let node=flowNodes[cursor];if(node.choice){showChoice(node,$('#stream'));refreshPositions();return}if(node.ref){let b=data.blocks[node.ref];maybeCG(node,$('#stream'));maybeBgmMark(node,$('#stream'));if(b){for(let unit of b.units||[])$('#stream').append(createUnit(b,unit,node))}}cursor++}$('#ending').classList.remove('hidden');refreshPositions();requestAnimationFrame(checkBottom)}
 // ---------- v0.9.1 CG ----------
 // 장면 배경 중 이름에 cg가 든 것 = CG. assets/cg/manifest.json에 있는 파일만 보여 준다 (없는 파일 요청을 만들지 않기 위해).
 let cgSet=new Set(),lastCG=null;
 fetchJSON('./assets/cg/manifest.json',1).then(m=>{cgSet=new Set(Array.isArray(m)?m:(m.files||[]))}).catch(()=>{});
-const cgMode=()=>{const m=get('cgMode',null);if(['large','small','off'].includes(m))return m;return get('showCG',true)===false?'off':'large'};
+const cgMode=()=>{const m=get('cgMode',null);if(m==='off'||m==='on')return m;if(m==='large'||m==='small')return 'on';return get('showCG',true)===false?'off':'on'};
 const cgSrc=p=>'./assets/cg/'+p+'.webp';
 function maybeCG(node,target){
- const p=(node.stage?.backgrounds||[]).find(x=>/cg/i.test(String(x).split('/').pop()));
- if(!p||p===lastCG)return;lastCG=p;
- const mode=cgMode();if(mode==='off'||!cgSet.has(p))return;
- const fig=el('figure','entry cg-figure cg-'+mode);fig.dataset.uid=(node.ref||'')+'.cg';
- const img=document.createElement('img');img.src=cgSrc(p);img.alt='CG';img.loading='lazy';img.decoding='async';img.onerror=()=>fig.remove();
- const btn=el('button','cg-thumb');btn.type='button';btn.setAttribute('aria-label','CG 크게 보기');btn.append(img);btn.onclick=()=>{$('#cgViewImg').src=cgSrc(p);$('#cgView').showModal()};
- fig.append(btn);target.append(fig);
+ const raw=(node.stage?.backgrounds||[]).find(x=>/cg/i.test(String(x).split('/').pop()));
+ if(!raw||raw===lastCG)return;lastCG=raw;
+ if(cgMode()==='off')return;
+ // 교수 모습이 남성이면 짝 그림(있을 때만)
+ const alt=profGender()==='m'?data?.boyAlt?.[raw]:null,p=alt&&cgSet.has(alt)?alt:raw;
+ if(!cgSet.has(p))return;
+ const fig=el('figure','entry cg-figure');fig.dataset.uid=(node.ref||'')+'.cg';
+ const btn=el('button','cg-thumb');btn.type='button';btn.setAttribute('aria-label','CG 펼치기');btn.setAttribute('aria-expanded','false');
+ const img=document.createElement('img');img.src=cgSrc(p);img.alt='CG';img.loading='lazy';img.decoding='async';img.onerror=()=>fig.remove();btn.append(img);
+ const full=el('button','cg-full','⤢');full.type='button';full.setAttribute('aria-label','전체 화면으로 보기');full.tabIndex=-1;
+ full.onclick=e=>{e.stopPropagation();$('#cgViewImg').src=cgSrc(p);$('#cgView').showModal()};
+ btn.onclick=()=>{
+  const open=!fig.classList.contains('open'),w=btn.clientWidth;
+  const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if(!reduce){btn.style.height=btn.clientHeight+'px';btn.offsetHeight;btn.style.height=Math.round(w/(open?2:5))+'px'}
+  fig.classList.toggle('open',open);btn.setAttribute('aria-expanded',String(open));btn.setAttribute('aria-label',open?'CG 접기':'CG 펼치기');full.tabIndex=open?0:-1;
+  const done=()=>{btn.style.height='';btn.removeEventListener('transitionend',done);refreshPositions()};
+  if(reduce)done();else btn.addEventListener('transitionend',done);
+ };
+ fig.append(btn,full);target.append(fig);
 }
 // ---------- v0.9.1 끝까지 읽음 = 100% · 맨 위로 ----------
 function checkBottom(){
@@ -709,7 +755,7 @@ async function openEpisode(id,{push=true}={}){
   $('#epTitle').textContent=context.title;$('#epDesc').textContent=d.meta?.description||'';
   $('#epId').textContent=context.breadcrumb;$('#crumb').textContent=context.breadcrumb;
   $('#stream').replaceChildren();$('#ending').classList.add('hidden');
-  updateEpisodeNav();set('lastEpisode',id);updateBookmarkToggle();flowNodes=d.timeline||[];cursor=0;lastCG=null;pump();
+  updateEpisodeNav();set('lastEpisode',id);updateBookmarkToggle();flowNodes=d.timeline||[];cursor=0;lastCG=null;lastMark=null;bgmMarkStarted=false;setEpisodeBgm(d.meta?.bgm||null);pump();
   if(push)saveRoute({type:'episode',id});
   window.scrollTo(0,0);observe();
  }catch(e){
@@ -735,7 +781,7 @@ const fontValues={fontSize:[14,16,18,20,22,24],letterSpacing:[0,.5,1,1.5,2],line
 const themeNames={light:'라이트',dim:'딤',dark:'다크',persica:'페르시카',entropics:'엔트로피'};
 function selectPage(page){settingsPage=page;$('#settingsRoot').hidden=page!=='root';$('#settingsFont').hidden=page!=='font';$('#settingsTheme').hidden=page!=='theme';$('#settingsBack').hidden=page==='root';$('#settingsTitle').textContent=page==='font'?'글꼴':page==='theme'?'테마':'설정';if(page==='theme')renderThemeList();if(page==='font')renderFontControls()}
 function setTheme(t){set('theme',t);set('brightness',BRIGHT.includes(t)?t:'custom');applySettings();renderThemeList();renderQuick()}
-function renderQuick(){const brightness=brightnessMode();document.querySelectorAll('[data-cg]').forEach(b=>b.classList.toggle('selected',cgMode()===b.dataset.cg));document.querySelectorAll('[data-brightness]').forEach(b=>b.classList.toggle('selected',b.dataset.brightness===brightness));const reading=get('readingMode','accessible');document.querySelectorAll('[data-reading]').forEach(b=>b.classList.toggle('selected',b.dataset.reading===reading))}
+function renderQuick(){const brightness=brightnessMode();document.querySelectorAll('[data-cg]').forEach(b=>b.classList.toggle('selected',cgMode()===b.dataset.cg));document.querySelectorAll('[data-prof]').forEach(b=>b.classList.toggle('selected',profGender()===b.dataset.prof));document.querySelectorAll('[data-brightness]').forEach(b=>b.classList.toggle('selected',b.dataset.brightness===brightness));const reading=get('readingMode','accessible');document.querySelectorAll('[data-reading]').forEach(b=>b.classList.toggle('selected',b.dataset.reading===reading))}
 function renderFontControls(){let host=$('#fontControls');host.replaceChildren();for(const [field,values] of Object.entries(fontValues)){const wrap=el('div','setting-block');const title=el('strong','',field==='fontSize'?'글자 크기':field==='letterSpacing'?'자간':'줄 간격');wrap.append(title);const options=el('div','setting-options font-options');let current=get(field,field==='fontSize'?16:field==='letterSpacing'?0:160);for(let v of values){let label=field==='lineHeight'?(v/100).toFixed(1):v+(field==='fontSize'||field==='letterSpacing'?'px':'');let b=el('button',current===v?'selected':'',label);b.onclick=()=>{set(field,v);applySettings();renderFontControls()};options.append(b)}wrap.append(options);host.append(wrap)}$('#settingsFont').style.setProperty('--preview-size',get('fontSize',16)+'px');$('#settingsFont').style.setProperty('--preview-spacing',get('letterSpacing',0)+'px');$('#settingsFont').style.setProperty('--preview-line',get('lineHeight',160)/100)}
 function renderThemeList(){const host=$('#themeList');host.replaceChildren();for(const [id,name] of Object.entries(themeNames)){let locked=['persica','entropics'].includes(id)&&!get('unlocked.'+id,false);let row=el('div','theme-option');let b=el('button','theme-pick'+(currentTheme()===id?' selected':''));b.disabled=locked;b.append(el('span','theme-swatch swatch-'+id),el('span','', (locked?'🔒 ':'')+name));if(currentTheme()===id)b.append(el('span','theme-current','✓'));b.onclick=()=>setTheme(id);row.append(b);if(!locked&&['persica','entropics'].includes(id)){let replay=el('button','theme-replay','↻ 재생');replay.onclick=()=>runUnlock(id,true);row.append(replay)}host.append(row)}}
 function renderLang(){const host=$('#langOptions');host.replaceChildren();const cur=uiLang();for(const [id,name] of LANGS){const ready=readyLangs.includes(id);const b=el('button',cur===id?'selected':'',name+(ready?'':' · 준비 중'));b.type='button';b.dataset.lang=id;b.disabled=!ready;b.onclick=()=>{if(uiLang()===id)return;set('lang',id);location.reload()};host.append(b)}}
@@ -763,6 +809,88 @@ function openInfo(pg){
  for(const item of pg.items||[]){const box=el('section','info-item');if(item.title)box.append(el('h3','',item.title));(item.lines||[]).forEach(t=>box.append(el('p','',t)));body.append(box)}
  $('#infoDialog').showModal();
 }
-fetchJSON(dataPath('site_info.json')).then(info=>{siteInfo=info;if(Array.isArray(info.languages)&&info.languages.length)readyLangs=info.languages;renderFooter(info);if(index&&category==null&&!openFolderId&&!$('#search').value.trim()&&!$('#library').classList.contains('hidden'))drawLibrary()}).catch(()=>{});
-applySettings();fetchJSON(dataPath('speakers.json')).then(m=>speakerAliases=m.aliases||{}).catch(()=>{});fetchJSON('./data/image_map.json').then(m=>{imageMap=m.portraits||m}).catch(()=>{});fetchJSON(dataPath('index.json')).then(d=>{initIndex(d);restoreRoute()}).catch(e=>$('#groups').append(error('데이터를 불러올 수 없습니다. data/'+dataLang()+'/index.json 위치를 확인하고 로컬 서버 또는 Cloudflare Pages에서 실행해 주세요. ('+e.message+')')));
+fetchJSON(dataPath('site_info.json')).then(info=>{siteInfo=info;fillHeroTags();renderSettingsFeedback();maybeWelcome();initBgm();if(Array.isArray(info.languages)&&info.languages.length)readyLangs=info.languages;renderFooter(info);if(index&&category==null&&!openFolderId&&!$('#search').value.trim()&&!$('#library').classList.contains('hidden'))drawLibrary()}).catch(()=>{});
+
+// ---------- v0.9.3 소개 카드 태그 ----------
+function fillHeroTags(){
+ if(index){const n=(index.groups||[]).reduce((a,g)=>a+(g.episodes||[]).length,0);$('#tagRecords').textContent=n.toLocaleString('en-US')+' RECORDS'}
+ if(siteInfo?.updated)$('#tagUpdated').textContent='UPDATED '+String(siteInfo.updated).replaceAll('-','.');
+}
+// ---------- v0.9.3 검색 칸 「//:_▌」 ----------
+{const s=$('#search'),w=s.closest('.search-wrap');const sync=()=>w.classList.toggle('has-value',!!s.value);s.addEventListener('input',sync);sync()}
+// ---------- v0.9.3 별명 검색: 어떤 이름으로 찾아도 결과는 정식 이름 ----------
+function aliasTargets(nq){
+ if(!dolls||!nq)return [];
+ const out=new Set();
+ for(const x of dolls.dolls||[]){
+  const names=[x.name,x.names?.zh,x.names?.ja,x.names?.en,...(x.aliases||[])].filter(Boolean).map(v=>norm(String(v).replace(/\([^)]*\)/g,'')));
+  if(names.some(a=>a&&(a===nq||(nq.length>=2&&a.includes(nq)))))out.add(norm(String(x.name).split('·')[0]));
+ }
+ return [...out];
+}
+// ---------- v0.9.3 교수 모습 ----------
+const profGender=()=>get('profGender','f')==='m'?'m':'f';
+document.querySelectorAll('[data-prof]').forEach(b=>b.onclick=()=>{set('profGender',b.dataset.prof);renderQuick();if(data&&current&&!$('#reader').classList.contains('hidden'))openEpisode(current,{push:false})});
+// ---------- v0.9.3 설정 맨 아래 피드백 ----------
+function renderSettingsFeedback(){const h=$('#settingsFeedback');if(h)h.replaceChildren(...feedbackLinks())}
+// ---------- v0.9.3 첫 접속: 교수 모습 → 공지 (언어 선택은 다른 언어가 열리면) ----------
+function maybeWelcome(){
+ if(get('welcomed',false))return;
+ const dlg=$('#welcome'),body=$('#welcomeBody');
+ const step1=()=>{body.replaceChildren();
+  body.append(el('div','setting-label','PROFESSOR'),el('p','welcome-q','교수님의 모습을 골라 주세요.'),el('p','setting-hint','이야기 속 교수 그림(일부 CG 포함)이 고른 모습으로 나옵니다. 사용자 창에서 언제든 바꿀 수 있어요.'));
+  const row=el('div','setting-options welcome-pick');
+  for(const [v,label] of [['f','여성 교수'],['m','남성 교수']]){const b=el('button','',label);b.type='button';b.onclick=()=>{set('profGender',v);step2()};row.append(b)}
+  body.append(row)};
+ const step2=()=>{body.replaceChildren();const n=sortedNotices()[0];
+  body.append(el('div','setting-label','NOTICE'));
+  if(n){body.append(el('h3','welcome-notice-title',n.title||''));(n.lines||[]).forEach(t=>body.append(el('p','welcome-line',t)))}
+  const ok=el('button','welcome-ok','확인');ok.type='button';ok.onclick=()=>{set('welcomed',true);dlg.close()};body.append(ok)};
+ step1();try{dlg.showModal()}catch(e){}
+ dlg.addEventListener('cancel',e=>{e.preventDefault()});
+}
+// ---------- v0.9.3 BGM (곡 파일이 있는 곳에서만: Cloudflare) ----------
+let bgmMarkStarted=false,bgmList=null,bgmCtx=null,bgmGain=null,bgmSrc=null,bgmPlaying=null,bgmEpisode=null,lastMark=null;const bgmBuf=new Map();
+const bgmBase=()=>siteInfo?.home?.bgmBase||'./assets/bgm/';
+const bgmTitle=c=>String(c||'').replace(/^Mus_/,'').replace(/_/g,' ');
+function initBgm(){fetchJSON(bgmBase()+'bgm.json',1).then(m=>{bgmList=m;if(current&&!$('#reader').classList.contains('hidden'))setEpisodeBgm(bgmEpisode)}).catch(()=>{bgmList=null})}
+function setEpisodeBgm(cue){bgmEpisode=cue;const bar=$('#bgmBar');const ok=!!(bgmList&&cue&&bgmList[cue]);bar.classList.toggle('hidden',!ok);if(ok){$('#bgmName').textContent=bgmTitle(cue);syncBgmBar()}}
+function syncBgmBar(){const on=bgmPlaying&&bgmPlaying===bgmEpisode;$('#bgmPlay').textContent=on?'❚❚':'▶';$('#bgmPlay').setAttribute('aria-label',on?'BGM 멈춤':'BGM 재생');$('#bgmNow').textContent=bgmPlaying&&bgmPlaying!==bgmEpisode?' · 지금: '+bgmTitle(bgmPlaying):'';document.querySelectorAll('.bgm-mark').forEach(m=>m.classList.toggle('playing',m.dataset.cue===bgmPlaying))}
+const bgmVolume=()=>Math.max(0,Math.min(100,+get('bgmVolume',60)));
+async function bgmPlay(cue){
+ const info=bgmList?.[cue];if(!info)return;
+ try{
+  bgmCtx=bgmCtx||new (window.AudioContext||window.webkitAudioContext)();if(bgmCtx.state==='suspended')await bgmCtx.resume();
+  if(!bgmGain){bgmGain=bgmCtx.createGain();bgmGain.connect(bgmCtx.destination)}
+  bgmGain.gain.value=(bgmVolume()/100)**2;
+  let buf=bgmBuf.get(cue);
+  if(!buf){$('#bgmPlay').textContent='…';const r=await fetch(bgmBase()+encodeURIComponent(info.file||cue+'.m4a'));if(!r.ok)throw Error('HTTP '+r.status);buf=await bgmCtx.decodeAudioData(await r.arrayBuffer());bgmBuf.set(cue,buf);if(bgmBuf.size>4)bgmBuf.delete(bgmBuf.keys().next().value)}
+  bgmStop(false);
+  const src=bgmCtx.createBufferSource();src.buffer=buf;src.loop=true;
+  const ls=+info.loopStart||0,le=+info.loopEnd||0;if(le>ls&&le<=buf.duration+.05){src.loopStart=ls;src.loopEnd=Math.min(le,buf.duration)}
+  src.connect(bgmGain);src.start();bgmSrc=src;bgmPlaying=cue;
+ }catch(e){bgmPlaying=null;$('#bgmNow').textContent=' · 재생할 수 없어요'}
+ syncBgmBar();
+}
+function bgmStop(sync=true){try{bgmSrc?.stop()}catch(e){}bgmSrc=null;if(sync){bgmPlaying=null;syncBgmBar()}}
+$('#bgmPlay').onclick=()=>{if(bgmPlaying&&bgmPlaying===bgmEpisode)bgmStop();else bgmPlay(bgmEpisode)};
+$('#bgmVolBtn').onclick=()=>{const p=$('#bgmVolPop');p.hidden=!p.hidden;$('#bgmVolBtn').setAttribute('aria-expanded',String(!p.hidden))};
+{const v=$('#bgmVol');v.value=bgmVolume();$('#bgmVolNum').textContent=v.value;v.oninput=()=>{set('bgmVolume',+v.value);$('#bgmVolNum').textContent=v.value;if(bgmGain)bgmGain.gain.value=(+v.value/100)**2}}
+document.addEventListener('click',e=>{const p=$('#bgmVolPop');if(!p.hidden&&!e.target.closest('.bgm-vol')){p.hidden=true;$('#bgmVolBtn').setAttribute('aria-expanded','false')}});
+// 회차 중간에 곡이 바뀌는 곳: 「♪ 곡 이름」 작은 단추 (누르면 그 곡으로)
+function maybeBgmMark(node,target){
+ if(!('bgm' in node))return;if(node.bgm===null){lastMark=null;return}
+ // 회차 첫 곡은 위 BGM 줄이 맡으므로 표시하지 않는다
+ if(!bgmMarkStarted){bgmMarkStarted=true;lastMark=node.bgm;return}
+ if(node.bgm===lastMark)return;lastMark=node.bgm;
+ if(!bgmList?.[node.bgm])return;
+ const m=el('button','bgm-mark','♪ '+bgmTitle(node.bgm));m.type='button';m.dataset.cue=node.bgm;m.onclick=()=>{if(bgmPlaying===node.bgm)bgmStop();else bgmPlay(node.bgm)};
+ if(bgmPlaying===node.bgm)m.classList.add('playing');target.append(m);
+}
+
+applySettings();fetchJSON(dataPath('speakers.json')).then(m=>speakerAliases=m.aliases||{}).catch(()=>{});fetchJSON('./data/image_map.json',1).then(m=>{imageMap=m.portraits||m}).catch(()=>{});
+// v0.9.2a: 느린 연결에서도 첫 화면이 비지 않게, 목록 데이터를 기다리지 않고 먼저 그린다
+{const r=parseRoute();if(r.type==='home'&&!r.category){category=null;drawLibrary()}else{$('#groups').replaceChildren(el('p','loading-note','기록을 불러오는 중…'))}}
+fetchJSON(dataPath('dolls.json')).then(d=>{dolls=d;if(index&&category==null&&!openFolderId&&!$('#search').value.trim()&&!$('#library').classList.contains('hidden'))drawLibrary()}).catch(()=>{dolls={dolls:[]}});
+fetchJSON(dataPath('index.json')).then(d=>{initIndex(d);fillHeroTags();restoreRoute()}).catch(e=>$('#groups').append(error('데이터를 불러올 수 없습니다. data/'+dataLang()+'/index.json 위치를 확인하고 로컬 서버 또는 Cloudflare Pages에서 실행해 주세요. ('+e.message+')')));
 })();

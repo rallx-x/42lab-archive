@@ -123,7 +123,7 @@
  ],
  "home": {
   "illustration": {
-   "src": "./assets/img/home/illust.webp",
+   "src": "",
    "alt": "42LAB 기록 열람실 일러스트",
    "credit": ""
   },
@@ -178,5 +178,6 @@
     "url": "https://pnc-doll-card.pages.dev/"
    }
   ]
- }
+ },
+ "updated": "2026-10-28"
 }
