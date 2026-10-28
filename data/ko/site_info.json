@@ -168,14 +168,14 @@
   },
   "otherSites": [
    {
-    "name": "취향픽",
-    "desc": "",
-    "url": ""
+    "name": "뉴럴 클라우드 취향픽",
+    "desc": "나만의 인형 취향표 만들기",
+    "url": "https://pnc-pick.pages.dev/"
    },
    {
-    "name": "인형 수집",
-    "desc": "",
-    "url": ""
+    "name": "뉴럴 클라우드 인형증",
+    "desc": "인형 카드 직접 만들고 저장하기",
+    "url": "https://pnc-doll-card.pages.dev/"
    }
   ]
  }

@@ -48,7 +48,7 @@ function makeDisplayGroups(groups){
  return [...groups].filter(g=>g.category!=='dorm').sort((x,y)=>(rank.get(x.category)??99)-(rank.get(y.category)??99)||(x.order??9999)-(y.order??9999));
 }
 const sectionDefs=g=>new Map((g.sections||[]).map(s=>[String(s.id),s]));
-let openFolderId=null;
+let openFolderId=null,openShelf=null;
 let viewMode=get('viewMode','file');
 let routeToken=0;
 const groupKey=g=>String(g.id||g.key);
@@ -56,7 +56,7 @@ function routeHash(route){
  if(route.type==='episode')return '#ep/'+encodeURIComponent(route.id);
  if(route.type==='chapter')return '#chapter/'+encodeURIComponent(route.category)+':'+encodeURIComponent(route.id);
  // v0.9.0: #home = 첫 화면(공지·일러스트·피드백), #home/<분류> = 그 분류의 스토리 목록 (#home/all = 전체 기록)
- return route.category?'#home/'+encodeURIComponent(route.category):'#home';
+ return route.category?'#home/'+encodeURIComponent(route.category)+(route.shelf?'/'+encodeURIComponent(route.shelf):''):'#home';
 }
 function parseRoute(){
  let raw=location.hash.slice(1);
@@ -66,7 +66,7 @@ function parseRoute(){
    let part=raw.slice(8),colon=part.indexOf(':');
    if(colon!==-1)return {type:'chapter',category:decodeURIComponent(part.slice(0,colon)),id:decodeURIComponent(part.slice(colon+1))};
   }
-  if(raw.startsWith('home/'))return {type:'home',category:decodeURIComponent(raw.slice(5))};
+  if(raw.startsWith('home/')){const [c,sh]=raw.slice(5).split('/');return {type:'home',category:decodeURIComponent(c),shelf:sh?decodeURIComponent(sh):null}}
   if(raw==='home'||raw==='')return {type:'home',category:null};
   // Compatibility with old links: #episode_id
   let id=decodeURIComponent(raw);
@@ -86,19 +86,19 @@ function showChapter(id,cat=category,{push=true}={}){
  if($('#search').value){$('#search').value=''}
  routeToken++;
  selectCategory(cat==='all'||categoryMatches(group,cat)?cat:displayCategory(group.category));
- openFolderId=groupKey(group);
+ openFolderId=groupKey(group);openShelf=null;
  if(push)saveRoute({type:'chapter',category,id:openFolderId});
  drawLibrary();
  document.querySelector('#groups')?.scrollIntoView({block:'start'});
  return true;
 }
-function showHome(cat=null,{push=true}={}){
+function showHome(cat=null,{push=true,shelf=null}={}){
  routeToken++;
  selectCategory(cat);
- openFolderId=null;
+ openFolderId=null;openShelf=shelf||null;
  $('#reader').classList.add('hidden');
  $('#library').classList.remove('hidden');
- if(push)saveRoute({type:'home',category});
+ if(push)saveRoute({type:'home',category,shelf:openShelf});
  drawLibrary();
  window.scrollTo(0,0);
 }
@@ -112,7 +112,7 @@ async function restoreRoute(){
   }
  }
  if(route.type==='chapter'&&showChapter(route.id,route.category,{push:false}))return;
- showHome(route.category||null,{push:false});
+ showHome(route.category||null,{push:false,shelf:route.shelf||null});
 }
 // A presentation-only shelf layout: no edits to Cherry's episode data or ordering.
 // Explicit group metadata from a future index takes precedence over legacy title/key hints.
@@ -125,9 +125,9 @@ function renderShelfSections(visible,makeCard){
   shelves.get(label).push(item);
  }
  const labels=[...shelves.keys()];
- const frag=document.createDocumentFragment();
+ const frag=el('div','shelf-wrap');
  for(const label of labels){
-  const section=el('section','story-shelf');
+  const section=el('section','story-shelf'+(shelves.get(label).length<=2?' shelf-half':''));
   const heading=el('div','story-shelf-heading');
   const left=el('div','story-shelf-label');
   left.append(el('span','story-shelf-icon','▱'),el('h3','',label));
@@ -276,19 +276,19 @@ function renderSearch(q,host){
 function drawLibrary(){
  $('#library').classList.remove('hidden');$('#reader').classList.add('hidden');$('#crumb').textContent='';
  const q=$('#search').value.trim().toLowerCase(), host=$('#groups');host.replaceChildren();
- $('#listHead').classList.add('hidden');
+ $('#listHead').classList.add('hidden');renderCatTabs();
  if(q){renderSearch(q,host);return}
  if(category==null&&!openFolderId){renderLanding(host);return}
  if(!openFolderId){
   const name=(storyCategories.find(([id])=>id===category)||[,'전체 기록'])[1];
-  $('#listTitle').textContent=name;$('#listCount').textContent=displayGroups.filter(g=>categoryMatches(g,category)).length+'개 챕터';
+  $('#listTitle').textContent=openShelf?name+' › '+openShelf:name;$('#listCount').textContent=displayGroups.filter(g=>categoryMatches(g,category)&&(!openShelf||shelfFor(g)===openShelf)).length+'개 챕터';
   $('#listHead').classList.remove('hidden');
  }
  const visible=displayGroups.filter(g=>categoryMatches(g,category)).map(g=>({g,episodes:sortedEpisodes(g).filter(e=>!q||[e.title,e.description,e.id,g.title,chapterDisplayTitle(g)].some(v=>(v||'').toLowerCase().includes(q)))})).filter(x=>x.episodes.length);
  if(!visible.length){host.append(error('검색 결과가 없습니다.'));return}
  const selected=visible.find(x=>x.g.id===openFolderId||x.g.key===openFolderId);
  if(selected){
-  const back=el('button','folder-back','← 폴더 목록');back.onclick=()=>showHome(category);host.append(back);
+  const back=el('button','folder-back',selected.g.shelfFolder?'← '+shelfFor(selected.g):'← 폴더 목록');back.onclick=()=>showHome(category,{shelf:selected.g.shelfFolder?shelfFor(selected.g):null});host.append(back);
   const panel=el('section','folder-detail');const art=el('div','folder-art');art.append(el('div','folder-art-kicker','42LAB / CHAPTER RECORD'),el('div','folder-art-symbol','◇'),el('h2','',chapterDisplayTitle(selected.g)),el('p','','CHAPTER IMAGE PENDING'));
   const side=el('div','folder-episodes');
   const episodeScroll=el('div','folder-episode-scroll');
@@ -340,15 +340,29 @@ function drawLibrary(){
     const info=el('span','chapter-list-info');info.append(el('strong','',title));if(g.subtitle)info.append(el('span','chapter-card-subtitle',g.subtitle));info.append(el('small','',episodes.length+'개 기록'));
     b.append(info,el('span','chapter-list-arrow','›'));
    }
-   b.onclick=()=>showChapter(groupKey(g));
+   b.onclick=()=>g._folder?showHome(category,{shelf:g.shelf}):showChapter(groupKey(g));
+   if(g._folder){b.classList.add('shelf-folder-card');const sm=b.querySelector('small');if(sm)sm.textContent=g._count+'개 폴더 · '+episodes.length+'개 기록'}
    return b;
   };
+  // v0.9.2 폴더 안 폴더: shelfFolder 묶음은 「그 외」에서 상위 폴더 카드 하나로, 누르면 세부 폴더
+  let items=visible;
+  if(openShelf){
+   items=visible.filter(x=>shelfFor(x.g)===openShelf);
+   const catName=(storyCategories.find(([id])=>id===category)||[,''])[1];
+   const up=el('button','folder-back','← '+catName);up.onclick=()=>showHome(category);host.append(up);
+  }else{
+   const folders=new Map();items=[];
+   for(const x of visible){
+    if(x.g.shelfFolder){const k=shelfFor(x.g);let f=folders.get(k);if(!f){f={g:{id:'shelf:'+k,title:k,shelf:k,_folder:true,_count:0},episodes:[]};folders.set(k,f);items.push(f)}f.g._count++;f.episodes.push(...x.episodes)}
+    else items.push(x);
+   }
+  }
   // Keep main story's chronology as a continuous list; group special stories into shelves.
-  if(category==='special'||visible.some(x=>shelfFor(x.g))){
-   host.append(renderShelfSections(visible,makeCard));
+  if(!openShelf&&items.some(x=>shelfFor(x.g))){
+   host.append(renderShelfSections(items,makeCard));
   }else{
    const grid=el('div',viewMode==='folder'?'drive-grid':viewMode==='list'?'chapter-list':'folder-grid');
-   visible.forEach((item,i)=>grid.append(makeCard(item,i)));
+   items.forEach((item,i)=>grid.append(makeCard(item,i)));
    host.append(grid);
   }
 
@@ -371,6 +385,11 @@ function chapterDisplayTitle(group){
  return title.startsWith(n+' ')||title.startsWith(n+'.')?title:n+'. '+title;
 }
 
+function renderCatTabs(){
+ const nav=$('#catTabs');if(!nav)return;
+ if(!nav.childElementCount){const h=el('button','cat-tab cat-home','홈');h.type='button';h.dataset.category='';h.onclick=()=>{$('#search').value='';showHome(null)};nav.append(h);for(const [id,name] of storyCategories.filter(([id])=>id!=='all')){const b=el('button','cat-tab',name.replace(/\s*스토리$/,''));b.type='button';b.dataset.category=id;b.onclick=()=>{$('#search').value='';showHome(id)};nav.append(b)}}
+ nav.querySelectorAll('.cat-tab').forEach(b=>{const on=b.dataset.category===(category??'')&&!openFolderId||(b.dataset.category!==''&&b.dataset.category===category);b.classList.toggle('selected',on);b.setAttribute('aria-pressed',String(on))});
+}
 function initIndex(d){index=d;storyCategories=[...(d.categories||[]).map(c=>[c.id,c.name]),['all','전체 기록']];displayGroups=makeDisplayGroups(d.groups||[]);drawLibrary()}
 // ---------- v0.9.0 첫 화면: 공지 · 일러스트 · 피드백/다른 사이트 ----------
 function deviceLabel(){
@@ -423,7 +442,7 @@ function renderLanding(host){
  wrap.append(notice,art,side);host.append(wrap);
 }
 // Hierarchical navigation: category label navigates, chevron expands chapter links.
-function closeArchiveMenu(){const menu=$('#archiveMenu');menu.classList.add('hidden');$('#menuBtn').setAttribute('aria-expanded','false')}
+function closeArchiveMenu(){const menu=$('#archiveMenu');menu.classList.remove('open');menu.setAttribute('aria-hidden','true');$('#menuBtn').setAttribute('aria-expanded','false');$('#menuBtn').classList.remove('is-open')}
 function renderArchiveMenu(){
  const host=$('#archiveMenuList');host.replaceChildren();
  const homeLink=el('button','archive-menu-link archive-menu-home','홈');homeLink.type='button';homeLink.onclick=()=>{closeArchiveMenu();$('#search').value='';showHome(null)};host.append(homeLink);
@@ -433,16 +452,16 @@ function renderArchiveMenu(){
   const label=el('button','archive-menu-link',name);label.type='button';
   label.onclick=()=>{closeArchiveMenu();showHome(id)};
   const groups=displayGroups.filter(g=>categoryMatches(g,id));
-  const children=el('div','archive-menu-children hidden');
-  const arrow=el('button','archive-menu-expand','›');arrow.type='button';
+  const children=el('div','archive-menu-children');const inner=el('div','archive-menu-children-inner');children.append(inner);
+  const arrow=el('button','archive-menu-expand');arrow.type='button';arrow.append(el('span','tri','▶'));
   arrow.setAttribute('aria-label',name+' 챕터 펼치기');arrow.setAttribute('aria-expanded','false');
-  arrow.onclick=()=>{const expanded=children.classList.toggle('hidden')===false;arrow.textContent=expanded?'⌄':'›';arrow.setAttribute('aria-expanded',String(expanded))};
-  for(const g of groups){const link=el('button','archive-menu-chapter',chapterDisplayTitle(g));link.type='button';link.onclick=()=>{closeArchiveMenu();showChapter(groupKey(g),id)};children.append(link)}
+  arrow.onclick=()=>{const expanded=row.classList.toggle('expanded');arrow.setAttribute('aria-expanded',String(expanded))};
+  for(const g of groups){const link=el('button','archive-menu-chapter',chapterDisplayTitle(g));link.type='button';link.onclick=()=>{closeArchiveMenu();showChapter(groupKey(g),id)};inner.append(link)}
   line.append(label,arrow);row.append(line,children);host.append(row);
  }
  const all=el('button','archive-menu-link archive-menu-all','전체 기록');all.onclick=()=>{closeArchiveMenu();showHome('all')};host.append(all);
 }
-$('#menuBtn').onclick=()=>{const menu=$('#archiveMenu');if(menu.classList.contains('hidden')){renderArchiveMenu();menu.classList.remove('hidden');$('#menuBtn').setAttribute('aria-expanded','true')}else closeArchiveMenu()};
+$('#menuBtn').onclick=()=>{const menu=$('#archiveMenu');if(!menu.classList.contains('open')){renderArchiveMenu();menu.classList.add('open');menu.removeAttribute('aria-hidden');$('#menuBtn').setAttribute('aria-expanded','true');$('#menuBtn').classList.add('is-open')}else closeArchiveMenu()};
 $('#archiveMenuClose').onclick=closeArchiveMenu;
 $('#archiveMenuBackdrop').onclick=closeArchiveMenu;
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeArchiveMenu()});
@@ -494,6 +513,14 @@ function createUnit(block,unit,entry,context=''){
   if(first&&(!right||who.professorVariant==='role'||who.professorVariant==='joint')){const label=el('div','name');if(who.nameSpans)spans(label,{spans:who.nameSpans});else label.textContent=who.name||nick();main.append(label)}
   let bubble=el('div','bubble'+(unit.monologue?' mono':'')+(first?' tail':''));spans(bubble,unit);main.append(bubble);chat.append(main);outer.append(chat);
  }else{
+  const raw=String(unit.displayText||(unit.spans||[]).map(x=>x.text||'').join(''));
+  const cm=raw.match(/^\s*(>>)\s*((?:SPECIAL\s+)?CHAPTER\s*\d*)\s*(\/\/)\s*([\s\S]*)$/i);
+  if(cm&&(kind==='scene'||kind==='narration')){
+   // v0.9.2 챕터 제목 줄: 콘솔 한 줄 (B안)
+   const end=/E\s*N\s*D/.test(cm[4]);const c=el('div','center-item chapter-line'+(end?' is-end':''));
+   c.append(el('span','cl-mark','>> '),el('span','cl-chapter',cm[2].replace(/\s+/g,' ').trim()),el('span','cl-sep',' // '),el('span','cl-title',cm[4].replace(/\u00a0/g,' ').replace(/\s{2,}/g,' ').trim()),el('span','cl-cursor','▌'));
+   outer.append(c);return outer;
+  }
   let cls=unit.style==='letter'?'letter':kind==='scene'?'scene':kind==='warning'?'warning':'narration';
   let c=el('div','center-item '+cls);spans(c,unit);outer.append(c)
  }return outer
@@ -604,12 +631,13 @@ function pump(){while(cursor<flowNodes.length){let node=flowNodes[cursor];if(nod
 // 장면 배경 중 이름에 cg가 든 것 = CG. assets/cg/manifest.json에 있는 파일만 보여 준다 (없는 파일 요청을 만들지 않기 위해).
 let cgSet=new Set(),lastCG=null;
 fetchJSON('./assets/cg/manifest.json',1).then(m=>{cgSet=new Set(Array.isArray(m)?m:(m.files||[]))}).catch(()=>{});
+const cgMode=()=>{const m=get('cgMode',null);if(['large','small','off'].includes(m))return m;return get('showCG',true)===false?'off':'large'};
 const cgSrc=p=>'./assets/cg/'+p+'.webp';
 function maybeCG(node,target){
  const p=(node.stage?.backgrounds||[]).find(x=>/cg/i.test(String(x).split('/').pop()));
  if(!p||p===lastCG)return;lastCG=p;
- if(!get('showCG',true)||!cgSet.has(p))return;
- const fig=el('figure','entry cg-figure');fig.dataset.uid=(node.ref||'')+'.cg';
+ const mode=cgMode();if(mode==='off'||!cgSet.has(p))return;
+ const fig=el('figure','entry cg-figure cg-'+mode);fig.dataset.uid=(node.ref||'')+'.cg';
  const img=document.createElement('img');img.src=cgSrc(p);img.alt='CG';img.loading='lazy';img.decoding='async';img.onerror=()=>fig.remove();
  const btn=el('button','cg-thumb');btn.type='button';btn.setAttribute('aria-label','CG 크게 보기');btn.append(img);btn.onclick=()=>{$('#cgViewImg').src=cgSrc(p);$('#cgView').showModal()};
  fig.append(btn);target.append(fig);
@@ -707,14 +735,14 @@ const fontValues={fontSize:[14,16,18,20,22,24],letterSpacing:[0,.5,1,1.5,2],line
 const themeNames={light:'라이트',dim:'딤',dark:'다크',persica:'페르시카',entropics:'엔트로피'};
 function selectPage(page){settingsPage=page;$('#settingsRoot').hidden=page!=='root';$('#settingsFont').hidden=page!=='font';$('#settingsTheme').hidden=page!=='theme';$('#settingsBack').hidden=page==='root';$('#settingsTitle').textContent=page==='font'?'글꼴':page==='theme'?'테마':'설정';if(page==='theme')renderThemeList();if(page==='font')renderFontControls()}
 function setTheme(t){set('theme',t);set('brightness',BRIGHT.includes(t)?t:'custom');applySettings();renderThemeList();renderQuick()}
-function renderQuick(){const brightness=brightnessMode();document.querySelectorAll('[data-cg]').forEach(b=>b.classList.toggle('selected',String(get('showCG',true))===b.dataset.cg));document.querySelectorAll('[data-brightness]').forEach(b=>b.classList.toggle('selected',b.dataset.brightness===brightness));const reading=get('readingMode','accessible');document.querySelectorAll('[data-reading]').forEach(b=>b.classList.toggle('selected',b.dataset.reading===reading))}
+function renderQuick(){const brightness=brightnessMode();document.querySelectorAll('[data-cg]').forEach(b=>b.classList.toggle('selected',cgMode()===b.dataset.cg));document.querySelectorAll('[data-brightness]').forEach(b=>b.classList.toggle('selected',b.dataset.brightness===brightness));const reading=get('readingMode','accessible');document.querySelectorAll('[data-reading]').forEach(b=>b.classList.toggle('selected',b.dataset.reading===reading))}
 function renderFontControls(){let host=$('#fontControls');host.replaceChildren();for(const [field,values] of Object.entries(fontValues)){const wrap=el('div','setting-block');const title=el('strong','',field==='fontSize'?'글자 크기':field==='letterSpacing'?'자간':'줄 간격');wrap.append(title);const options=el('div','setting-options font-options');let current=get(field,field==='fontSize'?16:field==='letterSpacing'?0:160);for(let v of values){let label=field==='lineHeight'?(v/100).toFixed(1):v+(field==='fontSize'||field==='letterSpacing'?'px':'');let b=el('button',current===v?'selected':'',label);b.onclick=()=>{set(field,v);applySettings();renderFontControls()};options.append(b)}wrap.append(options);host.append(wrap)}$('#settingsFont').style.setProperty('--preview-size',get('fontSize',16)+'px');$('#settingsFont').style.setProperty('--preview-spacing',get('letterSpacing',0)+'px');$('#settingsFont').style.setProperty('--preview-line',get('lineHeight',160)/100)}
 function renderThemeList(){const host=$('#themeList');host.replaceChildren();for(const [id,name] of Object.entries(themeNames)){let locked=['persica','entropics'].includes(id)&&!get('unlocked.'+id,false);let row=el('div','theme-option');let b=el('button','theme-pick'+(currentTheme()===id?' selected':''));b.disabled=locked;b.append(el('span','theme-swatch swatch-'+id),el('span','', (locked?'🔒 ':'')+name));if(currentTheme()===id)b.append(el('span','theme-current','✓'));b.onclick=()=>setTheme(id);row.append(b);if(!locked&&['persica','entropics'].includes(id)){let replay=el('button','theme-replay','↻ 재생');replay.onclick=()=>runUnlock(id,true);row.append(replay)}host.append(row)}}
 function renderLang(){const host=$('#langOptions');host.replaceChildren();const cur=uiLang();for(const [id,name] of LANGS){const ready=readyLangs.includes(id);const b=el('button',cur===id?'selected':'',name+(ready?'':' · 준비 중'));b.type='button';b.dataset.lang=id;b.disabled=!ready;b.onclick=()=>{if(uiLang()===id)return;set('lang',id);location.reload()};host.append(b)}}
 $('#settingsBtn').onclick=()=>{selectPage('root');renderQuick();renderLang();settings.showModal()};$('#settingsClose').onclick=()=>settings.close();$('#settingsBack').onclick=()=>selectPage('root');document.querySelectorAll('[data-page]').forEach(b=>b.onclick=()=>selectPage(b.dataset.page));
 $('#nickname').onchange=e=>{set('nickname',e.target.value.trim()||'교수');if(data&&current)openEpisode(current,{push:false})};
 document.querySelectorAll('[data-brightness]').forEach(b=>b.onclick=()=>{const v=b.dataset.brightness;if(v==='system')set('brightness','system');else setTheme(v);applySettings();renderThemeList();renderQuick()});
-document.querySelectorAll('[data-cg]').forEach(b=>b.onclick=()=>{set('showCG',b.dataset.cg==='true');renderQuick()});
+document.querySelectorAll('[data-cg]').forEach(b=>b.onclick=()=>{set('cgMode',b.dataset.cg);renderQuick()});
 try{matchMedia('(prefers-color-scheme: dark)').addEventListener('change',()=>{if(brightnessMode()==='system')applySettings()})}catch(e){}
 document.querySelectorAll('[data-reading]').forEach(b=>b.onclick=()=>{set('readingMode',b.dataset.reading);applySettings();renderQuick()});
 // Hidden theme unlock. Trigger is recognized only in find/search, never nickname.

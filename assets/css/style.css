@@ -394,3 +394,60 @@ html,body{overflow-x:hidden}
  .to-top{right:14px;bottom:18px;width:42px;height:42px}
  .system-box{max-width:96%}
 }
+
+/* v0.9.2 (체리) */
+/* 1. 시스템 안내 상자 가운데 */
+.system-box{margin-left:auto;margin-right:auto}
+/* 3. 챕터 제목 줄 — 콘솔 한 줄 */
+.chapter-line{margin:14px auto;padding:6px 10px;font:600 18px/1.6 ui-monospace,"Cascadia Mono",Consolas,"Noto Sans KR",monospace;letter-spacing:.02em;color:var(--ink);text-align:center;white-space:pre-wrap}
+.chapter-line .cl-mark,.chapter-line .cl-chapter{color:var(--accent-text,var(--accent));font-weight:800}
+.chapter-line .cl-sep{color:var(--sub)}
+.chapter-line .cl-cursor{color:var(--accent);margin-left:4px;animation:cl-blink 1.05s steps(1) infinite}
+.chapter-line.is-end{font-size:15px;color:var(--sub)}
+@keyframes cl-blink{50%{opacity:0}}
+/* 4. CG 크게(칸 폭 가득) · 작게 */
+.cg-figure.cg-large{align-self:stretch;max-width:none;width:100%;margin:8px 0}
+.cg-figure.cg-small{max-width:min(420px,80%)}
+/* 6. ☰ 메뉴 열고 닫기 움직임 + ☰ → ✕ */
+.archive-menu{visibility:hidden;pointer-events:none;transition:visibility 0s linear .26s}
+.archive-menu.open{visibility:visible;pointer-events:auto;transition:visibility 0s}
+.archive-menu .archive-menu-backdrop{opacity:0;transition:opacity .26s ease}
+.archive-menu.open .archive-menu-backdrop{opacity:1}
+.archive-menu .archive-menu-panel{transform:translateX(-102%);transition:transform .26s cubic-bezier(.2,.8,.2,1)}
+.archive-menu.open .archive-menu-panel{transform:none}
+.archive-menu-toggle{position:relative;width:40px;height:40px;font-size:0!important}
+.archive-menu-toggle::before,.archive-menu-toggle::after{content:"";position:absolute;left:11px;right:11px;height:2px;background:currentColor;border-radius:2px;transition:transform .26s ease,box-shadow .26s ease}
+.archive-menu-toggle::before{top:13px;box-shadow:0 6px 0 currentColor}
+.archive-menu-toggle::after{top:25px}
+.archive-menu-toggle.is-open::before{transform:translateY(6px) rotate(45deg);box-shadow:none}
+.archive-menu-toggle.is-open::after{transform:translateY(-6px) rotate(-45deg)}
+/* 7. 펼치기 ▶ 회전 + 목록 부드럽게 */
+.archive-menu-expand .tri{display:inline-block;font-size:11px;transition:transform .2s ease}
+.archive-menu-category.expanded .archive-menu-expand .tri{transform:rotate(90deg)}
+.archive-menu-children{display:grid;grid-template-rows:0fr;transition:grid-template-rows .22s ease;padding:0 6px 0 17px}
+.archive-menu-category.expanded .archive-menu-children{grid-template-rows:1fr;padding-bottom:10px}
+.archive-menu-children-inner{overflow:hidden;display:flex;flex-direction:column;gap:2px;min-height:0}
+@media(prefers-reduced-motion:reduce){.archive-menu,.archive-menu *,.archive-menu-toggle::before,.archive-menu-toggle::after,.chapter-line .cl-cursor{transition:none!important;animation:none!important}}
+/* 8. 분류 버튼 + 검색 칸 */
+.toolbar{align-items:center;gap:14px}
+.cat-tabs{display:flex;gap:6px;flex:none}
+.cat-tab{height:52px;padding:0 18px;border-radius:12px;font-size:14px;font-weight:600;white-space:nowrap;background:var(--panel)}
+.cat-tab.selected{border-color:var(--accent);color:var(--accent-text,var(--accent));background:color-mix(in srgb,var(--accent) 10%,var(--panel))}
+/* 8. 폴더 적은 선반은 반씩 */
+.shelf-wrap{display:grid;grid-template-columns:1fr 1fr;column-gap:32px}
+.shelf-wrap>.story-shelf{grid-column:1/-1;min-width:0}
+.shelf-wrap>.story-shelf.shelf-half{grid-column:auto}
+.shelf-half .folder-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+.shelf-half .drive-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+.shelf-folder-card .folder-tile-symbol::before{content:"▤ ";font-size:.5em;vertical-align:middle}
+@media(max-width:900px){.cat-tab{padding:0 12px}}
+@media(max-width:750px){
+ .toolbar{flex-direction:column;align-items:stretch;gap:10px}
+ .cat-tabs{overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;padding-bottom:2px}
+ .cat-tabs::-webkit-scrollbar{display:none}
+ .cat-tab{height:40px;flex:none}
+ .shelf-wrap{grid-template-columns:1fr}
+ .shelf-wrap>.story-shelf.shelf-half{grid-column:1/-1}
+ .chapter-line{font-size:15px}
+ .chapter-line.is-end{font-size:13px}
+}
