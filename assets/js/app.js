@@ -99,7 +99,7 @@ function showHome(cat=null,{push=true,shelf=null}={}){
  routeToken++;
  selectCategory(cat);
  openFolderId=null;openShelf=shelf||null;
- $('#reader').classList.add('hidden');
+ $('#reader').classList.add('hidden');bgmLeave();
  $('#library').classList.remove('hidden');
  if(push)saveRoute({type:'home',category,shelf:openShelf});
  drawLibrary();
@@ -277,7 +277,7 @@ function renderSearch(q,host){
  if(!any&&cast)host.append(error('검색 결과가 없습니다.'));
 }
 function drawLibrary(){
- $('#library').classList.remove('hidden');$('#reader').classList.add('hidden');$('#crumb').textContent='';
+ $('#library').classList.remove('hidden');$('#reader').classList.add('hidden');bgmLeave();$('#crumb').textContent='';
  const q=$('#search').value.trim().toLowerCase(), host=$('#groups');host.replaceChildren();
  $('#listHead').classList.add('hidden');renderCatTabs();
  if(q){renderSearch(q,host);return}
@@ -293,7 +293,7 @@ function drawLibrary(){
  const selected=visible.find(x=>x.g.id===openFolderId||x.g.key===openFolderId);
  if(selected){
   const back=el('button','folder-back');back.append(ic('left'),document.createTextNode(' '+(selected.g.shelfFolder?shelfFor(selected.g):'폴더 목록')));back.onclick=()=>showHome(category,{shelf:selected.g.shelfFolder?shelfFor(selected.g):null});host.append(back);
-  const panel=el('section','folder-detail');const art=el('div','folder-art');art.append(el('div','folder-art-kicker','42LAB / CHAPTER RECORD'),el('div','folder-art-symbol','◇'),el('h2','',chapterDisplayTitle(selected.g)),el('p','','CHAPTER IMAGE PENDING'));
+  const panel=el('section','folder-detail');const art=el('div','folder-art');art.dataset.gid=selected.g.id;art.append(el('div','folder-art-kicker','42LAB / CHAPTER RECORD'),el('div','folder-art-symbol','◇'),el('h2','',chapterDisplayTitle(selected.g)),el('p','folder-art-pending','CHAPTER IMAGE PENDING'));applyFolderArt(art);
   const side=el('div','folder-episodes');
   const episodeScroll=el('div','folder-episode-scroll');
   const header=el('div','folder-episodes-header');
@@ -332,7 +332,7 @@ function drawLibrary(){
    b.type='button';
    const title=chapterDisplayTitle(g);
    if(viewMode==='file'){
-    const visual=el('div','folder-tile-visual');
+    const visual=el('div','folder-tile-visual');visual.dataset.gid=g.id;
     visual.append(el('span','folder-tile-code','42LAB / '+String(i+1).padStart(2,'0')),el('span','folder-tile-symbol','◇'));
     const info=el('div','folder-tile-info');info.append(el('strong','',title));if(g.subtitle)info.append(el('span','chapter-card-subtitle',g.subtitle));info.append(el('small','',episodes.length+'개 기록'));
     b.append(visual,info);
@@ -344,6 +344,7 @@ function drawLibrary(){
     const info=el('span','chapter-list-info');info.append(el('strong','',title));if(g.subtitle)info.append(el('span','chapter-card-subtitle',g.subtitle));info.append(el('small','',episodes.length+'개 기록'));
     {const a=el('span','chapter-list-arrow');a.append(ic('right'));b.append(info,a)}
    }
+   {const v=b.querySelector('.folder-tile-visual');if(v)applyFolderArt(v)}
    b.onclick=()=>g._folder?showHome(category,{shelf:g.shelf}):showChapter(groupKey(g));
    if(g._folder){b.classList.add('shelf-folder-card');const sm=b.querySelector('small');if(sm)sm.textContent=g._count+'개 폴더 · '+episodes.length+'개 기록'}
    return b;
@@ -677,6 +678,13 @@ function pump(){while(cursor<flowNodes.length){let node=flowNodes[cursor];if(nod
 // ---------- v0.9.1 CG ----------
 // 장면 배경 중 이름에 cg가 든 것 = CG. assets/cg/manifest.json에 있는 파일만 보여 준다 (없는 파일 요청을 만들지 않기 위해).
 let cgSet=new Set(),lastCG=null;
+// v0.9.9 챕터(폴더) 일러스트: assets/folder/manifest.json = {그룹 id: 파일 이름}. 바깥 카드는 작은 그림(s/), 안쪽 칸은 큰 그림
+let folderArt=null;
+function applyFolderArt(node){const slug=folderArt?.[node.dataset.gid];if(!slug||node.classList.contains('has-art'))return;
+ const big=node.classList.contains('folder-art'),img=document.createElement('img');img.className='folder-art-img';img.alt='';img.decoding='async';if(!big)img.loading='lazy';
+ img.src='./assets/folder/'+(big?'':'s/')+slug+'.webp';img.onload=()=>node.classList.add('art-ready');img.onerror=()=>{img.remove();node.classList.remove('has-art')};
+ node.classList.add('has-art');node.prepend(img)}
+fetchJSON('./assets/folder/manifest.json',1).then(m=>{folderArt=m||{};document.querySelectorAll('[data-gid]').forEach(applyFolderArt)}).catch(()=>{folderArt={}});
 fetchJSON('./assets/cg/manifest.json',1).then(m=>{cgSet=new Set(Array.isArray(m)?m:(m.files||[]))}).catch(()=>{});
 const cgMode=()=>{const m=get('cgMode',null);if(m==='off'||m==='on')return m;if(m==='large'||m==='small')return 'on';return get('showCG',true)===false?'off':'on'};
 const cgSrc=p=>'./assets/cg/'+p+'.webp';
@@ -881,6 +889,7 @@ async function bgmPlay(cue){
   bgmGain.gain.value=(bgmVolume()/100)**2;
   let buf=bgmBuf.get(cue);
   if(!buf){$('#bgmPlay').replaceChildren(el('span','bgm-wait','…'));const r=await fetch(bgmBase()+encodeURIComponent(info.file||cue+'.m4a'));if(!r.ok)throw Error('HTTP '+r.status);buf=await bgmCtx.decodeAudioData(await r.arrayBuffer());bgmBuf.set(cue,buf);if(bgmBuf.size>4)bgmBuf.delete(bgmBuf.keys().next().value)}
+  if($('#reader').classList.contains('hidden'))return; // 곡을 받는 사이 회차 화면을 나갔으면 틀지 않음
   bgmStop(false);
   const src=bgmCtx.createBufferSource();src.buffer=buf;src.loop=true;
   const ls=+info.loopStart||0,le=+info.loopEnd||0;if(le>ls&&le<=buf.duration+.05){src.loopStart=ls;src.loopEnd=Math.min(le,buf.duration)}
@@ -888,11 +897,19 @@ async function bgmPlay(cue){
  }catch(e){bgmPlaying=null;$('#bgmNow').textContent=' · 재생할 수 없어요'}
  syncBgmBar();
 }
+// 회차 화면을 나가면(첫 화면 · 목록 · 챕터) 음악을 멈춤. 회차끼리 넘어갈 때는 계속
+function bgmLeave(){if(bgmSrc||bgmPlaying)bgmStop()}
 function bgmStop(sync=true){try{bgmSrc?.stop()}catch(e){}bgmSrc=null;if(sync){bgmPlaying=null;syncBgmBar()}}
 $('#bgmPlay').onclick=()=>{if(bgmPlaying&&bgmPlaying===bgmEpisode)bgmStop();else bgmPlay(bgmEpisode)};
-$('#bgmVolBtn').onclick=()=>{const p=$('#bgmVolPop');p.hidden=!p.hidden;$('#bgmVolBtn').setAttribute('aria-expanded',String(!p.hidden))};
-{const v=$('#bgmVol');v.value=bgmVolume();$('#bgmVolNum').textContent=v.value;v.oninput=()=>{set('bgmVolume',+v.value);$('#bgmVolNum').textContent=v.value;if(bgmGain)bgmGain.gain.value=(+v.value/100)**2}}
-document.addEventListener('click',e=>{const p=$('#bgmVolPop');if(!p.hidden&&!e.target.closest('.bgm-vol')){p.hidden=true;$('#bgmVolBtn').setAttribute('aria-expanded','false')}});
+
+// v0.9.7 창 바깥(어두운 부분)을 누르면 닫기. 첫 방문 창 · 테마 해금 연출은 제외
+for(const id of ['settings','userDialog','infoDialog','cgView','lore']){const d=document.getElementById(id);if(!d)continue;let downOut=false;
+ const out=e=>{const r=d.getBoundingClientRect();return e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom};
+ d.addEventListener('pointerdown',e=>{downOut=e.target===d&&out(e)});
+ d.addEventListener('click',e=>{if(downOut&&e.target===d&&out(e))d.close();downOut=false})}
+// v0.9.6 음량은 설정 > SOUND 에서 (막대 채움 색은 --val)
+{const v=$('#bgmVol');const show=()=>{$('#bgmVolNum').textContent=v.value+'%';v.style.setProperty('--val',v.value+'%')};v.value=bgmVolume();show();v.oninput=()=>{set('bgmVolume',+v.value);show();if(bgmGain)bgmGain.gain.value=(+v.value/100)**2}}
+
 // 회차 중간에 곡이 바뀌는 곳: 「♪ 곡 이름」 작은 단추 (누르면 그 곡으로)
 function maybeBgmMark(node,target){
  if(!('bgm' in node))return;if(node.bgm===null){lastMark=null;return}

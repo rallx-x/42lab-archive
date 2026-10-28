@@ -567,3 +567,73 @@ html,body{overflow-x:hidden}
 /* v0.9.5a 그림만 있는 단추: 아이콘을 정가운데로 */
 .cg-full,.cg-close,.to-top,.icon-btn,.bgm-play,.bgm-vol-btn,.cal-nav,.episode-navigation button,.archive-menu-toggle,#archiveMenuClose,.settings-header button{display:grid;place-items:center}
 .cg-full .ic,.cg-close .ic,.to-top .ic,.icon-btn .ic,.bgm-play .ic,.bgm-vol-btn .ic,.cal-nav .ic,.episode-navigation .ic,#archiveMenuClose .ic,.settings-header button .ic{display:block;vertical-align:0}
+
+/* v0.9.6 BGM 막대: 회차 중간 「♪ 곡」처럼 둥글게, 가운데 */
+.bgm-bar{width:fit-content;max-width:100%;margin:16px auto 0;padding:5px 18px 5px 5px;gap:10px;border-radius:999px;background:var(--panel)}
+.bgm-bar .bgm-play{width:30px;height:30px}
+.bgm-bar .bgm-label{flex:0 1 auto;font-size:13px}
+/* 설정 > SOUND 음량 막대 */
+.vol-row{display:flex;align-items:center;gap:12px;margin-top:10px}
+.vol-ic{font-size:18px;color:var(--sub)}
+.vol-num{font:600 12px ui-monospace,Consolas,monospace;color:var(--sub);min-width:38px;text-align:right}
+.vol-range{-webkit-appearance:none;appearance:none;flex:1;min-width:0;height:22px;background:transparent;margin:0;cursor:pointer;--val:30%}
+.vol-range::-webkit-slider-runnable-track{height:6px;border-radius:999px;background:linear-gradient(90deg,var(--accent) var(--val),var(--line) var(--val))}
+.vol-range::-moz-range-track{height:6px;border-radius:999px;background:var(--line)}
+.vol-range::-moz-range-progress{height:6px;border-radius:999px;background:var(--accent)}
+.vol-range::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;margin-top:-6px;border-radius:50%;background:var(--panel);border:2px solid var(--accent);box-shadow:0 1px 4px #0004}
+.vol-range::-moz-range-thumb{width:14px;height:14px;border-radius:50%;background:var(--panel);border:2px solid var(--accent)}
+.vol-range:focus-visible{outline:2px solid var(--accent);outline-offset:4px;border-radius:8px}
+
+/* v0.9.7 음량 막대에 창 입력칸 테두리가 씌워지던 것 없앰 */
+dialog input.vol-range{border:0;padding:0;background:transparent;margin:0;display:block}
+/* v0.9.8 첫 화면 소개 칸: CG를 칸 전체 배경으로, 글씨는 위에 (PC · 모바일 같음, 모든 테마에서 어둡게 깔아 글씨가 잘 보이게) */
+.hero{position:relative;display:block;min-height:320px;background:#1a2632 url("../img/hero-42lab.webp") 70% 50%/cover no-repeat;border-color:#ffffff1f;isolation:isolate}
+.hero::before{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(90deg,#0d141cf2 0%,#0d141cd9 34%,#0d141c80 62%,#0d141c26 100%),linear-gradient(0deg,#0d141c99,transparent 45%)}
+.hero .hero-copy{position:relative;max-width:640px}
+.hero h1{color:#fff;text-shadow:0 2px 18px #0008}
+.hero p{color:#d7dde4;text-shadow:0 1px 10px #000a}
+.hero .eyebrow{text-shadow:0 1px 8px #0009}
+.hero-tags span{background:#0d141cb3;border-color:#ffffff2e;color:#c9d0d8;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}
+.hero-art.has-img{position:absolute;inset:0;background:none;pointer-events:none;display:block}
+.hero-art.has-img:before{content:none}
+.hero-art.has-img .hero-art-caption{color:#ffffffb3}
+@media(max-width:750px){
+ .hero{min-height:0;background-position:72% 50%}
+ .hero::before{background:linear-gradient(90deg,#0d141ceb 0%,#0d141cc7 55%,#0d141c66 100%),linear-gradient(0deg,#0d141cb3,transparent 50%)}
+ .hero-art.has-img{display:none}
+}
+
+/* v0.9.9 챕터(폴더) 일러스트 */
+.folder-art-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 30%;opacity:0;transition:opacity .35s ease;z-index:0}
+.art-ready>.folder-art-img{opacity:1}
+.has-art .folder-art-symbol,.has-art .folder-tile-symbol,.has-art .folder-art-pending{display:none}
+/* 안쪽 칸: 아래쪽을 어둡게 깔아 제목이 잘 보이게 (테마 상관없이 흰 글씨) */
+.folder-art.has-art{isolation:isolate;background:#10161d}
+.folder-art.has-art::before{content:"";position:absolute;inset:0;z-index:1;background:linear-gradient(0deg,#0b1016f0 0%,#0b1016b3 22%,#0b101626 50%,transparent 70%)}
+.folder-art.has-art>*:not(.folder-art-img){position:relative;z-index:2}
+.folder-art.has-art::after{z-index:2;border-color:#ffffff30}
+.folder-art.has-art h2{color:#fff;text-shadow:0 2px 14px #000c}
+/* 바깥 카드 */
+.folder-tile-visual.has-art{background:#10161d}
+.folder-tile-visual.has-art::before{content:"";position:absolute;inset:0;z-index:1;background:linear-gradient(180deg,#0b1016a6 0%,transparent 38%)}
+.folder-tile-visual.has-art .folder-tile-code{z-index:2;color:#ffffffd9;text-shadow:0 1px 6px #000}
+.folder-tile-visual.has-art::after{z-index:2;border-color:#ffffff30}
+.folder-tile:hover .art-ready>.folder-art-img{transform:scale(1.04)}
+.folder-tile-visual .folder-art-img{transition:opacity .35s ease,transform .4s ease}
+@media(prefers-reduced-motion:reduce){.folder-art-img{transition:none!important}.folder-tile:hover .art-ready>.folder-art-img{transform:none}}
+/* 모바일: 안쪽 칸을 띠로 보여줌 (그림 있을 때만) */
+@media(max-width:750px){
+ .folder-art.has-art{display:flex;min-height:210px;padding:22px 22px 20px;border-radius:14px 14px 0 0}
+ .folder-art.has-art .folder-art-img{object-position:50% 22%}
+ .folder-art.has-art h2{font-size:22px}
+}
+
+/* v0.9.9a 소개 칸: 그림 전체를 덮지 않고 왼쪽만 그라데이션 + 글씨 그림자 */
+.hero::before{background:linear-gradient(90deg,#0b1118d9 0%,#0b1118a6 26%,#0b111840 46%,transparent 62%)}
+.hero h1{text-shadow:0 2px 4px #000a,0 4px 24px #000c}
+.hero p{color:#e6ebf0;text-shadow:0 1px 3px #000c,0 2px 14px #000a}
+.hero .eyebrow{text-shadow:0 1px 3px #000c,0 1px 10px #000a}
+.hero-art.has-img .hero-art-caption{text-shadow:0 1px 4px #000c}
+@media(max-width:750px){
+ .hero::before{background:linear-gradient(90deg,#0b1118d9 0%,#0b1118a6 45%,#0b111833 80%,transparent 100%)}
+}
