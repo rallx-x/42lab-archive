@@ -13,9 +13,61 @@
  ],
  "notices": [
   {
+   "id": "2026-10-30-welcome",
+   "date": "2026-10-30",
+   "pinned": true,
+   "title": "About the 42LAB Record Archive",
+   "lines": [
+    "Welcome to the 42LAB Record Archive, where all the stories and records of Girls' Frontline: Neural Cloud are gathered.",
+    "This is a fan-made site built through vibe coding. All rights belong to Sunborn Network Technology Co., Ltd. and MICA Team.",
+    "It contains every story and Doll profile from the global server, plus content that exists only on the CN server.",
+    "You can browse everything from in-game stories to Doll profiles and voice lines.",
+    "All text for the four Dolls with no text on the global server (Havoc, Olivia, Inola, ENIAC) was translated with Claude (AI).",
+    "Because of this, some characters' descriptions or speech may feel unnatural. Corrections and reports are welcome through the Google Form on the main page.",
+    "Most bug reports and questions can be sent through the Google Form.",
+    "For special inquiries, send an Ask or DM to @BPT2xNoa on X (formerly Twitter), and I will do my best to help.",
+    "Thank you."
+   ]
+  },
+  {
+   "id": "2026-10-30-story",
+   "date": "2026-10-30",
+   "title": "About the stories",
+   "lines": [
+    "The Character Events of the three Dolls not released on the global server (Olivia, Inola, ENIAC) may have awkward sentences or incorrectly shown characters.",
+    "If you find any, please include the part name and the exact passage in the form when requesting a fix.",
+    "For the \"Tutorial\" and \"Needs Review\" scripts in the \"Others\" tab, feedback on where they belong and on corrections is always welcome.",
+    "These are parts I couldn't verify myself, so I'd be grateful if you could let me know through the feedback form.",
+    "Thank you."
+   ]
+  },
+  {
+   "id": "2026-10-30-doll",
+   "date": "2026-10-30",
+   "title": "About Doll records",
+   "lines": [
+    "The Doll profiles of the three Dolls not released on the global server (Olivia, Inola, ENIAC) may read unnaturally.",
+    "If you find any, please include the Doll's name and the passage in the form when requesting a fix.",
+    "We are aware that Havoc speaks in a regional dialect, but reviewing the dialect in the Korean version is difficult, so it is on hold for now.",
+    "Thank you."
+   ]
+  },
+  {
+   "id": "2026-10-30-uiux",
+   "date": "2026-10-30",
+   "title": "About UI/UX and features",
+   "lines": [
+    "Feedback on UI/UX improvements and new features is always welcome.",
+    "Changes are made where possible, while keeping the site from getting too heavy.",
+    "Features related to illustrations or in-game information may be added to the menu in the future.",
+    "Features and updates are added without a fixed schedule, and updates are announced only in the notices on this site.",
+    "If you find awkward translations, stage directions shown as dialogue, or broken layouts, please let me know through the feedback form. Including the episode name and the sentence helps me fix it faster.",
+    "Thank you."
+   ]
+  },
+  {
    "id": "2026-10-23-update",
    "date": "2026-10-23",
-   "pinned": true,
    "title": "Update · New home screen and user panel",
    "lines": [
     "Notices, illustration and feedback are now gathered on the home screen.",
@@ -40,12 +92,12 @@
   {
    "id": "guide",
    "date": "",
-   "title": "About the 42LAB Record Archive",
+   "title": "Site guide · Copyright · Privacy",
    "lines": [
     "The 42LAB Record Archive is an unofficial fan site that lets you reread the stories of Girls' Frontline: Neural Cloud like messenger chats.",
     "It is a personal fan project unrelated to the game company, and it makes no money.",
     "Story text is taken as-is from the game. Typos in the original may remain.",
-    "Read in English · 日本語 · 繁體中文 · 简体中文 · 한국어. Stories that exist only on the CN server are fan translations.",
+    "Read in English · 日本語 · 繁體中文 · 简体中文 · 한국어. Stories that exist only on the CN server are fan translations made with Claude (AI).",
     "",
     "[Copyright]",
     "All copyrights to the stories, characters, images and names of Girls' Frontline: Neural Cloud belong to their owners (Sunborn Network Technology Co., Ltd. / MICA Team).",
@@ -58,7 +110,7 @@
     "Settings such as nickname, theme and reading position are stored only in your browser and are deleted with your browser data.",
     "",
     "[Bug reports]",
-    "There are no individual replies. Fixes are announced in notices and on X.",
+    "There are no individual replies. Fixes are announced in the notices on this site.",
     "Typos in the original game text are kept as they are, so they may not be fixed right away."
    ]
   },
@@ -145,5 +197,5 @@
   ],
   "bgmBase": "https://42lab-bgm.pages.dev/"
  },
- "updated": "2026-10-28"
+ "updated": "2026-10-30"
 }

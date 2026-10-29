@@ -830,7 +830,7 @@ function updateEpisodeNav(){
   const g=displayGroups.find(x=>groupKey(x)===n.groupId);
   const battles=sortedEpisodes(g).filter(e=>e.kind==='battleDialog'&&e.follows===current);
   if(battles.length){host.append(el('p','after-head','이 회차의 전투 중 대사 '+battles.length+'편'));const row=el('div','after-row');
-   for(const e of battles){const b=el('button','after-link');b.type='button';b.append(el('span','after-num','전투 '+episodeNumber(e)),el('span','',e.battle?.stageName||episodeTitle(e)));b.onclick=()=>openEpisode(e.id);row.append(b)}
+   for(const e of battles){const b=el('button','after-link');b.type='button';b.append(el('span','after-num',episodeNumber(e)),el('span','',e.battle?.stageName||episodeTitle(e)));b.onclick=()=>openEpisode(e.id);row.append(b)}
    host.append(row)}
  }
 }
@@ -1260,7 +1260,7 @@ function storyPanel(p){
  head.append(prev,tabs,next);box.append(head,body);draw();return box;
 }
 // 본섭에만 있는 글을 옮긴 곳에 붙이는 「팬 번역」 안내 (2026-10-29 채운)
-function fanNote(){const w=el('div','fan-tl');w.append(el('span','fan-tl-tag','팬 번역'),el('span','fan-tl-text','본섭에만 있는 글을 팬이 옮긴 번역이에요. 오류는 피드백 폼으로 알려 주세요.'));const u=(typeof feedbackURL==='function'&&feedbackURL())||siteInfo?.home?.feedback?.form;if(u){const a=el('a','fan-tl-link','피드백 폼');a.href=u;a.target='_blank';a.rel='noopener';w.append(a)}return w}
+function fanNote(){const w=el('div','fan-tl');w.append(el('span','fan-tl-tag','팬 번역'),el('span','fan-tl-text','본섭에만 있는 글을 Claude(AI)로 옮긴 팬 번역이에요. 오류는 피드백 폼으로 알려 주세요.'));const u=(typeof feedbackURL==='function'&&feedbackURL())||siteInfo?.home?.feedback?.form;if(u){const a=el('a','fan-tl-link','피드백 폼');a.href=u;a.target='_blank';a.rel='noopener';w.append(a)}return w}
 function renderDoll(p){
  const host=$('#dollView');host.replaceChildren();$('#crumb').textContent='인형 기록 · '+p.name;
  const back=el('button','folder-back');back.type='button';back.append(ic('left'),document.createTextNode(' 인형 목록'));back.onclick=()=>showDolls();host.append(back);
@@ -1274,7 +1274,11 @@ function renderDoll(p){
  info.append(el('div','eyebrow',[p.company,p.role].filter(Boolean).join(' / ').toUpperCase()||'DOLL RECORD'));
  const nameRow=el('div','doll-name-row');nameRow.append(el('h1','doll-name',p.name));
  if(p.alt?.key){const a=el('button','doll-alt');a.type='button';a.append(el('span','doll-alt-label','이격'),el('b','',p.alt.name||p.alt.key),ic('right'));a.setAttribute('aria-label',(p.alt.name||'')+' 프로필로 이동');a.onclick=()=>showDoll(p.alt.key);nameRow.append(a)}
- info.append(nameRow);if(p.fanTL)info.append(fanNote());
+ info.append(nameRow);
+ // 전속 스토리로 바로 가기 (채운 2026-10-29, 기록 166) — 이격 버튼 아래 줄
+ {const EXH={'exclusive:24winter':1080};const exs=(typeof displayGroups!=='undefined'?displayGroups:[]).filter(g=>g.category==='exclusive'&&String(g.doll?.heroId??EXH[g.id]??'')===String(p.heroId));
+  if(exs.length){const row=el('div','doll-links');for(const g of exs){const b=el('button','doll-alt doll-ex');b.type='button';b.append(el('span','doll-alt-label','전속 스토리'),el('b','',chapterDisplayTitle(g)),ic('right'));b.onclick=()=>showChapter(groupKey(g),'exclusive');row.append(b)}info.append(row)}}
+ if(p.fanTL)info.append(fanNote());
  const sub=el('p','doll-sub');sub.append(el('span','doll-stars',starText(p.stars)));if(p.nameEn)sub.append(el('span','',p.nameEn));info.append(sub);
  const dl=el('dl','doll-facts');
  for(const [k,v] of [['클래스',p.role],['기업',p.company],['모델명',p.model],['직업',p.job],['생일',bdayText(p.birthday)],['성우',p.cv]]){if(!v)continue;dl.append(el('dt','',k),el('dd','',v))}
@@ -1284,7 +1288,7 @@ function renderDoll(p){
  const chips=(label,arr)=>{if(!arr?.length)return;const w=el('div','doll-chips');w.append(el('span','doll-chips-label',label));arr.forEach(x=>w.append(el('span','doll-chip',x)));info.append(w)};
  chips('좋아함',p.likes);chips('싫어함',p.dislikes);
  if(p.relations?.length){const w=el('div','doll-chips');w.append(el('span','doll-chips-label','관계'));for(const r of p.relations){const key=(dollIndex?.dolls||[]).find(d=>d.heroId===r.heroId)?.voiceKey;const c=el(key?'button':'span','doll-chip rel'+(key?' link':''));if(key){c.type='button';c.title=r.name+' 프로필로 이동';c.onclick=()=>showDoll(key)}c.append(el('b','',r.name),document.createTextNode(' '+String(r.text||'').replace(/^"|"$/g,'')));w.append(c)}info.append(w)}
- const car=el('div','doll-career');car.append(el('h4','','이력'));car.append(p.career?sentenceBlock(p.career):el('p','doll-empty','한국어 번역 준비 중이에요.'));info.append(car);
+ const car=el('div','doll-career');car.append(el('h4','',window.L?window.L('이력'):'이력'));car.append(p.career?sentenceBlock(p.career):el('p','doll-empty','한국어 번역 준비 중이에요.'));info.append(car);
  hero.append(info);host.append(hero);
  // 2) 인형 스토리
  host.append(foldSection('story','인형 스토리','',inner=>inner.append(storyPanel(p))));

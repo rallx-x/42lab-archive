@@ -248,7 +248,7 @@ const D=[
 ['뉴럴 클라우드 취향픽','ニューラルクラウド 好みピック','Neural Cloud Pick','雲圖計劃 喜好表','云图计划 喜好表'],
 ['뉴럴 클라우드 인형증','ニューラルクラウド 人形証','Neural Cloud Doll Card','雲圖計劃 人形證','云图计划 人形证'],
 ['팬 번역','ファン翻訳','Fan translation','粉絲翻譯','粉丝翻译'],
-['본섭에만 있는 글을 팬이 옮긴 번역이에요. 오류는 피드백 폼으로 알려 주세요.','中国版にしかない文章をファンが翻訳したものです。誤りはフィードバックフォームでお知らせください。','This text exists only on the CN server and was translated by fans. Please report errors through the feedback form.','此內容僅存在於國服，由粉絲翻譯。如有錯誤請透過意見表單告知。','']
+['본섭에만 있는 글을 Claude(AI)로 옮긴 팬 번역이에요. 오류는 피드백 폼으로 알려 주세요.','中国版にしかない文章をファンがClaude（AI）で翻訳したものです。誤りはフィードバックフォームでお知らせください。','This text exists only on the CN server and was fan-translated using Claude (AI). Please report errors through the feedback form.','此內容僅存在於國服，由簡體中文原文自動轉換為繁體。如有錯誤請透過意見表單告知。','']
 ];
 
 /* ---------- 숫자 · 이름이 섞인 글 ($1 $2 = 괄호 속 값) ---------- */

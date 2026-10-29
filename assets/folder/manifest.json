@@ -118,11 +118,15 @@
   "collab:23sg_prologue": "50% 20%",
   "exclusive:taisch": "50% 80%",
   "exclusive:luna": "50% 20%",
-  "exclusive:inola": "upper"
+  "exclusive:inola": "upper",
+  "exclusive:olivia": "50% 18%",
+  "exclusive:eniac": "50% 22%"
  },
  "other:tutorial-oasisbuild": "tutorial",
  "other:tutorial-shop": "tutorial",
  "other:tutorial-rossumclear": "tutorial",
  "other:tutorial-pending": "tutorial",
- "exclusive:inola": "exclusive_inola"
+ "exclusive:inola": "exclusive_inola",
+ "exclusive:olivia": "exclusive_olivia",
+ "exclusive:eniac": "exclusive_eniac"
 }

@@ -858,6 +858,7 @@ button.doll-chip:hover{border-color:var(--accent)}
 .doll-alt .ic{font-size:11px;color:var(--accent)}
 .doll-alt-label{font-size:10px;letter-spacing:.14em;font-weight:800;color:var(--sub)}
 .doll-alt b{color:var(--accent)}
+.doll-links{display:flex;flex-wrap:wrap;gap:8px;margin:-4px 0 12px}.doll-ex b{max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .doll-oath{display:block}
 .doll-oath-top{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
 .doll-oath-line{border:0;border-top:1px solid color-mix(in srgb,var(--accent) 35%,var(--line));margin:12px 0 10px}
@@ -938,3 +939,20 @@ button.doll-chip:hover{border-color:var(--accent)}
 .fan-tl-text{flex:1 1 200px;word-break:keep-all;overflow-wrap:anywhere}
 .fan-tl-link{color:var(--accent);font-weight:600;text-decoration:underline;text-underline-offset:2px;white-space:nowrap}
 .doll-card .fan-mini,.fan-mini{font-size:10px;padding:1px 6px;border-radius:999px;border:1px solid color-mix(in srgb,var(--accent) 50%,var(--line));color:var(--accent);margin-left:4px;white-space:nowrap}
+
+/* v0.12.4 곡 받는 중 */
+.bgm-mark.loading{opacity:.75}.bgm-mark.loading::after{content:' …';color:var(--accent)}
+.doll-card-meta{white-space:normal;line-height:1.4;overflow:visible;text-overflow:clip}
+
+/* v0.12.4 선반 폴더 아이콘 · 폴더 이전/다음 */
+.ic-folders{--ic:url(../icons/folders.png)}
+.story-shelf-icon .ic{font-size:20px;vertical-align:-.2em}
+.folder-nav{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:nowrap;margin-bottom:18px}.folder-nav .folder-back{flex:0 1 auto;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.folder-nav .folder-back{margin-bottom:0}
+.folder-steps{display:flex;gap:8px;margin-left:auto;min-width:0}
+.folder-step{display:flex;flex-direction:column;align-items:flex-start;gap:1px;max-width:180px;min-width:0;padding:7px 12px;text-align:left}
+.folder-step.next{align-items:flex-end;text-align:right}
+.folder-step-label{font-size:13px;font-weight:700}
+.folder-step-name{font-size:11px;color:var(--sub);max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.folder-step:disabled{opacity:.4;cursor:default}
+@media(max-width:600px){.folder-nav .folder-back{padding:8px 10px}.folder-steps{gap:6px}.folder-step{max-width:118px;padding:6px 10px}}
