@@ -956,3 +956,6 @@ button.doll-chip:hover{border-color:var(--accent)}
 .folder-step-name{font-size:11px;color:var(--sub);max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .folder-step:disabled{opacity:.4;cursor:default}
 @media(max-width:600px){.folder-nav .folder-back{padding:8px 10px}.folder-steps{gap:6px}.folder-step{max-width:118px;padding:6px 10px}}
+
+/* v0.12.13 아이폰 확대 방지: iOS는 16px보다 작은 입력칸을 누르면 화면을 강제로 확대함 → 터치 기기에서만 입력칸 글자 16px (채운 2026-10-29) */
+@media (hover:none) and (pointer:coarse){input,select,textarea{font-size:16px!important}}
