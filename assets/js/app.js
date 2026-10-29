@@ -5,7 +5,7 @@ const ic=(name,cls)=>{const i=el('i','ic ic-'+name+(cls?' '+cls:''));i.setAttrib
 const withIc=(name,text,cls)=>{const s=el('span',cls||'');s.append(ic(name),document.createTextNode(' '+text));return s};
 const key='42lab.', get=(k,f)=>{try{let v=localStorage.getItem(key+k);return v===null?f:JSON.parse(v)}catch{return f}},set=(k,v)=>{try{localStorage.setItem(key+k,JSON.stringify(v));return true}catch{return false}};
 let index=null,data=null,current='',positions=[],observer=null,active=0,category=null,flowNodes=[],cursor=0,choiceStates={},suspendObserve=false;
-const nick=()=>get('nickname','교수')||'교수';
+const nick=()=>{const v=get('nickname','');return v&&!(v==='교수'&&window.UI_LANG&&window.UI_LANG!=='ko')?v:window.L('교수')};
 // ---------- v0.9.0 언어 기반 ----------
 // 사이트가 실제로 가진 언어(data/<lang>/)만 사용한다. 준비 안 된 언어를 골라도 데이터는 ko로 읽는다.
 // v0.11.3 tw = 대만섭(번체), zh = 본섭(간체, 나중)
@@ -39,7 +39,7 @@ function episodeNumber(ep){
  if(!Number.isInteger(ep.no))return '';
  return String(ep.no).padStart(2,'0')+(Number.isInteger(ep.sub)?'.'+ep.sub:'');
 }
-function episodeLabel(ep){const n=episodeNumber(ep);if(!n)return '';return ep.kind==='battleDialog'?'전투 '+n:ep.kind==='tutorial'?'튜토리얼 '+n:n}
+function episodeLabel(ep){const n=episodeNumber(ep);if(!n)return '';return ep.kind==='battleDialog'?window.L('전투 '+n):ep.kind==='tutorial'?window.L('튜토리얼 '+n):n}
 function episodeTitle(ep){
  const title=(ep.title||'').trim()||(ep.kind==='battleDialog'?'전투 중 대사':'(제목 없음)');
  return (ep.kind==='battleDialog'&&title!=='전투 중 대사'&&!title.startsWith('전투 중 대사 · ')?'전투 중 대사 · ':'')+title;
@@ -200,7 +200,7 @@ function updateBookmarkToggle(){const b=$('#bmToggle');if(!b)return;const on=!!c
 function toggleBookmark(id){
  let list=bookmarks();
  if(list.some(x=>x.id===id))list=list.filter(x=>x.id!==id);else list.unshift({id,at:Date.now()});
- if(!set('bookmarks',list))alert('브라우저 저장소를 사용할 수 없어 북마크를 저장하지 못했습니다. (시크릿 모드나 저장 차단 설정을 확인해 주세요)');
+ if(!set('bookmarks',list))alert(({ja:'ブラウザの保存領域が使えないため、ブックマークを保存できませんでした。（シークレットモードや保存ブロック設定を確認してください）',en:'Could not save the bookmark because browser storage is unavailable. (Check private mode or storage blocking.)',tw:'無法使用瀏覽器儲存空間，書籤未能儲存。（請確認無痕模式或儲存封鎖設定）',zh:'无法使用浏览器存储空间，书签未能保存。（请确认无痕模式或存储拦截设置）'})[window.UI_LANG]||'브라우저 저장소를 사용할 수 없어 북마크를 저장하지 못했습니다. (시크릿 모드나 저장 차단 설정을 확인해 주세요)');
  updateBookmarkToggle();
 }
 function bookmarkRow(id,{at,last}={}){
@@ -210,7 +210,7 @@ function bookmarkRow(id,{at,last}={}){
   const ctx=chapterDisplayTitle(found.g)+(episodeLabel(found.e)?' · '+episodeLabel(found.e):'');
   info.append(el('small','',ctx),el('strong','',episodeTitle(found.e)));
  }else info.append(el('small','','기록을 찾을 수 없음'),el('strong','','데이터에서 사라진 기록입니다'));
- if(at)info.append(el('span','bm-date',new Date(at).toLocaleDateString('ko-KR')+' 저장'));
+ if(at)info.append(el('span','bm-date',new Date(at).toLocaleDateString(window.UI_LOCALE||'ko-KR')+' 저장'));
  row.append(info);
  const tools=el('div','bm-tools');
  if(found){const open=el('button','bm-open',last?'이어 읽기':'열기');open.type='button';open.onclick=async()=>{$('#userDialog').close();await openEpisode(id);if(last)setTimeout(resume,250)};tools.append(open)}
@@ -495,7 +495,7 @@ function renderBirthday(card){
   if(!who.length)cards.append(el('p','bm-empty',isToday?'오늘 생일인 인형이 없어요.':'이날 생일인 인형이 없어요.'));
   for(const x of who){
    const c=el('div','bday-card'+(isToday?' today':''));
-   const face=el('div','avatar bday-face');const url=(x.portrait&&imageMap[x.portrait])||imageMap[x.name];
+   const face=el('div','avatar bday-face');const url=(x.portrait&&imageMap[x.portrait])||imageMap[x.nameKo]||imageMap[x.name];
    if(url){const im=document.createElement('img');im.src=url.startsWith('./')?url:'./'+url;im.alt='';im.onerror=()=>{im.remove();face.classList.add('fallback')};face.append(im)}else face.classList.add('fallback');
    const t=el('div','bday-text');t.append(el('strong','',x.birthday+'. Happy Birthday!'),el('span','',x.name));
    c.append(face,t);cards.append(c);
@@ -837,6 +837,7 @@ async function openEpisode(id,{push=true}={}){
   showOnly('reader');voiceStop();
   const context=episodeDisplayContext(id);
   $('#epTitle').textContent=context.title;$('#epDesc').textContent=d.meta?.description||'';
+  document.querySelectorAll('.reader-head .fan-tl').forEach(x=>x.remove());if(d.meta?.fanTL)$('#epDesc').after(fanNote());
   $('#epId').textContent=context.breadcrumb;$('#crumb').textContent=context.breadcrumb;
   $('#stream').replaceChildren();$('#ending').classList.add('hidden');
   updateEpisodeNav();set('lastEpisode',id);updateBookmarkToggle();flowNodes=d.timeline||[];cursor=0;lastCG=null;lastMark=null;bgmMarkStarted=false;setEpisodeBgm(d.meta?.bgm||null);pump();
@@ -880,7 +881,7 @@ let unlockTimer=null,unlockTarget=null,unlockWasUnlocked=false;const unlock=$('#
 function finishUnlock(){if(unlockTimer){clearInterval(unlockTimer);unlockTimer=null}if(!unlockTarget)return;set('unlocked.'+unlockTarget,true);$('#unlockResult').textContent='ACCESS GRANTED  //  '+(unlockWasUnlocked?'THEME ALREADY UNLOCKED':'THEME UNLOCKED')+' — '+themeNames[unlockTarget];$('#unlockDone').hidden=false;renderThemeList()}
 function runUnlock(target,replay=false){if(unlock.open)unlock.close();unlockTarget=target;unlockWasUnlocked=get('unlocked.'+target,false);$('#hexOutput').textContent='[AUTH] SIGNATURE DETECTED\n[SCAN] DECRYPTING RECORD...\n';$('#unlockResult').textContent='';$('#unlockDone').hidden=true;unlock.classList.toggle('purple',target==='entropics');unlock.classList.toggle('pink',target==='persica');unlock.showModal();if(matchMedia('(prefers-reduced-motion: reduce)').matches){finishUnlock();return}let n=0;unlockTimer=setInterval(()=>{let bytes=Array.from({length:16},()=>Math.floor(Math.random()*256).toString(16).padStart(2,'0').toUpperCase()).join(' ');$('#hexOutput').textContent+=`0x${(0x42A0+n*16).toString(16).toUpperCase()}  ${bytes}\n`;$('#hexOutput').scrollTop=$('#hexOutput').scrollHeight;if(++n>=32)finishUnlock()},65)}
 $('#unlockSkip').onclick=finishUnlock;$('#unlockDone').onclick=()=>unlock.close();unlock.addEventListener('close',()=>{if(unlockTimer)finishUnlock()});
-$('#viewMode').value=viewMode;$('#viewMode').onchange=e=>{viewMode=e.target.value;set('viewMode',viewMode);openFolderId=null;drawLibrary()};$('#search').oninput=()=>{openFolderId=null;let q=$('#search').value.trim().toLowerCase();let trigger=q==='entropics'?'entropics':(q==='2063.09.23'||q==='20630923')?'persica':null;if(trigger){$('#search').value='';runUnlock(trigger);return}drawLibrary()};
+$('#viewMode').value=viewMode;$('#viewMode').onchange=e=>{viewMode=e.target.value;set('viewMode',viewMode);openFolderId=null;drawLibrary()};$('#search').oninput=()=>{openFolderId=null;let q=$('#search').value.trim().toLowerCase();let trigger=(q==='entropic'||q==='entropics')?'entropics':(q==='2063.09.23'||q==='20630923')?'persica':null;if(trigger){$('#search').value='';runUnlock(trigger);return}drawLibrary()};
 // Site notices (공지·업데이트·제보·저작권·개인정보) come from data/ko/site_info.json.
 function renderFooter(info){
  const f=$('.site-footer');if(!f||!info)return;f.replaceChildren();
@@ -1032,7 +1033,9 @@ function sentences(text){
  }
  return out;
 }
-function sentenceBlock(text,cls){const box=el('div','sent-block'+(cls?' '+cls:''));for(const {s,first} of sentences(text))box.append(el('p','sent'+(first?' para':''),s));return box}
+// 게임 글 속 꼬리표 정리: <cmdr> → 교수 이름, 색 · 기울임 같은 꼬리표는 지움 (2026-10-29 채운 제보)
+const cleanTags=t=>String(t||'').replace(/<cmdr>/gi,()=>nick()).replace(/<\/?(?:color|i|b|size)(?:=[^>]*)?>/gi,'');
+function sentenceBlock(text,cls){const box=el('div','sent-block'+(cls?' '+cls:''));for(const {s,first} of sentences(cleanTags(text)))box.append(el('p','sent'+(first?' para':''),s));return box}
 function foldSection(id,title,count,fill,{open=true}={}){
  const shut=dollFold.has(id)||(!open&&!dollFold.has('!'+id));
  const sec=el('section','doll-sec'+(shut?'':' expanded'));sec.dataset.sec=id;
@@ -1178,7 +1181,7 @@ function voiceRow(p,v,folder){
  // 서약 A · B: 같은 줄에 버튼으로
  if(v.variants?.length){const vw=el('span','voice-vars');for(const x of v.variants){const vb=el('button','voice-var','서약 '+x.name);vb.type='button';vb.dataset.label='서약 '+x.name;vb.prepend(ic('play'));vb.setAttribute('aria-label','서약 '+x.name+' 듣기');vb.onclick=()=>voicePlay(voiceUrl(p,folder,x.cue),vb,state);vw.append(vb)}h.append(vw)}
  h.append(state);if(v.dur)h.append(el('span','voice-dur',v.dur.toFixed(1)+'초'));
- body.append(h);if(v.text)body.append(el('p','voice-text',v.text.replace(/\s*\n+\s*/g,' ')));
+ body.append(h);if(v.text)body.append(el('p','voice-text',cleanTags(v.text).replace(/\s*\n+\s*/g,' ')));
  row.append(b,body);return row;
 }
 function repeatButton(){
@@ -1243,6 +1246,8 @@ function storyPanel(p){
  prev.onclick=()=>{if(storyPage>0){storyPage--;draw()}};next.onclick=()=>{if(storyPage<1){storyPage++;draw()}};
  head.append(prev,tabs,next);box.append(head,body);draw();return box;
 }
+// 본섭에만 있는 글을 옮긴 곳에 붙이는 「팬 번역」 안내 (2026-10-29 채운)
+function fanNote(){const w=el('div','fan-tl');w.append(el('span','fan-tl-tag','팬 번역'),el('span','fan-tl-text','본섭에만 있는 글을 팬이 옮긴 번역이에요. 오류는 피드백 폼으로 알려 주세요.'));const u=(typeof feedbackURL==='function'&&feedbackURL())||siteInfo?.home?.feedback?.form;if(u){const a=el('a','fan-tl-link','피드백 폼');a.href=u;a.target='_blank';a.rel='noopener';w.append(a)}return w}
 function renderDoll(p){
  const host=$('#dollView');host.replaceChildren();$('#crumb').textContent='인형 기록 · '+p.name;
  const back=el('button','folder-back');back.type='button';back.append(ic('left'),document.createTextNode(' 인형 목록'));back.onclick=()=>showDolls();host.append(back);
@@ -1256,12 +1261,12 @@ function renderDoll(p){
  info.append(el('div','eyebrow',[p.company,p.role].filter(Boolean).join(' / ').toUpperCase()||'DOLL RECORD'));
  const nameRow=el('div','doll-name-row');nameRow.append(el('h1','doll-name',p.name));
  if(p.alt?.key){const a=el('button','doll-alt');a.type='button';a.append(el('span','doll-alt-label','이격'),el('b','',p.alt.name||p.alt.key),ic('right'));a.setAttribute('aria-label',(p.alt.name||'')+' 프로필로 이동');a.onclick=()=>showDoll(p.alt.key);nameRow.append(a)}
- info.append(nameRow);
+ info.append(nameRow);if(p.fanTL)info.append(fanNote());
  const sub=el('p','doll-sub');sub.append(el('span','doll-stars',starText(p.stars)));if(p.nameEn)sub.append(el('span','',p.nameEn));info.append(sub);
  const dl=el('dl','doll-facts');
  for(const [k,v] of [['클래스',p.role],['기업',p.company],['모델명',p.model],['직업',p.job],['생일',bdayText(p.birthday)],['성우',p.cv]]){if(!v)continue;dl.append(el('dt','',k),el('dd','',v))}
  info.append(dl);
- if(p.quote)info.append(el('blockquote','doll-quote',p.quote));
+ if(p.quote)info.append(el('blockquote','doll-quote',cleanTags(p.quote)));
  if(p.oathTitle?.length){const o=el('div','doll-oath');const top=el('div','doll-oath-top');top.append(el('span','doll-oath-label','서약 칭호'));const t=el('span','doll-oath-title');p.oathTitle.forEach((x,i)=>{if(i)t.append(el('i','doll-oath-sep'));t.append(el('span','',x))});top.append(t);o.append(top);if(p.oathDesc){o.append(el('hr','doll-oath-line'),el('p','doll-oath-desc',p.oathDesc))}info.append(o)}
  const chips=(label,arr)=>{if(!arr?.length)return;const w=el('div','doll-chips');w.append(el('span','doll-chips-label',label));arr.forEach(x=>w.append(el('span','doll-chip',x)));info.append(w)};
  chips('좋아함',p.likes);chips('싫어함',p.dislikes);
