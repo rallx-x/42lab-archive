@@ -158,7 +158,7 @@ function renderShelfSections(visible,makeCard){
   const section=el('section','story-shelf'+(shelves.get(label).length<=2?' shelf-half':''));
   const heading=el('div','story-shelf-heading');
   const left=el('div','story-shelf-label');
-  left.append(el('span','story-shelf-icon','▱'),el('h3','',label));
+  {const si=el('span','story-shelf-icon');si.append(ic('folders'));left.append(si,el('h3','',label))}
   heading.append(left,el('span','story-shelf-count',shelves.get(label).length+'개 폴더'));
   const grid=el('div',viewMode==='folder'?'drive-grid':viewMode==='list'?'chapter-list':'folder-grid');
   shelves.get(label).forEach((item,i)=>grid.append(makeCard(item,i)));
@@ -317,7 +317,12 @@ function drawLibrary(){
  if(!visible.length){host.append(error('검색 결과가 없습니다.'));return}
  const selected=visible.find(x=>x.g.id===openFolderId||x.g.key===openFolderId);
  if(selected){
-  const back=el('button','folder-back');back.append(ic('left'),document.createTextNode(' '+(selected.g.shelfFolder?shelfFor(selected.g):'폴더 목록')));back.onclick=()=>showHome(category,{shelf:selected.g.shelfFolder?shelfFor(selected.g):null});host.append(back);
+  const back=el('button','folder-back');back.append(ic('menu'),document.createTextNode(' '+(selected.g.shelfFolder?shelfFor(selected.g):'폴더 목록')));back.onclick=()=>showHome(category,{shelf:selected.g.shelfFolder?shelfFor(selected.g):null});
+  // v0.12.4 (58번) 이전 · 다음 폴더: 같은 분류 목록 순서대로, 튜토리얼처럼 선반 폴더면 그 선반 안에서만. 처음 · 끝은 흐리게
+  {const sib=visible.map(x=>x.g).filter(g=>selected.g.shelfFolder?(g.shelfFolder&&shelfFor(g)===shelfFor(selected.g)):!g.shelfFolder);const at=sib.findIndex(g=>g===selected.g);
+   const nav=el('div','folder-nav');nav.append(back);
+   const mk=(g,dir)=>{const b=el('button','folder-step '+dir);b.type='button';const lab=el('span','folder-step-label',dir==='prev'?'‹ 이전':'다음 ›');b.append(lab);if(g){b.append(el('small','folder-step-name',chapterDisplayTitle(g)));b.onclick=()=>showChapter(groupKey(g),category)}else b.disabled=true;return b};
+   const steps=el('div','folder-steps');steps.append(mk(at>0?sib[at-1]:null,'prev'),mk(at>=0&&at<sib.length-1?sib[at+1]:null,'next'));nav.append(steps);host.append(nav)}
   const panel=el('section','folder-detail');const art=el('div','folder-art');art.dataset.gid=selected.g.id;art.append(el('div','folder-art-kicker','42LAB / CHAPTER RECORD'),el('div','folder-art-symbol','◇'),el('h2','',chapterDisplayTitle(selected.g)),el('p','folder-art-pending','CHAPTER IMAGE PENDING'));applyFolderArt(art);
   const side=el('div','folder-episodes');
   const episodeScroll=el('div','folder-episode-scroll');
@@ -585,6 +590,7 @@ function isProfessor(who){return who?.isProfessor===true}
 function avatarFor(who,entry){
  const av=el('div','avatar');av.setAttribute('aria-label',(who.name||'알 수 없음')+' 프로필');
  // v0.9.10 말하는 인물의 그림(무대 위 같은 imgId)을 먼저 → 이름 → 무대에 한 명뿐일 때 그 그림
+ if(who.noFace){av.classList.add('unknown');return av} // v0.12.5 얼굴을 일부러 비우는 화자 (이놀라 전속 2화 끝 새 인형 · 채운)
  const chars=entry.stage?.characters||[],faceIds=new Set((who.faces||[]).map(x=>x.imgId));
  const facePaths=chars.filter(c=>faceIds.has(c.imgId)).map(c=>c.path);const lone=chars.length===1&&!faceIds.size?[chars[0].path]:[];
  const speakerKey=who.heroId!=null?'hero:'+who.heroId:'name:'+(who.lookup||who.rawName||'');const portraitKey=speakerAliases[speakerKey];const ids=[who.portrait,...facePaths,portraitKey,speakerKey,String(who.heroId??''),who.lookup,who.rawName,who.name,...lone].filter(Boolean);
@@ -960,30 +966,37 @@ function maybeWelcome(){
 let bgmMarkStarted=false,bgmList=null,bgmCtx=null,bgmGain=null,bgmSrc=null,bgmPlaying=null,bgmEpisode=null,lastMark=null;const bgmBuf=new Map();
 const bgmBase=()=>siteInfo?.home?.bgmBase||'./assets/bgm/';
 const bgmTitle=c=>String(c||'').replace(/^Mus_/,'').replace(/_/g,' ');
-function initBgm(){fetchJSON(bgmBase()+'bgm.json',1).then(m=>{bgmList=m;if(current&&!$('#reader').classList.contains('hidden'))setEpisodeBgm(bgmEpisode)}).catch(()=>{bgmList=null})}
+function initBgm(){fetchJSON(bgmBase()+'bgm.json',1).then(m=>{bgmList=m;document.querySelectorAll('.bgm-mark[hidden]').forEach(x=>{if(m?.[x.dataset.cue])x.hidden=false;else x.remove()});if(current&&!$('#reader').classList.contains('hidden'))setEpisodeBgm(bgmEpisode)}).catch(()=>{bgmList=null})}
 function setEpisodeBgm(cue){bgmEpisode=cue;const bar=$('#bgmBar');const ok=!!(bgmList&&cue&&bgmList[cue]);bar.classList.toggle('hidden',!ok);if(ok){$('#bgmName').textContent=bgmTitle(cue);syncBgmBar()}}
-function syncBgmBar(){const on=bgmPlaying&&bgmPlaying===bgmEpisode;$('#bgmPlay').replaceChildren(ic(on?'pause':'play'));$('#bgmPlay').dataset.state=on?'playing':'stopped';$('#bgmPlay').setAttribute('aria-label',on?'BGM 멈춤':'BGM 재생');$('#bgmNow').textContent=bgmPlaying&&bgmPlaying!==bgmEpisode?' · 지금: '+bgmTitle(bgmPlaying):'';document.querySelectorAll('.bgm-mark').forEach(m=>m.classList.toggle('playing',m.dataset.cue===bgmPlaying))}
+// v0.12.4 (68번) 위 단추 · ♪ 단추 엇갈림 고침: 마지막으로 누른 곡만 이김(늦게 받아진 곡은 버림), 받는 중엔 그 단추에 … 표시, 받는 중에 다시 누르면 취소
+let bgmReq=0,bgmLoading=null;
+function syncBgmBar(){const on=bgmPlaying&&bgmPlaying===bgmEpisode;const wait=bgmLoading&&bgmLoading===bgmEpisode;$('#bgmPlay').replaceChildren(wait?el('span','bgm-wait','…'):ic(on?'pause':'play'));$('#bgmPlay').dataset.state=wait?'loading':on?'playing':'stopped';$('#bgmPlay').setAttribute('aria-label',on?'BGM 멈춤':'BGM 재생');const now=bgmLoading&&bgmLoading!==bgmEpisode?bgmLoading:bgmPlaying&&bgmPlaying!==bgmEpisode?bgmPlaying:null;$('#bgmNow').textContent=now?' · 지금: '+bgmTitle(now):'';document.querySelectorAll('.bgm-mark').forEach(m=>{m.classList.toggle('playing',m.dataset.cue===bgmPlaying&&!bgmLoading);m.classList.toggle('loading',m.dataset.cue===bgmLoading)})}
 const bgmVolume=()=>Math.max(0,Math.min(100,+get('bgmVolume',30)));
 async function bgmPlay(cue){
  const info=bgmList?.[cue];if(!info)return;
+ const req=++bgmReq;bgmLoading=cue;syncBgmBar();
  try{
   bgmCtx=bgmCtx||new (window.AudioContext||window.webkitAudioContext)();if(bgmCtx.state==='suspended')await bgmCtx.resume();
   if(!bgmGain){bgmGain=bgmCtx.createGain();bgmGain.connect(bgmCtx.destination)}
   bgmGain.gain.value=(bgmVolume()/100)**2;
   let buf=bgmBuf.get(cue);
-  if(!buf){$('#bgmPlay').replaceChildren(el('span','bgm-wait','…'));const r=await fetch(bgmBase()+encodeURIComponent(info.file||cue+'.m4a'));if(!r.ok)throw Error('HTTP '+r.status);buf=await bgmCtx.decodeAudioData(await r.arrayBuffer());bgmBuf.set(cue,buf);if(bgmBuf.size>4)bgmBuf.delete(bgmBuf.keys().next().value)}
-  if($('#reader').classList.contains('hidden'))return; // 곡을 받는 사이 회차 화면을 나갔으면 틀지 않음
+  if(!buf){const r=await fetch(bgmBase()+encodeURIComponent(info.file||cue+'.m4a'));if(!r.ok)throw Error('HTTP '+r.status);buf=await bgmCtx.decodeAudioData(await r.arrayBuffer());bgmBuf.set(cue,buf);if(bgmBuf.size>4)bgmBuf.delete(bgmBuf.keys().next().value)}
+  if(req!==bgmReq)return; // 받는 사이 다른 곡을 눌렀거나 멈췄으면 이 곡은 버림
+  bgmLoading=null;
+  if($('#reader').classList.contains('hidden')){syncBgmBar();return} // 곡을 받는 사이 회차 화면을 나갔으면 틀지 않음
   bgmStop(false);
   const src=bgmCtx.createBufferSource();src.buffer=buf;src.loop=true;
   const ls=+info.loopStart||0,le=+info.loopEnd||0;if(le>ls&&le<=buf.duration+.05){src.loopStart=ls;src.loopEnd=Math.min(le,buf.duration)}
   src.connect(bgmGain);src.start();bgmSrc=src;bgmPlaying=cue;
- }catch(e){bgmPlaying=null;$('#bgmNow').textContent=' · 재생할 수 없어요'}
+ }catch(e){if(req!==bgmReq)return;bgmLoading=null;bgmPlaying=null;syncBgmBar();$('#bgmNow').textContent=' · 재생할 수 없어요';return}
  syncBgmBar();
 }
+// 곡 단추 하나를 눌렀을 때: 받는 중이면 취소, 그 곡이 나오는 중이면 멈춤, 아니면 그 곡 틀기
+function bgmToggle(cue){if(!cue)return;if(bgmLoading===cue){bgmReq++;bgmLoading=null;syncBgmBar();return}if(bgmPlaying===cue&&!bgmLoading){bgmStop();return}bgmPlay(cue)}
 // 회차 화면을 나가면(첫 화면 · 목록 · 챕터) 음악을 멈춤. 회차끼리 넘어갈 때는 계속
-function bgmLeave(){if(bgmSrc||bgmPlaying)bgmStop()}
-function bgmStop(sync=true){try{bgmSrc?.stop()}catch(e){}bgmSrc=null;if(sync){bgmPlaying=null;syncBgmBar()}}
-$('#bgmPlay').onclick=()=>{if(bgmPlaying&&bgmPlaying===bgmEpisode)bgmStop();else bgmPlay(bgmEpisode)};
+function bgmLeave(){if(bgmSrc||bgmPlaying||bgmLoading)bgmStop()}
+function bgmStop(sync=true){try{bgmSrc?.stop()}catch(e){}bgmSrc=null;if(sync){bgmReq++;bgmLoading=null;bgmPlaying=null;syncBgmBar()}}
+$('#bgmPlay').onclick=()=>bgmToggle(bgmEpisode);
 
 // v0.9.7 창 바깥(어두운 부분)을 누르면 닫기. 첫 방문 창 · 테마 해금 연출은 제외
 for(const id of ['settings','userDialog','infoDialog','cgView','lore']){const d=document.getElementById(id);if(!d)continue;let downOut=false;
@@ -999,9 +1012,9 @@ function maybeBgmMark(node,target){
  // 회차 첫 곡은 위 BGM 줄이 맡으므로 표시하지 않는다
  if(!bgmMarkStarted){bgmMarkStarted=true;lastMark=node.bgm;return}
  if(node.bgm===lastMark)return;lastMark=node.bgm;
- if(!bgmList?.[node.bgm])return;
- const m=el('button','bgm-mark');m.append(ic('music'),document.createTextNode(' '+bgmTitle(node.bgm)));m.type='button';m.dataset.cue=node.bgm;m.onclick=()=>{if(bgmPlaying===node.bgm)bgmStop();else bgmPlay(node.bgm)};
- if(bgmPlaying===node.bgm)m.classList.add('playing');target.append(m);
+ if(bgmList&&!bgmList[node.bgm])return; // 곡 목록이 아직 안 왔으면 일단 숨겨 두고, 오면 보이기 (v0.12.4)
+ const m=el('button','bgm-mark');m.append(ic('music'),document.createTextNode(' '+bgmTitle(node.bgm)));m.type='button';m.dataset.cue=node.bgm;m.onclick=()=>bgmToggle(node.bgm);
+ if(!bgmList)m.hidden=true;if(bgmPlaying===node.bgm)m.classList.add('playing');target.append(m);
 }
 
 
