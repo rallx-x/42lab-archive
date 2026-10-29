@@ -8,8 +8,10 @@ let index=null,data=null,current='',positions=[],observer=null,active=0,category
 const nick=()=>get('nickname','교수')||'교수';
 // ---------- v0.9.0 언어 기반 ----------
 // 사이트가 실제로 가진 언어(data/<lang>/)만 사용한다. 준비 안 된 언어를 골라도 데이터는 ko로 읽는다.
-const LANGS=[['ko','한국어'],['zh','中文'],['ja','日本語'],['en','English']];
-let readyLangs=['ko'],siteInfo=null;
+// v0.11.3 tw = 대만섭(번체), zh = 본섭(간체, 나중)
+const LANGS=[['ko','한국어'],['ja','日本語'],['en','English'],['tw','繁體中文'],['zh','简体中文']];
+// v0.11.0 데이터가 있는 언어 (site_info 를 기다리지 않음 — 목록이 한국어로 먼저 읽히던 문제)
+let readyLangs=['ko','ja','en','tw','zh'],siteInfo=null;
 const uiLang=()=>{const v=get('lang','ko');return LANGS.some(([id])=>id===v)?v:'ko'};
 const dataLang=()=>readyLangs.includes(uiLang())?uiLang():'ko';
 const dataPath=p=>'./data/'+dataLang()+'/'+p;
@@ -556,7 +558,10 @@ $('#archiveMenuBackdrop').onclick=closeArchiveMenu;
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeArchiveMenu()});
 
 
+// v0.11.0 교수 말투: 일본어 등은 여성 교수 말투가 따로 있음 (unit.alt.f) → 교수 모습이 여성이면 그 글로
+const gz=o=>o&&o.alt&&o.alt.f&&profGender()==='f'?{...o,...o.alt.f}:o;
 function spans(parent,unit){
+ unit=gz(unit);
  const arr=unit.spans||[{text:unit.displayText||''}];
  for(const part of arr){
   const raw=part.professorName?nick():part.text||'';
@@ -582,7 +587,7 @@ function avatarFor(who,entry){
  // v0.9.10 말하는 인물의 그림(무대 위 같은 imgId)을 먼저 → 이름 → 무대에 한 명뿐일 때 그 그림
  const chars=entry.stage?.characters||[],faceIds=new Set((who.faces||[]).map(x=>x.imgId));
  const facePaths=chars.filter(c=>faceIds.has(c.imgId)).map(c=>c.path);const lone=chars.length===1&&!faceIds.size?[chars[0].path]:[];
- const speakerKey=who.heroId!=null?'hero:'+who.heroId:'name:'+(who.rawName||'');const portraitKey=speakerAliases[speakerKey];const ids=[who.portrait,...facePaths,portraitKey,speakerKey,String(who.heroId??''),who.rawName,who.name,...lone].filter(Boolean);
+ const speakerKey=who.heroId!=null?'hero:'+who.heroId:'name:'+(who.lookup||who.rawName||'');const portraitKey=speakerAliases[speakerKey];const ids=[who.portrait,...facePaths,portraitKey,speakerKey,String(who.heroId??''),who.lookup,who.rawName,who.name,...lone].filter(Boolean);
  // v0.9.13 회차별 얼굴 바꾸기 (예: 집도 시점의 페르시카)
  const ov=data?.meta?.portraitOverride;
  let url=ids.map(k=>imageMap[(ov&&ov[k])||k]).find(Boolean);
@@ -621,6 +626,7 @@ function createUnit(block,unit,entry,context=''){
 // Cherry v2: only explicit option.display === "action" is an action direction.
 // Never infer action status from parentheses, nor alter the stored source text.
 function makeSelectedChoiceEntry(opt,uid){
+ opt=gz(opt);
  const entry=el('div','entry choice-spoken'+(opt.display==='action'?' choice-action':''));
  if(uid)entry.dataset.uid=uid;
  const raw=String(opt.displayText??opt.rawText??'');
@@ -651,7 +657,7 @@ function showChoice(node,target){
     const nested=el('div','nested-choice');nested.dataset.pending='true';holder.append(nested);
     const child=data.blocks[n.choice]?.choice?.options||[];
     for(const opt of child){
-     const button=el('button','option',opt.displayText||'선택 '+opt.index),slot=el('div','nested-output');
+     const button=el('button','option',gz(opt).displayText||'선택 '+opt.index),slot=el('div','nested-output');
      nested.append(button,slot);
      button.onclick=()=>{nested.dataset.pending='false';nested.querySelectorAll(':scope > .option').forEach(x=>x.classList.toggle('selected',x===button));nested.querySelectorAll(':scope > .nested-output').forEach(x=>x.replaceChildren());const match=(n.options||[]).find(x=>x.index===opt.index);const r=makeSelectedChoiceEntry(opt,n.choice+'.selected.'+opt.index);slot.append(r);renderParts(match?.path||[],slot);if(!slot.querySelector('.nested-choice[data-pending="true"]'))resumeFlow();refreshPositions()};
     }
@@ -674,7 +680,7 @@ function showChoice(node,target){
  }
  opts.forEach((opt,i)=>{
   if(i)box.append(el('div','choice-separator'));
-  const btn=el('button','option',opt.displayText||'선택 '+opt.index);controls.push(btn);box.append(btn);
+  const btn=el('button','option',gz(opt).displayText||'선택 '+opt.index);controls.push(btn);box.append(btn);
   btn.onclick=()=>{
    if(opt.exit===true){chosen.add(opt.index);set('choices.'+current+'.'+node.choice,[...chosen]);btn.classList.add('selected');gate.textContent='질문을 마쳤습니다.';resumeFlow();refreshPositions();return}
    if(isAll||isRevisit){
@@ -917,19 +923,36 @@ document.querySelectorAll('[data-prof]').forEach(b=>b.onclick=()=>{set('profGend
 // ---------- v0.9.3 설정 맨 아래 피드백 ----------
 function renderSettingsFeedback(){const h=$('#settingsFeedback');if(h)h.replaceChildren(...feedbackLinks())}
 // ---------- v0.9.3 첫 접속: 교수 모습 → 공지 (언어 선택은 다른 언어가 열리면) ----------
+function profPick(cls){
+ // v0.10.3 교수 모습: 글자 없이 그림 두 장 (왼쪽 A 여성 · 오른쪽 B 남성)
+ const row=el('div','prof-pick'+(cls?' '+cls:''));
+ for(const [v,img,label] of [['f','prof_a','여성 교수'],['m','prof_b','남성 교수']]){
+  const b=el('button','prof-card');b.type='button';b.dataset.prof=v;b.setAttribute('aria-label',label);b.title=label;
+  const im=el('img');im.src='./assets/img/'+img+'.webp';im.alt='';im.decoding='async';b.append(im);row.append(b);
+ }
+ return row;
+}
 function maybeWelcome(){
  if(get('welcomed',false))return;
- const dlg=$('#welcome'),body=$('#welcomeBody');
- const step1=()=>{body.replaceChildren();
-  body.append(el('div','setting-label','PROFESSOR'),el('p','welcome-q','교수님의 모습을 골라 주세요.'),el('p','setting-hint','이야기 속 교수 그림(일부 CG 포함)이 고른 모습으로 나옵니다. 사용자 창에서 언제든 바꿀 수 있어요.'));
-  const row=el('div','setting-options welcome-pick');
-  for(const [v,label] of [['f','여성 교수'],['m','남성 교수']]){const b=el('button','',label);b.type='button';b.onclick=()=>{set('profGender',v);step2()};row.append(b)}
-  body.append(row)};
- const step2=()=>{body.replaceChildren();const n=sortedNotices()[0];
-  body.append(el('div','setting-label','NOTICE'));
-  if(n){body.append(el('h3','welcome-notice-title',n.title||''));(n.lines||[]).forEach(t=>body.append(el('p','welcome-line',t)))}
-  const ok=el('button','welcome-ok','확인');ok.type='button';ok.onclick=()=>{set('welcomed',true);dlg.close()};body.append(ok)};
- step1();try{dlg.showModal()}catch(e){}
+ const dlg=$('#welcome'),body=$('#welcomeBody');let picked=get('profGender',null);
+ body.replaceChildren();
+ // 1) 언어
+ body.append(el('div','setting-label','LANGUAGE'));
+ const langs=el('div','setting-options welcome-langs');
+ for(const [id,name] of LANGS){const ready=readyLangs.includes(id);const b=el('button',uiLang()===id?'selected':'',name);b.type='button';b.disabled=!ready;if(!ready)b.title='준비 중';b.onclick=()=>{if(uiLang()===id)return;set('lang',id);location.reload()};langs.append(b)}
+ body.append(langs);
+ // 2) 공지
+ const n=sortedNotices()[0];
+ if(n){body.append(el('div','setting-label','NOTICE'));const box=el('div','welcome-notice');box.append(el('h3','welcome-notice-title',n.title||''));(n.lines||[]).forEach(t=>box.append(el('p','welcome-line',t)));body.append(box)}
+ // 3) 교수 모습 (안 고르면 무작위)
+ body.append(el('div','setting-label','PROFESSOR'));
+ const pick=profPick('welcome-prof');
+ const sync=()=>pick.querySelectorAll('.prof-card').forEach(b=>{const on=b.dataset.prof===picked;b.classList.toggle('selected',on);b.setAttribute('aria-pressed',String(on))});
+ pick.querySelectorAll('.prof-card').forEach(b=>b.onclick=()=>{picked=b.dataset.prof;sync()});sync();
+ body.append(pick,el('p','setting-hint','고르지 않으면 무작위로 정해져요. 사용자 창에서 언제든 바꿀 수 있어요.'));
+ const ok=el('button','welcome-ok','확인');ok.type='button';
+ ok.onclick=()=>{set('profGender',picked||(Math.random()<.5?'f':'m'));set('welcomed',true);renderQuick();dlg.close()};body.append(ok);
+ try{dlg.showModal()}catch(e){}
  dlg.addEventListener('cancel',e=>{e.preventDefault()});
 }
 // ---------- v0.9.3 BGM (곡 파일이 있는 곳에서만: Cloudflare) ----------
@@ -990,12 +1013,13 @@ const dollFold=new Set(get('dollFold',[]));
 const STAGE_NAME={1:'기본 투영',2:'확장 투영',3:'완벽 투영'};
 const VOICE_GROUPS=[['basic','기본 보이스'],['affinity','친밀도 보이스'],['dorm','숙소 반응'],['live2d','Live2D 터치'],['extra','그 외']];
 // 기업별 · 직군별로 나눌 때의 칸 순서 (목록에 없는 이름은 뒤에 가나다순)
-const CO_ORDER=['42LAB','스바로그 중공업','유니버셜 애니씽 서비스','사이버 미디어','얼티 라이프 홀딩스','특수 슈타인즈게이트','정화자','엔트로피'];
-const ROLE_ORDER=['수위','전사','사수','해결사','치료사'];
+// 언어별 칸 순서 (같은 위치 = 같은 기업). 목록에 없는 이름은 뒤에 가나다순
+const CO_ORDER=[['42LAB','스바로그 중공업','유니버셜 애니씽 서비스','사이버 미디어','얼티 라이프 홀딩스','특수 슈타인즈게이트','정화자','엔트로피'],['42LAB','スヴァローグ重工','UAS','サイバーメディア','最終生命','特殊 STEINS;GATE','浄化者','エントロピー'],['42LAB','Svarog','UAS','Cyber Media','Ultimate Life','Special · STEINS;GATE','Sanctifier','Entropic'],['42LAB','火神重工','UAS','賽博傳媒','最終生命','特殊 命運石之門','淨化者','熵'],['42LAB','火神重工','UAS','赛博传媒','最终生命','特殊 命运石之门','净化者','熵']];
+const ROLE_ORDER=[['수위','전사','사수','해결사','치료사'],['ガード','ファイター','シューター','ユニーク','メディック'],['Guard','Warrior','Sniper','Specialist','Medic'],['守衛','戰士','射手','特種','醫師'],['守卫','战士','射手','特种','医师']];
 const LOAD_NOTE='처음 열 때는 불러오는 데 몇 초 걸릴 수 있어요.';
 function showOnly(id){for(const x of ['library','reader','dollView'])$('#'+x).classList.toggle('hidden',x!==id)}
 const loadDollIndex=()=>dollIndex?Promise.resolve(dollIndex):fetchJSON(dataPath('doll_index.json')).then(d=>dollIndex=d);
-const dollFace=d=>imageMap[d.name]||imageMap[(d.voiceKey||'')+'_avg']||imageMap[d.voiceKey]||null;
+const dollFace=d=>imageMap[d.nameKo]||imageMap[d.name]||imageMap[(d.voiceKey||'')+'_avg']||imageMap[d.voiceKey]||null;
 const starText=n=>'★'.repeat(Math.max(0,+n||0));
 const bdayText=b=>b&&/^\d{4}$/.test(b)?(+b.slice(0,2))+'월 '+(+b.slice(2))+'일':'';
 const dnorm=s=>String(s||'').toLowerCase().replace(/[\s·・.\-_()]/g,'');
@@ -1044,8 +1068,8 @@ const byName=(a,b)=>a.name.localeCompare(b.name,'ko');
 const sortDolls=list=>[...list].sort((a,b)=>(a.stars||0)-(b.stars||0)||byName(a,b));
 function dollMatches(d,q){
  if(!q)return true;
- const extra=(dolls?.dolls||[]).find(x=>x.heroId===d.heroId||x.name===d.name);
- const names=[d.name,d.nameEn,extra?.names?.zh,extra?.names?.ja,extra?.names?.en,...(extra?.aliases||[])].filter(Boolean).map(v=>dnorm(String(v).replace(/\([^)]*\)/g,'')));
+ const extra=(dolls?.dolls||[]).find(x=>String(x.heroId)===String(d.heroId)||x.name===d.name);
+ const names=[d.name,d.nameEn,extra?.nameKo,extra?.names?.zh,extra?.names?.ja,extra?.names?.en,...(extra?.aliases||[])].filter(Boolean).map(v=>dnorm(String(v).replace(/\([^)]*\)/g,'')));
  return names.some(n=>n.includes(q));
 }
 function selectBox(label,opts,val,on){
@@ -1059,7 +1083,7 @@ function renderDollList(){
  const head=el('div','doll-list-head');const t=el('div');t.append(el('div','eyebrow','DATABASE / DOLLS'),el('h2','','인형 기록'));head.append(t);
  const count=el('span','section-sub');head.append(count);host.append(head);
  const bar=el('div','doll-controls');const left=el('div','doll-ctl-group');
- const orderOf=(arr,x)=>arr.indexOf(x)+1||99;
+ const orderOf=(lists,x)=>{for(const l of lists){const i=l.indexOf(x);if(i>=0)return i}return 99};
  const cos=[...new Set(all.map(d=>d.company).filter(Boolean))].sort((a,b)=>orderOf(CO_ORDER,a)-orderOf(CO_ORDER,b)||a.localeCompare(b,'ko'));
  const roles=[...new Set(all.map(d=>d.role).filter(Boolean))].sort((a,b)=>orderOf(ROLE_ORDER,a)-orderOf(ROLE_ORDER,b)||a.localeCompare(b,'ko'));
  const grid=el('div','doll-list-body');
