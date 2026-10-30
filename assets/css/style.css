@@ -965,3 +965,6 @@ button.doll-chip:hover{border-color:var(--accent)}
 
 /* 휴대폰은 작은 첫 화면 그림 (2026-10-30 로딩) */
 @media(max-width:600px){.hero,.hero-art.has-img{background-image:url("../img/hero-42lab-m.webp")}}
+
+/* 진척도 코드 (2026-10-30, 기록 176) */
+.progress-code{display:block;width:100%;resize:vertical;padding:11px;background:var(--bg);color:var(--ink);border:1px dashed var(--line);border-radius:8px;font:12px/1.5 monospace;word-break:break-all}.progress-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:8px}.progress-actions button:disabled{opacity:.5;cursor:not-allowed}#progressMsg:empty{display:none}#progressMsg.ok{color:var(--accent)}#progressMsg.bad{color:#d75d59}

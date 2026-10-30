@@ -238,7 +238,31 @@ function renderUserPanel(){
  for(const b of list)host.append(bookmarkRow(b.id,{at:b.at}));
 }
 function selectUserPage(page){$('#userRoot').hidden=page!=='root';$('#userProgress').hidden=page!=='progress';$('#userBack').hidden=page==='root';$('#userTitle').textContent=page==='progress'?'진척도 코드':'사용자'}
-function openUser(){renderQuick();$('#nickname').value=nick();selectUserPage('root');renderUserPanel();$('#userDialog').showModal()}
+// 진척도 코드 (2026-10-30, 기록 176): 이 브라우저에 저장된 읽기 기록·설정을 코드 하나로 → 다른 기기에서 불러오기
+// 코드 = 「42L1.」 + (내용 JSON 을 압축한 것, 압축을 못 쓰는 브라우저는 「42L0.」 + 그대로) 을 URL에 써도 되는 글자로
+const PROG_KEYS=['lastEpisode','bookmarks','nickname','profGender','theme','brightness','fontFamily','fontSize','letterSpacing','lineHeight','readingMode','viewMode','cgMode','showCG','voiceRepeat','bgmVolume','dollSort','lang'];
+const PROG_PREFIX=['position.','completed.','farthest.','choices.','unlocked.'];
+const b64u={enc:u8=>{let s='';for(let i=0;i<u8.length;i+=0x8000)s+=String.fromCharCode(...u8.subarray(i,i+0x8000));return btoa(s).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'')},
+ dec:t=>{t=t.replace(/-/g,'+').replace(/_/g,'/');while(t.length%4)t+='=';const s=atob(t),u=new Uint8Array(s.length);for(let i=0;i<s.length;i++)u[i]=s.charCodeAt(i);return u}};
+const zipOK=typeof CompressionStream==='function'&&typeof DecompressionStream==='function';
+async function streamBytes(u8,S){return new Uint8Array(await new Response(new Blob([u8]).stream().pipeThrough(S)).arrayBuffer())}
+function progressSnapshot(){const d={};try{for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(!k||!k.startsWith(key))continue;const n=k.slice(key.length);if(PROG_KEYS.includes(n)||PROG_PREFIX.some(x=>n.startsWith(x)))d[n]=JSON.parse(localStorage.getItem(k))}}catch{}return d}
+async function makeProgressCode(){const raw=new TextEncoder().encode(JSON.stringify({v:1,t:new Date().toISOString().slice(0,10),d:progressSnapshot()}));
+ if(zipOK){try{return '42L1.'+b64u.enc(await streamBytes(raw,new CompressionStream('deflate-raw')))}catch{}}return '42L0.'+b64u.enc(raw)}
+async function readProgressCode(code){code=String(code||'').replace(/\s+/g,'');const m=code.match(/^42L([01])\.([A-Za-z0-9_-]+)$/);if(!m)throw Error('form');
+ let u=b64u.dec(m[2]);if(m[1]==='1'){if(!zipOK)throw Error('zip');u=await streamBytes(u,new DecompressionStream('deflate-raw'))}
+ const o=JSON.parse(new TextDecoder().decode(u));if(!o||o.v!==1||typeof o.d!=='object')throw Error('form');return o}
+function progressMsg(t,cls){const m=$('#progressMsg');if(!m)return;m.textContent=t;m.className='setting-hint '+(cls||'')}
+function wireProgress(){const out=$('#progressOut'),inp=$('#progressIn');if(!out||out.dataset.wired)return;out.dataset.wired='1';
+ $('#progressIssue').onclick=async()=>{out.value=await makeProgressCode();$('#progressCopy').disabled=false;out.focus();out.select()};
+ $('#progressCopy').onclick=async()=>{try{await navigator.clipboard.writeText(out.value);$('#progressCopy').textContent=L('복사됨')}catch{out.focus();out.select()}setTimeout(()=>$('#progressCopy').textContent=L('복사'),1500)};
+ $('#progressApply').onclick=async()=>{let o;try{o=await readProgressCode(inp.value)}catch(e){progressMsg(L(e.message==='zip'?'이 브라우저에서는 이 코드를 풀 수 없어요. 브라우저를 최신으로 바꿔 주세요.':'코드가 올바르지 않아요. 빠진 글자 없이 전부 붙여 넣었는지 확인해 주세요.'),'bad');return}
+  const n=Object.keys(o.d).length;if(!confirm(L('이 기기의 읽기 기록과 설정을 코드 내용으로 바꿀까요?')+' ('+n+')'))return;
+  try{for(let i=localStorage.length-1;i>=0;i--){const k=localStorage.key(i);const nm=k&&k.startsWith(key)?k.slice(key.length):null;if(nm&&PROG_PREFIX.some(x=>nm.startsWith(x)))localStorage.removeItem(k)}
+   for(const [k,v] of Object.entries(o.d)){if(PROG_KEYS.includes(k)||PROG_PREFIX.some(x=>k.startsWith(x)))set(k,v)}set('welcomed',true)}catch{progressMsg(L('저장 공간이 부족해서 불러오지 못했어요.'),'bad');return}
+  progressMsg(L('불러왔어요. 잠시 뒤 새로 고칩니다.'),'ok');setTimeout(()=>location.reload(),900)}}
+const L=s=>window.L?window.L(s):s;
+function openUser(){wireProgress();renderQuick();$('#nickname').value=nick();selectUserPage('root');renderUserPanel();$('#userDialog').showModal()}
 
 // ---------- v0.8.0 검색·필터 ----------
 let cast=null,castLoading=false;
