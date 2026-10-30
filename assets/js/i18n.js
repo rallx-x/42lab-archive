@@ -5,6 +5,8 @@
 (function(){
 'use strict';
 let lang='ko';
+// 언어별 첫 페이지(/ja/ /en/ /tw/ /zh/)로 처음 들어오면 그 언어로 시작 (이미 고른 언어가 있으면 그대로) — 2026-10-30 검색용
+try{const pl=document.documentElement.dataset.langPage;if(pl&&localStorage.getItem('42lab.lang')===null&&['ko','ja','en','tw','zh'].includes(pl))localStorage.setItem('42lab.lang',JSON.stringify(pl))}catch(e){}
 try{const v=JSON.parse(localStorage.getItem('42lab.lang'));if(['ko','ja','en','tw','zh'].includes(v))lang=v}catch(e){}
 window.UI_LANG=lang;
 const LOCALE={ko:'ko-KR',ja:'ja-JP',en:'en-US',tw:'zh-TW',zh:'zh-CN'};
@@ -173,6 +175,9 @@ const D=[
 ['음악 음량','音楽の音量','Music volume','音樂音量','音乐音量'],
 ['회차 위의 둥근 막대에서 ▶ 로 재생 · 멈춤해요. 처음 음량은 30%예요.','話の上の丸いバーの ▶ で再生・停止します。初期音量は30%です。','Use ▶ on the round bar above each episode to play or stop. Default volume is 30%.','用篇章上方圓角列的 ▶ 播放・停止。初始音量為30%。','用篇章上方圆角栏的 ▶ 播放・停止。初始音量为30%。'],
 ['글꼴','フォント','Font','字型','字体'],
+['기본은 기기에 있는 글꼴, 고딕 · 명조는 화면 언어에 맞는 글꼴을 불러와요.','「基本」はお使いの端末のフォント、「ゴシック」「明朝」は表示言語に合ったフォントを読み込みます。','Default uses your device font; Sans and Serif load fonts matched to the display language.','「基本」使用裝置內建字型，「黑體」「明體」會載入符合顯示語言的字型。','“基本”使用设备自带字体，“黑体”“宋体”会加载符合显示语言的字体。'],
+['고딕','ゴシック','Sans','黑體','黑体'],
+['명조','明朝','Serif','明體','宋体'],
 ['글꼴 · 크기 · 자간 · 줄 간격','フォント・サイズ・字間・行間','Font · size · spacing · line height','字型・大小・字距・行距','字体・大小・字距・行距'],
 ['테마','テーマ','Theme','主題','主题'],
 ['라이트 · 딤 · 다크 · 잠긴 추가 테마','ライト・ディム・ダーク・ロックされた追加テーマ','Light · Dim · Dark · locked extra themes','淺色・暗淡・深色・鎖定的額外主題','浅色・暗淡・深色・锁定的额外主题'],

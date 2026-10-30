@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://42lab-archive.pages.dev/sitemap.xml
