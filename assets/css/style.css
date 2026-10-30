@@ -542,7 +542,7 @@ html,body{overflow-x:hidden}
 
 /* v0.9.5 아이콘 (assets/icons, 모양만 따서 글자색으로 칠함) */
 .ic{display:inline-block;width:1em;height:1em;flex:none;vertical-align:-.14em;background:currentColor;-webkit-mask:var(--ic) center/contain no-repeat;mask:var(--ic) center/contain no-repeat}
-.ic-user{--ic:url(../icons/user.png)}.ic-settings{--ic:url(../icons/settings.png)}.ic-volume{--ic:url(../icons/volume.png)}
+.ic-user{--ic:url(../icons/user.png)}.ic-share{--ic:url(../icons/share.png)}.ic-settings{--ic:url(../icons/settings.png)}.ic-volume{--ic:url(../icons/volume.png)}
 .ic-menu{--ic:url(../icons/menu.png)}.ic-close{--ic:url(../icons/close.png)}.ic-check{--ic:url(../icons/check.png)}
 .ic-lock{--ic:url(../icons/lock.png)}.ic-unlock{--ic:url(../icons/unlock.png)}.ic-expand{--ic:url(../icons/expand.png)}
 .ic-music{--ic:url(../icons/music.png)}.ic-play{--ic:url(../icons/play.png)}.ic-pause{--ic:url(../icons/pause.png)}
@@ -968,3 +968,6 @@ button.doll-chip:hover{border-color:var(--accent)}
 
 /* 진척도 코드 (2026-10-30, 기록 176) */
 .progress-code{display:block;width:100%;resize:vertical;padding:11px;background:var(--bg);color:var(--ink);border:1px dashed var(--line);border-radius:8px;font:12px/1.5 monospace;word-break:break-all}.progress-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:8px}.progress-actions button:disabled{opacity:.5;cursor:not-allowed}#progressMsg:empty{display:none}#progressMsg.ok{color:var(--accent)}#progressMsg.bad{color:#d75d59}
+
+/* 공유 (2026-10-30) */
+.share-toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%);z-index:60;background:var(--panel);color:var(--ink);border:1px solid var(--accent);border-radius:999px;padding:10px 18px;font-size:13px;box-shadow:0 8px 30px #0003;pointer-events:none;opacity:0;transition:opacity .2s}.share-toast.on{opacity:1}.doll-share{margin-left:auto}

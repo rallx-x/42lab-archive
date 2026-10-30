@@ -262,6 +262,13 @@ function wireProgress(){const out=$('#progressOut'),inp=$('#progressIn');if(!out
    for(const [k,v] of Object.entries(o.d)){if(PROG_KEYS.includes(k)||PROG_PREFIX.some(x=>k.startsWith(x)))set(k,v)}set('welcomed',true)}catch{progressMsg(L('저장 공간이 부족해서 불러오지 못했어요.'),'bad');return}
   progressMsg(L('불러왔어요. 잠시 뒤 새로 고칩니다.'),'ok');setTimeout(()=>location.reload(),900)}}
 const L=s=>window.L?window.L(s):s;
+// 공유 링크 (2026-10-30): 지금 보는 화면 주소를 그 언어 입구(/ja/ 등)로 만들어 공유 — 처음 받는 사람은 그 언어로 열림
+const LANG_PATH={ko:'',ja:'ja/',en:'en/',tw:'tw/',zh:'zh/'};
+function shareURL(){const base=location.origin+location.pathname.replace(/(?:ja|en|tw|zh)\/$/,'').replace(/index\.html$/,'');return base+(LANG_PATH[uiLang()]||'')+location.hash}
+function toast(t){let e=$('#shareToast');if(!e){e=el('div','share-toast');e.id='shareToast';e.setAttribute('role','status');document.body.append(e)}e.textContent=t;e.classList.add('on');clearTimeout(e._t);e._t=setTimeout(()=>e.classList.remove('on'),1800)}
+async function shareNow(title){const url=shareURL();const t=[title,'//:_42LAB-Archive'].filter(Boolean).join(' · ');
+ if(navigator.share&&matchMedia('(pointer:coarse)').matches){try{await navigator.share({title:t,url});return}catch(e){if(e&&e.name==='AbortError')return}}
+ try{await navigator.clipboard.writeText(url);toast(L('링크를 복사했어요.'))}catch{prompt(L('이 링크를 복사하세요.'),url)}}
 function openUser(){wireProgress();renderQuick();$('#nickname').value=nick();selectUserPage('root');renderUserPanel();$('#userDialog').showModal()}
 
 // ---------- v0.8.0 검색·필터 ----------
@@ -897,7 +904,7 @@ function showOpenError(id,e){
 function goHome(){$('#search').value='';showHome(null)}
 window.addEventListener('popstate',()=>{if(index)restoreRoute()});
 window.addEventListener('hashchange',()=>{if(index)restoreRoute()});
-$('#homeBtn').onclick=goHome;$('#back').onclick=()=>{const n=episodeNeighbors(current);if(n.groupId||n.dorm)backToChapter(n);else goHome()};$('#resumeBtn').onclick=resume;$('#userBtn').onclick=openUser;$('#userClose').onclick=()=>$('#userDialog').close();$('#userBack').onclick=()=>selectUserPage('root');document.querySelectorAll('[data-user-page]').forEach(b=>b.onclick=()=>selectUserPage(b.dataset.userPage));$('#bmToggle').onclick=()=>{if(current)toggleBookmark(current)};
+$('#homeBtn').onclick=goHome;$('#back').onclick=()=>{const n=episodeNeighbors(current);if(n.groupId||n.dorm)backToChapter(n);else goHome()};$('#resumeBtn').onclick=resume;$('#shareBtn').onclick=()=>{const r=parseRoute();const t=r.type==='episode'?$('#epTitle')?.textContent:r.type==='doll'?$('.doll-name')?.textContent:'';shareNow(t||'')};$('#userBtn').onclick=openUser;$('#userClose').onclick=()=>$('#userDialog').close();$('#userBack').onclick=()=>selectUserPage('root');document.querySelectorAll('[data-user-page]').forEach(b=>b.onclick=()=>selectUserPage(b.dataset.userPage));$('#bmToggle').onclick=()=>{if(current)toggleBookmark(current)};
 // Settings: quick controls and independent subpages.
 const settings=$('#settings');let settingsPage='root';
 const fontValues={fontSize:[14,16,18,20,22,24],letterSpacing:[0,.5,1,1.5,2],lineHeight:[140,160,180,200]};
