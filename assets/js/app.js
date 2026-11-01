@@ -490,12 +490,12 @@ function noticeDate(n){return n.date?String(n.date).replaceAll('-','.'):''}
 function renderLanding(host){
  const home=siteInfo?.home||{},wrap=el('div','home-grid'),fb=home.feedback||{};
  // 모바일: 「외부 링크」 단추 줄(옆으로 밀기) — PC에서는 숨김
- const ext=el('section','home-ext');ext.append(el('div','tb-label','외부 링크'));
- const chips=el('nav','home-chips');chips.setAttribute('aria-label','외부 링크');
+ const ext=el('section','home-ext');ext.append(el('div','tb-label','외부 URL'));
+ const chips=el('nav','home-chips');chips.setAttribute('aria-label','외부 URL');
  const chip=(label,href,cls='')=>{const a=el(href?'a':'span','home-chip'+(cls?' '+cls:'')+(href?'':' disabled'),label);if(href){a.href=href;a.target='_blank';a.rel='noopener'}chips.append(a)};
  for(const s of home.otherSites||[])chip(s.name+(s.url?'':' · 준비 중'),s.url||'');
  chips.append(el('span','home-chip-sep','│'));
- chip('피드백 폼',feedbackURL()||fb.form||'','primary');chip('X '+(fb.xHandle||''),fb.x||'');
+ chip('피드백 폼',feedbackURL()||fb.form||'','primary');chip('X '+(fb.xHandle||''),fb.x||'');if(fb.email)chip(fb.email,'mailto:'+fb.email);
  ext.append(chips);host.append(ext);
  // 공지 (리스트)
  const notice=landingCard('home-notice','공지','menu');const list=el('div','notice-list');
@@ -505,13 +505,13 @@ function renderLanding(host){
  notice.append(list);
  // 생일 달력 (PC만)
  const cal=landingCard('home-birthday','생일');renderBirthday(cal);
- // 다른 사이트 · 피드백 (PC만)
+ // 외부 URL · 피드백 · 연락처 (PC만) — 한 칸에서 ‹ › 로 쪽 넘김 (v0.12.21)
  const side=el('div','home-side');
- const other=landingCard('home-other','Other');
- for(const s of home.otherSites||[]){const a=el(s.url?'a':'div','home-link'+(s.url?'':' disabled'));if(s.url){a.href=s.url;a.target='_blank';a.rel='noopener'}a.append(el('strong','',s.name),el('small','',s.url?(s.desc||''):(s.desc?s.desc+' · ':'')+'준비 중'));other.append(a)}
- if(!(home.otherSites||[]).length)other.append(el('p','bm-empty','준비 중'));
- const fbCard=landingCard('home-feedback','피드백');fbCard.append(...feedbackLinks());
- side.append(other,fbCard);
+ const sites=el('div','home-page');
+ for(const s of home.otherSites||[]){const a=el(s.url?'a':'div','home-link'+(s.url?'':' disabled'));if(s.url){a.href=s.url;a.target='_blank';a.rel='noopener'}a.append(el('strong','',s.name),el('small','',s.url?(s.desc||''):(s.desc?s.desc+' · ':'')+'준비 중'));sites.append(a)}
+ if(!(home.otherSites||[]).length)sites.append(el('p','bm-empty','준비 중'));
+ const fbPage=el('div','home-page');fbPage.append(...feedbackLinks());
+ side.append(pagedCard('home-other',[['외부 URL',sites],['피드백 · 연락처',fbPage]]));
  wrap.append(notice,cal,side);host.append(wrap);
 }
 function sortedNotices(){return [...(siteInfo?.notices||[])].sort((a,b)=>(b.pinned===true)-(a.pinned===true)||String(b.date||'').localeCompare(String(a.date||'')))}
@@ -519,8 +519,24 @@ function openNotice(n){openInfo({title:n.title,items:[{title:noticeDate(n),lines
 function feedbackLinks(){
  const fb=siteInfo?.home?.feedback||{};
  const form=el('a','home-link primary');form.href=feedbackURL()||fb.form||'#';form.target='_blank';form.rel='noopener';form.append(el('strong','','피드백 폼'),el('small','','오류 · 오탈자 · 기능 제안은 폼으로 먼저 보내 주세요.'));
- const x=el('a','home-link');x.href=fb.x||'#';x.target='_blank';x.rel='noopener';x.append(el('strong','','X '+(fb.xHandle||'')),el('small','','개인 연락 · 급한 문의만. 제보는 폼 제출을 우선 부탁드려요.'));
- return [form,x];
+ const contact=el('div','home-contact');contact.append(el('div','home-contact-label','개인 연락처'));
+ const x=el('a','home-link');x.href=fb.x||'#';x.target='_blank';x.rel='noopener';x.append(el('strong','','X '+(fb.xHandle||'')),el('small','',fb.x?fb.x.replace(/^https?:\/\//,''):''));contact.append(x);
+ if(fb.email){const m=el('a','home-link');m.href='mailto:'+fb.email;m.append(el('strong','','이메일'),el('small','',fb.email));contact.append(m)}
+ contact.append(el('p','home-contact-note','되도록이면 피드백 사항은 피드백 폼으로 제출 부탁드리겠습니다.'));
+ return [form,contact];
+}
+// 쪽 넘김 카드: pages = [[제목, 내용], …]. 제목줄 오른쪽 ‹ 1/2 › 단추, 키보드 ← → 도 됨
+function pagedCard(cls,pages){
+ const card=el('section','home-card home-paged '+cls),head=el('div','home-card-head'),h=el('h2','');
+ const nav=el('div','page-nav'),prev=el('button','cal-nav'),next=el('button','cal-nav'),count=el('span','page-count');
+ prev.type=next.type='button';prev.append(ic('left'));next.append(ic('right'));
+ prev.setAttribute('aria-label','이전 쪽');next.setAttribute('aria-label','다음 쪽');
+ nav.append(prev,count,next);head.append(h,nav);card.append(head);
+ for(const [,body] of pages)card.append(body);
+ let i=0;const go=d=>{i=(i+d+pages.length)%pages.length;h.textContent=pages[i][0];count.textContent=(i+1)+' / '+pages.length;pages.forEach(([,b],k)=>b.hidden=k!==i)};
+ prev.onclick=()=>go(-1);next.onclick=()=>go(1);
+ card.tabIndex=-1;card.addEventListener('keydown',e=>{if(e.target.closest('input,textarea'))return;if(e.key==='ArrowLeft'){go(-1);e.preventDefault()}else if(e.key==='ArrowRight'){go(1);e.preventDefault()}});
+ go(0);return card;
 }
 // ---------- v0.9.3 생일 달력 ----------
 // 날짜는 한국 시간 새벽 5시에 바뀐다 (게임 서버 갱신 시각)

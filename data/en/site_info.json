@@ -181,7 +181,8 @@
       "code": "entry.1398581144"
      }
     }
-   }
+   },
+   "email": "rallentandox.x@gmail.com"
   },
   "otherSites": [
    {
@@ -193,6 +194,16 @@
     "name": "뉴럴 클라우드 인형증",
     "desc": "Make and save your own Doll card",
     "url": "https://pnc-doll-card.pages.dev/"
+   },
+   {
+    "name": "보드게임 TCG 카드",
+    "desc": "Make and save your own board game TCG card",
+    "url": "https://pnc-tcg.pages.dev/"
+   },
+   {
+    "name": "보드게임 플레이어 말",
+    "desc": "Make and save your own board game player piece",
+    "url": "https://pnc-chess.pages.dev/"
    }
   ],
   "bgmBase": "https://42lab-bgm.pages.dev/"

@@ -344,6 +344,14 @@ html,body{overflow-x:hidden}
 .home-link.primary{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 12%,var(--bg))}
 .home-link.disabled{opacity:.55;cursor:default}
 .home-link.disabled:hover{border-color:var(--line)}
+.home-paged .home-card-head{justify-content:space-between}
+.home-paged .home-card-head h2{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.page-nav{display:flex;align-items:center;gap:2px;margin-right:-8px}
+.page-count{font:700 12px monospace;color:var(--sub);min-width:3.2em;text-align:center}
+.home-page[hidden]{display:none}
+.home-contact{margin-top:18px;padding-top:12px;border-top:1px dashed var(--line)}
+.home-contact-label{font-size:12px;font-weight:700;color:var(--accent-text,var(--accent))}
+.home-contact-note{margin:12px 0 0;font-size:12px;line-height:1.6;color:var(--sub)}
 .archive-menu-home{width:100%;border-bottom:1px solid var(--line)!important;border-radius:0}
 .search-cat-card{border-color:var(--accent)}
 .progress-box{display:flex;gap:8px;align-items:center}
