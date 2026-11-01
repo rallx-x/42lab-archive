@@ -181,7 +181,8 @@
       "code": "entry.1398581144"
      }
     }
-   }
+   },
+   "email": "rallentandox.x@gmail.com"
   },
   "otherSites": [
    {
@@ -193,6 +194,16 @@
     "name": "뉴럴 클라우드 인형증",
     "desc": "人形カードを作って保存する",
     "url": "https://pnc-doll-card.pages.dev/"
+   },
+   {
+    "name": "보드게임 TCG 카드",
+    "desc": "ボードゲーム用のTCGカードを作って保存する",
+    "url": "https://pnc-tcg.pages.dev/"
+   },
+   {
+    "name": "보드게임 플레이어 말",
+    "desc": "ボードゲーム用のプレイヤー駒を作って保存する",
+    "url": "https://pnc-chess.pages.dev/"
    }
   ],
   "bgmBase": "https://42lab-bgm.pages.dev/"

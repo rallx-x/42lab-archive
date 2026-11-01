@@ -266,6 +266,15 @@ const D=[
 ['서약 후','誓約後','After Oath','誓約後','誓约后'],
 ['뉴럴 클라우드 취향픽','ニューラルクラウド 好みピック','Neural Cloud Pick','雲圖計劃 喜好表','云图计划 喜好表'],
 ['뉴럴 클라우드 인형증','ニューラルクラウド 人形証','Neural Cloud Doll Card','雲圖計劃 人形證','云图计划 人形证'],
+['보드게임 TCG 카드','ボードゲーム TCGカード','Board Game TCG Card','桌遊 TCG 卡片','桌游 TCG 卡片'],
+['보드게임 플레이어 말','ボードゲーム プレイヤー駒','Board Game Player Piece','桌遊 玩家棋子','桌游 玩家棋子'],
+['외부 URL','外部URL','External links','外部連結','外部链接'],
+['피드백 · 연락처','フィードバック・連絡先','Contact','意見回饋 · 聯絡方式','反馈 · 联系方式'],
+['개인 연락처','個人連絡先','Personal contact','個人聯絡方式','个人联系方式'],
+['이메일','メール','Email','電子郵件','电子邮件'],
+['되도록이면 피드백 사항은 피드백 폼으로 제출 부탁드리겠습니다.','フィードバックはできるだけフィードバックフォームからお送りください。','If possible, please submit feedback through the feedback form.','意見回饋請盡量透過意見表單提交。','反馈请尽量通过反馈表单提交。'],
+['이전 쪽','前のページ','Previous page','上一頁','上一页'],
+['다음 쪽','次のページ','Next page','下一頁','下一页'],
 ['팬 번역','ファン翻訳','Fan translation','粉絲翻譯','粉丝翻译'],
 ['본섭에만 있는 글을 Claude(AI)로 옮긴 팬 번역이에요. 오류는 피드백 폼으로 알려 주세요.','中国版にしかない文章をファンがClaude（AI）で翻訳したものです。誤りはフィードバックフォームでお知らせください。','This text exists only on the CN server and was fan-translated using Claude (AI). Please report errors through the feedback form.','此內容僅存在於國服，由簡體中文原文自動轉換為繁體。如有錯誤請透過意見表單告知。','']
 ];
