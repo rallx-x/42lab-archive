@@ -1286,3 +1286,10 @@ button.doll-chip:hover{border-color:var(--accent)}
 .doll-story.open .doll-story-head .tri{transform:rotate(90deg)}
 .doll-story-fold{display:none;padding:0 4px 16px}
 .doll-story.open .doll-story-fold{display:block}
+
+/* ===== v1.5.1 목차를 위로 · [프로필] 칸 ===== */
+.doll-toc{margin-top:8px}
+.doll-mini{display:grid;gap:2px;margin:0 0 14px}
+.doll-mini[hidden]{display:none}
+.doll-mini-name{font-size:26px;line-height:1.2}
+.doll-toc-body>.doll-hero{margin-top:0}
