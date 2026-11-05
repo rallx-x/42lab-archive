@@ -1719,14 +1719,14 @@ let armaData=null;
 const loadArma=()=>armaData?Promise.resolve(armaData):fetchJSON(dataPath('arma.json')).then(d=>armaData=d);
 const ROLE_TONE=['#3d8bff','#ff8a2a','#ff4f45','#a66bff','#3fc46b']; // 수위 · 전사 · 사수 · 해결사 · 치료사
 const ROMAN=['Ⅰ','Ⅱ','Ⅲ'];
-let armaLv=+get('armaLv',30)||30;
+let armaLv=(v=>Number.isFinite(v)?v:30)(+get('armaLv',30));
 // 1920×1080 화면 가운데 기준 좌표 → 무대 안 % 위치
 const armaPos=(x,y)=>({left:(x+960)/19.2+'%',top:(540-y)/10.8+'%'});
 const ARMA_NODE=[[-429,0],[429,0],[0,432]]; // 게임 화면: Ⅰ 왼쪽 · Ⅱ 오른쪽 · Ⅲ 위
 function armaPanel(p){
  const a=p.arma,MAX=a.levels?.length||30,attrs=armaData?.attrs||{};
  const ri=ROLE_ORDER.map(l=>l.indexOf(p.role)).find(i=>i>=0);const tone=ROLE_TONE[ri]??ROLE_TONE[2];
- let lv=Math.min(Math.max(armaLv,1),MAX),sel='center';
+ let lv=Math.min(Math.max(armaLv,0),MAX),sel='center';
  const wrap=el('div','arma');wrap.style.setProperty('--arma',tone);
  if(a.fan)wrap.append(fanNote());
  // 게임 화면 그대로: 1920×1080 판에 게임 조각(assets/img/arma, KR spriteatlas/ui_armainscripta)을 배치 위치대로 놓고 칸 너비에 맞춰 줄임
@@ -1738,7 +1738,6 @@ function armaPanel(p){
  put('lt',172-960,540-218,202,164);put('lb',136-960,209-540,284,373);put('rt',873,240,242,330);put('rb',827,127-540,182,212);
  // 레벨 마름모 30개 (레벨만큼 켜짐, 지금 레벨엔 선택 표시)
  const pts=(armaData?.points||[]).map(([x,y])=>({x,y,off:put('pt_off_'+R,x,y,91,90,0,'pt-off'),on:put('pt_on_'+R,x,y,91,90,0,'pt-on')}));
- const nowPt=put('sel_pt',0,0,102,102,45,'pt-now');
  // 가운데
  put('center_'+R,0,0,1472,1125);put('cpu_'+R,0,0,902,902);
  [[-128,127,45],[-128,-126,0],[128,-126,225],[127,126,0]].forEach(([x,y,r])=>put('cpuline_'+R,x,y,108,154,r));
@@ -1747,7 +1746,7 @@ function armaPanel(p){
  put('cdeco_'+R,0,0,360,360,45);
  put('arrow',0,318,19,38,90);put('arrow',-316,0,19,38,180);put('arrow',316,0,19,38,0);
  const cStep=put('n1',0,204,51,39,0,'c-step');
- const base=itemIconBase();if(base){const lg=put(base.replace(/\/?$/,'/')+'arma/'+p.heroId+'.webp',0,18,330,330,0,'c-logo');lg.onerror=()=>lg.remove()}
+ const base=itemIconBase();if(base){const lg=put(base.replace(/\/?$/,'/')+'arma/'+p.heroId+'.webp',0,0,330,330,0,'c-logo');lg.onerror=()=>lg.remove()}
  const txt=(cls,y,t)=>{const d=el('div','arma-tx '+cls);d.style.top=(540-y)+'px';if(t)d.textContent=t;cv.append(d);return d};
  const cLv=txt('c-lv',-188),cLvL=txt('c-lvl',-222,'- 레벨 -');
  txt('c-name arma-name',-318,[a.hero,a.name].filter(Boolean).join('·'));put('word',3,-351,197,9);
@@ -1766,9 +1765,9 @@ function armaPanel(p){
  // 레벨 조절
  const bar=el('div','arma-lvbar');
  const dn=el('button','arma-step','▼'),up=el('button','arma-step','▲');dn.type=up.type='button';dn.setAttribute('aria-label','레벨 -1');up.setAttribute('aria-label','레벨 +1');
- const range=el('input','arma-range');range.type='range';range.min=1;range.max=MAX;range.value=lv;range.setAttribute('aria-label','레벨');
+ const range=el('input','arma-range');range.type='range';range.min=0;range.max=MAX;range.value=lv;range.setAttribute('aria-label','레벨');
  const lvTxt=el('span','arma-lvtxt');
- const setLv=v=>{lv=Math.min(Math.max(v,1),MAX);armaLv=lv;set('armaLv',lv);range.value=lv;draw()};
+ const setLv=v=>{lv=Math.min(Math.max(v,0),MAX);armaLv=lv;set('armaLv',lv);range.value=lv;draw()};
  dn.onclick=()=>setLv(lv-1);up.onclick=()=>setLv(lv+1);range.oninput=()=>setLv(+range.value);
  bar.append(el('span','arma-lvlabel','레벨'),dn,range,up,lvTxt);
  const info=el('div','arma-info');
@@ -1777,7 +1776,6 @@ function armaPanel(p){
  const stepOf=()=>a.steps.findIndex(st=>lv<=st.maxLv)+1||a.steps.length;
  function draw(){
   pts.forEach((q,i)=>{q.on.hidden=i>=lv;q.off.hidden=i<lv});
-  const cur=pts[lv-1];if(cur){nowPt.hidden=false;nowPt.style.left=(960+cur.x-51)+'px';nowPt.style.top=(540-cur.y-51)+'px'}else nowPt.hidden=true;
   nodes.forEach((g,i)=>{g.fog.hidden=open(i);g.sel.hidden=sel!==i;g.b.classList.toggle('open',open(i))});
   cStep.src=IMG+'n'+Math.min(stepOf(),3)+'.webp';cLv.textContent=lv+'/'+MAX;
   lvTxt.replaceChildren(el('b','',String(lv).padStart(2,'0')),document.createTextNode(' / '+MAX));
