@@ -44,55 +44,35 @@
    "id": "2026-11-05-v1.4",
    "date": "2026-11-05",
    "kind": "update",
-   "title": "Update v1.4 · Doll skills · Profile contents",
+   "title": "Update v1.4",
    "lines": [
-    "Doll profiles now have \"Contents\" at the bottom: Skills · Intimacy · Voice · Outfits.",
-    "Skills: brief descriptions of Passive, Auto, and Ultimate skills. Press ▶ for the detailed text and values per level (Lv1–MAX), plus cooldown and pre-charge.",
-    "Press colored words in skill text (True Damage, Super Armor, etc.) to see what the term means.",
-    "Likes, dislikes, and relationships moved to \"Intimacy.\"",
-    "ENIAC's skills are fan translations of the CN server text."
+    "Added Doll skills and profile contents."
    ]
   },
   {
    "id": "2026-11-05-v1.3",
    "date": "2026-11-05",
-   "title": "Update v1.3 · Item cleanup",
+   "title": "Update v1.3",
    "lines": [
-    "Items now have \"Algorithms,\" \"Breakthrough Widgets,\" and \"Event Rewards\" tabs.",
-    "Breakthrough Widget boxes are grouped by grade, and Keycards, Search Commands, and Retraining Permits each have one folder.",
-    "Items with the same name and icon are merged into one card with all sources listed. If the description differs by event, see \"By event.\"",
-    "Event Rewards are split into one folder per event.",
-    "Skins inside boxes now show as \"Doll - Skin name.\"",
-    "Card spacing and sizes are now consistent."
+    "Reorganized item categories."
    ],
    "kind": "update"
   },
   {
    "id": "2026-11-05-v1.2",
    "date": "2026-11-05",
-   "title": "Update v1.2 · Library · Search filters",
+   "title": "Update v1.2",
    "lines": [
-    "The ☰ menu now has a \"Library\" group with Perception's Record, Loading Tips, and Items.",
-    "Search now has filters: All · Stories · Dolls · Items · Perception's Record · Loading Tips.",
-    "Long records in 《》 open on their own page. Going back returns you to where you were.",
-    "Each record and item now has its own link. Use the share button on a card to copy it.",
-    "Gift items show which Dolls like or dislike them, and gifts on Doll profiles link to the item.",
-    "Self-select boxes show \"Choose one,\" and random boxes show their \"Contents.\""
+    "Added the Library menu and search filters."
    ],
    "kind": "update"
   },
   {
    "id": "2026-11-05-v1.1",
    "date": "2026-11-05",
-   "title": "Update v1.1 · Perception's Record · Loading Tips · Items",
+   "title": "Update v1.1",
    "lines": [
-    "The ☰ menu (top left) now has \"Perception's Record,\" \"Loading Tips,\" and \"Items.\"",
-    "Perception's Record: the 79 terms you could only see through orange words in stories, now listed by category. Long records in 《》 can be expanded one at a time.",
-    "Loading Tips: 64 loading-screen tips, grouped into Dolls, Sectors, and Others.",
-    "Items: names, descriptions, and sources, sorted like the in-game warehouse. Box items can be expanded to show their contents.",
-    "Items › Dorm: browse 541 furniture pieces by type or by theme.",
-    "Gift preferences (likes · dislikes) on Doll profiles now show item icons.",
-    "All text is taken from each server's client. Please report errors through the feedback form."
+    "Added Perception's Record · Loading Tips · Items."
    ],
    "kind": "update"
   },
@@ -150,30 +130,13 @@
    ]
   },
   {
-   "id": "2026-10-23-update",
-   "date": "2026-10-23",
-   "title": "Update · New home screen and user panel",
+   "id": "2026-10-30-v1.0",
+   "date": "2026-10-30",
+   "kind": "update",
+   "title": "v1.0 Official launch",
    "lines": [
-    "Notices, illustration and feedback are now gathered on the home screen.",
-    "Open the story list from the ☰ menu at the top left.",
-    "Type a category name such as \"Main\" or \"Events\" in search to jump straight to that list.",
-    "The user button at the top right shows your professor name, last record and bookmarks in one place.",
-    "Settings include brightness, font, theme and language.",
-    "Please report bugs through the feedback form."
-   ],
-   "kind": "update"
-  },
-  {
-   "id": "2026-10-22-update",
-   "date": "2026-10-22",
-   "title": "Update · Bookmarks and search",
-   "lines": [
-    "Save records with the ☆ bookmark on the reading screen.",
-    "Search a character name to see the chapters they appear in most.",
-    "You can also search occasions and themes like \"Valentine\" or \"Summer\".",
-    "Fixed text looking too small on phones."
-   ],
-   "kind": "update"
+    "The 42LAB Record Archive is now open."
+   ]
   },
   {
    "id": "guide",
@@ -199,23 +162,6 @@
     "There are no individual replies. Fixes are announced in the notices on this site.",
     "Typos in the original game text are kept as they are, so they may not be fixed right away."
    ]
-  },
-  {
-   "id": "first-features",
-   "date": "",
-   "title": "Update · First features",
-   "lines": [
-    "Messenger-style reading screen: dialogue bubbles, inner-thought bubbles, narration, letters",
-    "Professor nickname: how characters address the professor shows your nickname.",
-    "Choices: the story follows your answer; see every branch with other choices or \"Show all\".",
-    "World Record links: tap orange words for an explanation.",
-    "Episode numbers, battle dialogue labels (e.g. 09.1) and Dark Zone markers",
-    "Main · Events · Character · Collab · Escort · Special · Other categories",
-    "Brightness and themes: Light · Dim · Dark (+ hidden themes)",
-    "Reading modes: Normal · Easy-read",
-    "Continue reading: remembers where you left off."
-   ],
-   "kind": "update"
   }
  ],
  "home": {
