@@ -1892,7 +1892,18 @@ function storyPanel(p){
   body.replaceChildren();
   if(storyPage===0){
    if(!p.infoStories?.length){body.append(el('p','doll-empty','한국어 번역 준비 중이에요.'));return}
-   p.infoStories.forEach((t,i)=>{const a=el('article','doll-story');const h=el('div','doll-story-head');h.append(el('h4','','이야기 '+(i+1)));const lv=p.storyLevels?.[i];if(lv)h.append(el('span','voice-unlock','친밀도 '+lv));a.append(h,sentenceBlock(t));body.append(a)});
+   // v1.5 이야기마다 접기 · 펼치기 (처음엔 1번만 펼침, 위 버튼으로 모두)
+   const arts=[];
+   const allBtn=el('button','story-all');allBtn.type='button';
+   const syncAll=()=>{const open=arts.every(a=>a.classList.contains('open'));allBtn.textContent=open?'모두 접기':'모두 펼치기'};
+   allBtn.onclick=()=>{const open=!arts.every(a=>a.classList.contains('open'));arts.forEach(a=>{a.classList.toggle('open',open);a.querySelector('.doll-story-head').setAttribute('aria-expanded',String(open))});syncAll()};
+   const bar=el('div','story-allbar');bar.append(allBtn);body.append(bar);
+   p.infoStories.forEach((t,i)=>{const a=el('article','doll-story fold'+(i===0?' open':''));const h=el('button','doll-story-head');h.type='button';h.setAttribute('aria-expanded',String(i===0));
+    h.append(el('h4','','이야기 '+(i+1)));const lv=p.storyLevels?.[i];if(lv)h.append(el('span','voice-unlock','친밀도 '+lv));
+    const pv=String(t||'').replace(/<[^>]+>/g,'').replace(/\s+/g,' ').trim();h.append(el('span','doll-story-peek',pv.length>70?pv.slice(0,70)+'…':pv),ic('right','tri'));
+    h.onclick=()=>{const on=a.classList.toggle('open');h.setAttribute('aria-expanded',String(on));syncAll()};
+    const bd=el('div','doll-story-fold');bd.append(sentenceBlock(t));a.append(h,bd);arts.push(a);body.append(a)});
+   syncAll();
   }else{
    if(!aff.length){body.append(el('p','doll-empty','친밀도 보이스가 없어요.'));return}
    const t=el('div','voice-top');t.append(el('p','load-note',LOAD_NOTE),repeatButton());body.append(t);
