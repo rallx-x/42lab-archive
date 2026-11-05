@@ -26,6 +26,20 @@
    ]
   },
   {
+   "id": "2026-11-05-v1.1",
+   "date": "2026-11-05",
+   "title": "Update v1.1 · Perception's Record · Loading Tips · Items",
+   "lines": [
+    "The ☰ menu (top left) now has \"Perception's Record,\" \"Loading Tips,\" and \"Items.\"",
+    "Perception's Record: the 79 terms you could only see through orange words in stories, now listed by category. Long records in 《》 can be expanded one at a time.",
+    "Loading Tips: 64 loading-screen tips, grouped into Dolls, Sectors, and Others.",
+    "Items: names, descriptions, and sources, sorted like the in-game warehouse. Box items can be expanded to show their contents.",
+    "Items › Dorm: browse 541 furniture pieces by type or by theme.",
+    "Gift preferences (likes · dislikes) on Doll profiles now show item icons.",
+    "All text is taken from each server's client. Please report errors through the feedback form."
+   ]
+  },
+  {
    "id": "2026-10-30-welcome",
    "date": "2026-10-30",
    "pinned": true,
