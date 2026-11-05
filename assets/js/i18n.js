@@ -232,6 +232,10 @@ const D=[
 ['마인드맵 파편','メンタルの欠片','Neural Fragment','心智碎片','心智碎片'],
 ['육성재료','育成素材','Upgrade Materials','培養材料','培养材料'],
 ['공장재료','工場素材','Factory Materials','工廠材料','工厂材料'],
+['숙소','宿舎','Dorm','宿舍','宿舍'],
+['종류별','種類別','By type','依種類','按种类'],
+['테마별','テーマ別','By theme','依主題','按主题'],
+['테마','テーマ','Theme','主題','主题'],
 ['기념품','記念品','Souvenirs','紀念品','纪念品'],
 ['획득처','入手方法','Source','獲取途徑','获取途径'],
 ['구성품','内容','Contents','內容物','内容物'],
@@ -351,6 +355,8 @@ const P=[
 [/^ · 재생할 수 없어요$/,' · 再生できません',' · Cannot play',' · 無法播放',' · 无法播放'],
 [/^(.+) · 준비 중$/,'$1 · 準備中','$1 · coming soon','$1 · 準備中','$1 · 准备中'],
 [/^아이템을 불러오지 못했어요\. \((.+)\)$/,'アイテムを読み込めませんでした。（$1）','Could not load items. ($1)','無法載入道具。（$1）','无法加载道具。（$1）'],
+[/^쾌적도 \+(\d+)$/,'快適度 +$1','Comfort +$1','舒適度 +$1','舒适度 +$1'],
+[/^(\d+)세트$/,'$1セット','$1 sets','$1 套','$1 套'],
 [/^로딩 팁을 불러오지 못했어요\. \((.+)\)$/,'ロード画面のTipsを読み込めませんでした。（$1）','Could not load loading tips. ($1)','無法載入載入提示。（$1）','无法加载加载提示。（$1）'],
 [/^시계 기록을 불러오지 못했어요\. \((.+)\)$/,'視界記録を読み込めませんでした。（$1）',"Could not load Perception's Record. ($1)",'無法載入視界記錄。（$1）','无法加载视界记录。（$1）'],
 [/^([\d,]+)자$/,'$1字','$1 chars','$1字','$1字'],
@@ -392,7 +398,7 @@ function tr(s){
 window.L=s=>tr(s)??s;
 window.tr18n=tr;
 /* 이야기 본문은 건너뜀 */
-const SKIP='.item-body,.item-chip-name,.wr-body,.tip-card,.wr-tab-name,.bubble,.center-item,.chat .name,.option,.choice-spoken,.voice-text,.doll-quote,.doll-career,.doll-story-body,.doll-chip,#stream .entry,#epTitle,#epDesc,#loreText,.notice-line,code,pre';
+const SKIP='.item-name,.item-desc,.item-src-text,.wr-long-title,.dorm-theme-info,.item-chip-name,.wr-body,.tip-card,.wr-tab-name,.bubble,.center-item,.chat .name,.option,.choice-spoken,.voice-text,.doll-quote,.doll-career,.doll-story-body,.doll-chip,#stream .entry,#epTitle,#epDesc,#loreText,.notice-line,code,pre';
 const ATTRS=['title','aria-label','placeholder','alt'];
 function skip(n){const e=n.nodeType===1?n:n.parentElement;return !e||!!e.closest(SKIP)}
 function doText(t){if(skip(t))return;const r=tr(t.nodeValue);if(r!=null&&r!==t.nodeValue)t.nodeValue=r}

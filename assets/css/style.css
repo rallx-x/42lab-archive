@@ -1049,3 +1049,17 @@ button.doll-chip:hover{border-color:var(--accent)}
 .item-chip-n{color:var(--sub);font-weight:700}
 .item-note{margin:0;font-size:12px;color:var(--sub)}
 @media(max-width:750px){.item-list{grid-template-columns:1fr}}
+/* v0.12.22 아이템 · 숙소(가구) */
+.wr-tab-dorm{margin-left:8px}
+.dorm-bar{display:flex;flex-direction:column;gap:10px;margin-bottom:14px}
+.dorm-views{display:inline-flex;gap:4px;padding:4px;background:var(--panel);border:1px solid var(--line);border-radius:12px;align-self:flex-start}
+.dorm-view{border:0;padding:7px 16px;font-size:13px;font-weight:700;border-radius:9px;background:none}
+.dorm-view.selected{background:color-mix(in srgb,var(--accent) 14%,var(--panel));color:var(--accent-text,var(--accent))}
+.dorm-cats{display:flex;flex-wrap:wrap;gap:6px}
+.dorm-cat{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;font-size:12px;font-weight:700;border-radius:20px}
+.dorm-cat.selected{border-color:var(--accent);color:var(--accent-text,var(--accent))}
+.furn-meta{display:block;margin-top:3px;font-size:11px;color:var(--sub);font-weight:700}
+.dorm-theme{padding:14px 16px 18px}
+.dorm-theme-info{margin:0 0 12px;color:var(--sub);font-size:13px;line-height:1.7}
+@media(max-width:750px){.dorm-cats{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}.dorm-cat{flex:none}}
+.item-list.dorm-mode{display:block}
