@@ -1378,16 +1378,19 @@ function renderItems(){
    if(o.desc)body.append(el('p','item-desc',cleanTags(o.desc)));
    if(o.source){const src=el('p','item-src');src.append(el('span','item-src-label','획득처'),el('span','item-src-text',cleanTags(o.source)));body.append(src)}
    main.append(body);card.append(main);
-   const cont=o.contents||[];
-   if(cont.length){
+   // 랜덤 · 고정 상자 = 구성품(아이콘 · 이름 · 개수) / 선택형 상자 = 선택지(아이콘 · 이름)
+   const cont=o.contents||[],opts=o.options||[];
+   const pick=cont.length?['구성품',cont]:opts.length?['선택 가능',opts.map(id=>[id,0])]:null;
+   if(pick){
+    const [label,listIds]=pick;
     const tg=el('button','item-toggle');tg.type='button';tg.setAttribute('aria-expanded',String(opened.has(o.id)));
-    tg.append(el('span','','구성품'),el('span','wr-tab-n',String(cont.length)),ic('right','tri'));
+    tg.append(el('span','',label),el('span','wr-tab-n',String(listIds.length)),ic('right','tri'));
     const panel=el('div','item-contents');
-    const fill=()=>{if(panel.childNodes.length)return;for(const [id,n] of cont){const r=ref(id);const c=el('span','item-chip');c.append(itemIcon(r.icon,'sm'),el('span','item-chip-name',r.name));if(n>0)c.append(el('span','item-chip-n','×'+n));panel.append(c)}};
+    const fill=()=>{if(panel.childNodes.length)return;for(const [id,n] of listIds){const r=ref(id);const c=el('span','item-chip');c.append(itemIcon(r.icon,'sm'),el('span','item-chip-name',r.name));if(n>0)c.append(el('span','item-chip-n','×'+n));panel.append(c)}};
     if(opened.has(o.id)){card.classList.add('open');fill()}
     tg.onclick=()=>{const on=!card.classList.contains('open');card.classList.toggle('open',on);tg.setAttribute('aria-expanded',String(on));if(on){opened.add(o.id);fill()}else opened.delete(o.id)};
     card.append(tg,panel);
-   }else if(o.select)card.append(el('p','item-note','고를 수 있는 아이템 목록은 준비 중이에요.'));
+   }
    list.append(card);
   }
  };
