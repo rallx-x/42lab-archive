@@ -350,6 +350,7 @@ function renderSearch(q,host){
  const nq=norm(q);ensureSearchData();
  const ex=searchExtra(nq);
  const bar=el('div','search-filters');bar.setAttribute('role','tablist');bar.setAttribute('aria-label','기록 찾기 분류');
+ {const lb=el('span','search-filters-label');lb.title='필터';lb.append(ic('filter'));bar.append(lb)}
  const counts={doll:ex.dolls.length,item:ex.items.length,record:ex.recs.length,tip:ex.tips.length};
  for(const [k,name] of SEARCH_KINDS){
   const b=el('button','search-filter'+(searchKind===k?' selected':''));b.type='button';b.dataset.kind=k;b.setAttribute('role','tab');b.setAttribute('aria-selected',String(searchKind===k));

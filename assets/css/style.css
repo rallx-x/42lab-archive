@@ -1293,3 +1293,7 @@ button.doll-chip:hover{border-color:var(--accent)}
 .doll-mini[hidden]{display:none}
 .doll-mini-name{font-size:26px;line-height:1.2}
 .doll-toc-body>.doll-hero{margin-top:0}
+
+/* v1.5.3 검색 필터 줄 앞 아이콘 */
+.ic-filter{--ic:url(../icons/filter.png)}
+.search-filters-label{display:inline-flex;align-items:center;justify-content:center;flex:none;width:30px;color:var(--sub);font-size:18px}
