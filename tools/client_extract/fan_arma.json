@@ -1,0 +1,23 @@
+{
+ "_note": "본섭(중국) 전용 무장각인 팬 번역 (Claude AI, 2026-11-05). 수치는 data/zh/arma.json 그대로, 이름 · 설명 · 강화 스킬 글만 여기 글로 바꿈. 강화 스킬 이름은 각 서버 공식 스킬 이름 + '+' 를 따름. tw 는 간체 원문을 번체 글자로 변환(fan_arma.py).",
+ "1061": {
+  "ko": {"name": "플래티넘 앙상블",
+         "desc": "펄럭이는 깃발 아래, 북소리와 박자와 발걸음이 함께 연주하는 감동의 악장은 운디네의 지휘에 맡겨 두자. 거침없이, 내일을 향해!",
+         "skills": {
+          "106104": {"name": "엘레간테+", "desc": "「반주곡」을 연주한다: 일정 시간마다 모든 적에게 치명타 가능한 「파생」 피해를 준다. 소환물이 일정 횟수 공격하면 「변주」가 추가되어 「반주곡」의 발동 간격이 줄어든다."},
+          "106105": {"name": "아지타토 블루밍+", "desc": "「변주」 1스택마다 자동스킬 피해가 일정 비율 증가한다."},
+          "106106": {"name": "엘레간테++", "desc": "「반주곡」이 발동할 때 체력이 가장 낮은 아군 유닛 3명을 치료한다."}}},
+  "ja": {"name": "プラチナアンサンブル",
+         "desc": "はためく旗の下、太鼓とリズムと足並みが奏でる感動の楽章は、ウンディーネの指揮に任せよう。迷わず前へ、明日へ！",
+         "skills": {
+          "106104": {"name": "メロディオーソ+", "desc": "「伴奏曲」を奏でる：一定時間ごとに敵全体へ会心可能な「派生」ダメージを与える。召喚物が一定回数攻撃すると「変奏」が追加され、「伴奏曲」の発動間隔が短くなる。"},
+          "106105": {"name": "イリデシェンツァ+", "desc": "「変奏」1スタックごとにオートスキルのダメージが一定割合上昇する。"},
+          "106106": {"name": "メロディオーソ++", "desc": "「伴奏曲」の発動時、HPが最も低い味方ユニット3体を治療する。"}}},
+  "en": {"name": "Platinum Ensemble",
+         "desc": "Beneath the fluttering banner, drumbeats, rhythm and footsteps play a stirring movement together — leave the conducting to Undine. Onward, toward tomorrow!",
+         "skills": {
+          "106104": {"name": "Harmonious Voices+", "desc": "Plays [Accompaniment]: periodically deals crit-capable [Derived] damage to all enemies. After summons attack a certain number of times, [Variation] is added, shortening the trigger interval of [Accompaniment]."},
+          "106105": {"name": "Rousing Brilliance+", "desc": "Each stack of [Variation] increases Auto skill damage by a certain percentage."},
+          "106106": {"name": "Harmonious Voices++", "desc": "When [Accompaniment] triggers, heals the 3 allied units with the lowest HP."}}}
+ }
+}

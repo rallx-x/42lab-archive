@@ -735,7 +735,7 @@ function spans(parent,unit){
  }
 }
 function showLore(id){let record=(data.worldRecords||{})[String(id)]||{};openLore(record.name||'세계기록 '+id,record.description,id)}
-function openLore(name,desc,id){$('#loreTitle').textContent=name;$('#loreText').textContent=cleanTags(desc)||'설명 정보가 없습니다.';
+function openLore(name,desc,id,eyebrow,tone){const dl=$('#lore');dl.querySelector('.eyebrow').textContent=eyebrow||'WORLD RECORD';dl.dataset.tone=tone||'';$('#loreTitle').textContent=name;$('#loreText').textContent=cleanTags(desc)||'설명 정보가 없습니다.';
  const f=$('#lore form');f.querySelector('.lore-link')?.remove();
  if(id!=null){const b=linkBtn('#record/'+id,name);b.classList.add('lore-link');f.append(b)}
  $('#lore').showModal()}
@@ -1436,7 +1436,7 @@ const loadItems=()=>itemData?Promise.resolve(itemData):fetchJSON(dataPath('items
 const itemIconBase=()=>siteInfo?.home?.itemIconBase||'';
 function itemIcon(icon,cls){
  const box=el('span','item-ic'+(cls?' '+cls:''));const base=itemIconBase();
- if(base&&icon){const im=el('img');im.alt='';im.loading='lazy';im.decoding='async';im.src=base.replace(/\/?$/,'/')+encodeURIComponent(icon)+'.webp';im.onerror=()=>{im.remove();box.classList.add('empty')};box.append(im)}else box.classList.add('empty');
+ if(base&&icon){const im=el('img');im.alt='';im.loading='lazy';im.decoding='async';im.src=base.replace(/\/?$/,'/')+String(icon).split('/').map(encodeURIComponent).join('/')+'.webp';im.onerror=()=>{im.remove();box.classList.add('empty')};box.append(im)}else box.classList.add('empty');
  return box;
 }
 async function showItems({push=true,cat=null}={}){
@@ -1628,12 +1628,139 @@ function giftLinks(w,vk,kind){loadItems().then(d=>{
 }).catch(()=>giftIcons(w))}
 // 선물 칸 아이콘 (그림 주소가 있을 때만, 아이템 이름으로 연결)
 function giftIcons(w){if(!itemIconBase())return;loadItems().then(d=>{const m=new Map((d.items||[]).filter(o=>o.page===2).map(o=>[o.name,o.icon]));w.querySelectorAll('.doll-chip[data-item]').forEach(c=>{const icon=m.get(c.dataset.item);if(icon&&!c.querySelector('.item-ic'))c.prepend(itemIcon(icon,'chip'))})}).catch(()=>{})}
+// ----- v1.4 인형 스킬 (data/<언어>/skills.json) -----
+let skillData=null;
+const loadSkills=()=>skillData?Promise.resolve(skillData):fetchJSON(dataPath('skills.json')).then(d=>skillData=d);
+const SKILL_TYPE={1:'자동',2:'패시브',3:'궁극기'},SKILL_ORDER={2:0,1:1,3:2};
+const TERM_TONE={1:'green',2:'red',3:'orange'};
+let skillLv=get('skillLv','max');
+function skillTerm(text){const terms=skillData?.terms||[];const t=text.replace(/\s+/g,'');let best=null;
+ for(const x of terms){const n=x.name.replace(/\s+/g,'');if(!n)continue;if((t===n||t.includes(n))&&(!best||n.length>best.name.replace(/\s+/g,'').length))best=x}return best}
+// 색 글자 = 게임 표기 그대로, 용어 사전에 있는 말이면 누르면 설명 창
+function skillText(parent,text){
+ const src=String(text||'').replace(/<cmdr>/gi,()=>nick()).replace(/\\n/g,'\n').replace(/\s+$/,'');
+ const re=/<color=(#[0-9a-fA-F]{6,8})>([\s\S]*?)<\/color>/gi;let last=0,m;
+ const plain=t=>t.replace(/<\/?(?:color|i|b|size)(?:=[^>]*)?>/gi,'');
+ const put=t=>{if(t)parent.append(document.createTextNode(plain(t)))};
+ while((m=re.exec(src))){put(src.slice(last,m.index));const word=plain(m[2]);const term=skillTerm(word);
+  const sp=el(term?'button':'span','skill-hl'+(term?' skill-term':''),word);sp.style.setProperty('--hl',m[1].slice(0,7));
+  if(term){sp.type='button';sp.onclick=e=>{e.stopPropagation();openLore(term.name,term.desc,null,'SKILL TERM',TERM_TONE[term.color]||'')}}
+  parent.append(sp);last=re.lastIndex}
+ put(src.slice(last));
+}
+const fmtNum=v=>v==null?'?':(Math.round(v*100)/100).toLocaleString(window.UI_LOCALE||'ko-KR',{maximumFractionDigits:2});
+function skillDetail(sk,lv){return String(sk.detail||'').replace(/\{(\d+)\}/g,(_,i)=>{const row=sk.vals?.[+i];return row?fmtNum(row[Math.min(lv,row.length)-1]):'{'+i+'}'})}
+function skillPanel(p){
+ const box=el('div','skill-list');
+ const list=[...(p.skills||[])].sort((a,b)=>(SKILL_ORDER[a.type]??9)-(SKILL_ORDER[b.type]??9));
+ if(list.some(x=>x.fan))box.append(fanNote());
+ for(const sk of list){
+  const max=sk.maxLv||1;let lv=skillLv==='max'?max:Math.min(+skillLv||max,max);
+  const row=el('section','skill-row');
+  const head=el('button','skill-head');head.type='button';head.setAttribute('aria-expanded','false');
+  const icw=skillHex(sk.icon);
+  const mid=el('span','skill-mid');const top=el('span','skill-top');
+  top.append(el('span','skill-type t'+sk.type,SKILL_TYPE[sk.type]||''),el('strong','skill-name',sk.name));
+  const meta=el('span','skill-meta');
+  const preAt=l=>{if(!sk.pre)return null;let v=sk.pre[0];(sk.preLv||[]).forEach((L,i)=>{if(l>=L)v=sk.pre[i]});return v};
+  const drawMeta=()=>{meta.replaceChildren();const pv=preAt(lv);if(pv!=null)meta.append(el('span','skill-chip','예충전 '+fmtNum(pv)+'초'));if(sk.cd)meta.append(el('span','skill-chip','⏳ '+fmtNum(sk.cd)+'초'))};
+  drawMeta();top.append(meta);
+  const brief=el('span','skill-brief');skillText(brief,sk.brief);
+  mid.append(top,brief);head.append(icw,mid,ic('right','tri'));
+  const panel=el('div','skill-panel');
+  const fill=()=>{panel.replaceChildren();
+   const lvbar=el('div','skill-lv');lvbar.append(el('span','skill-lv-label','레벨'));
+   for(let i=1;i<=max;i++){const b=el('button','skill-lv-btn'+(i===lv?' on':''),i===max?'MAX':String(i));b.type='button';b.onclick=e=>{e.stopPropagation();lv=i;skillLv=i===max?'max':String(i);set('skillLv',skillLv);drawMeta();fill()};lvbar.append(b)}
+   const det=el('p','skill-detail');skillText(det,skillDetail(sk,lv));
+   panel.append(lvbar,det);
+   if(sk.cut){/* 궁극기 컷씬: 영상 변환 후 연결 */}
+  };
+  head.onclick=()=>{const on=!row.classList.contains('open');row.classList.toggle('open',on);head.setAttribute('aria-expanded',String(on));if(on)fill()};
+  row.append(head,panel);box.append(row);
+ }
+ return box;
+}
+// 스킬 아이콘 = 게임 육각 틀(skill/_frame) + 아이콘(skill/<이름>). arma=true 면 무장각인 강화 틀(skill/_frame_arma)을 위에
+function skillHex(icon,arma){
+ const w=el('span','skill-ic skill-hex'+(arma?' arma':''));const base=itemIconBase();
+ if(base){const u=n=>'url("'+base.replace(/\/?$/,'/')+'skill/'+n+'.webp")';w.style.setProperty('--hex-bg',u('_frame'));if(arma)w.style.setProperty('--hex-fr',u('_frame_arma'))}
+ w.append(itemIcon(icon?'skill/'+icon:''));return w}
+
+// ----- v1.4 무장각인 (data/<언어>/arma.json · 로고 = pnc-item arma/<heroId>.webp) -----
+let armaData=null;
+const loadArma=()=>armaData?Promise.resolve(armaData):fetchJSON(dataPath('arma.json')).then(d=>armaData=d);
+const ROLE_TONE=['#3d8bff','#ff8a2a','#ff4f45','#a66bff','#3fc46b']; // 수위 · 전사 · 사수 · 해결사 · 치료사
+const ROMAN=['Ⅰ','Ⅱ','Ⅲ'];
+let armaLv=+get('armaLv',30)||30;
+// 1920×1080 화면 가운데 기준 좌표 → 무대 안 % 위치
+const armaPos=(x,y)=>({left:(x+960)/19.2+'%',top:(540-y)/10.8+'%'});
+const ARMA_NODE=[[0,432],[-429,0],[429,0]]; // 게임 배치: 1단계 위 · 2단계 왼쪽 · 3단계 오른쪽
+function armaPanel(p){
+ const a=p.arma,MAX=a.levels?.length||30,attrs=armaData?.attrs||{};
+ const ri=ROLE_ORDER.map(l=>l.indexOf(p.role)).find(i=>i>=0);const tone=ROLE_TONE[ri]??ROLE_TONE[2];
+ let lv=Math.min(Math.max(armaLv,1),MAX),sel='center';
+ const wrap=el('div','arma');wrap.style.setProperty('--arma',tone);
+ if(a.fan)wrap.append(fanNote());
+ const stage=el('div','arma-stage');
+ const pts=el('div','arma-pts');(armaData?.points||[]).forEach(([x,y])=>{const d=el('span','arma-pt');Object.assign(d.style,armaPos(x,y));pts.append(d)});
+ const center=el('button','arma-center');center.type='button';Object.assign(center.style,armaPos(0,0));
+ const logo=el('span','arma-logo');const base=itemIconBase();
+ if(base){const im=el('img');im.alt='';im.decoding='async';im.src=base.replace(/\/?$/,'/')+'arma/'+p.heroId+'.webp';im.onerror=()=>im.remove();logo.append(im)}
+ center.append(el('span','arma-dia'),logo);
+ const title=el('div','arma-title');title.append(el('strong','arma-name',a.name),el('span','arma-en','ARMA INSCRIPTA'));
+ const nodes=a.steps.slice(0,3).map((st,i)=>{const b=el('button','arma-node');b.type='button';Object.assign(b.style,armaPos(...ARMA_NODE[i]));
+  b.append(el('span','arma-node-dia'),el('span','arma-node-n',ROMAN[i]));const hx=skillHex(st.skill.icon,true);hx.classList.add('arma-node-ic');b.append(hx,ic('lock','arma-lock'));
+  b.onclick=()=>{sel=i;draw()};return b});
+ center.onclick=()=>{sel='center';draw()};
+ stage.append(pts,center,...nodes,title);
+ // 레벨 조절
+ const bar=el('div','arma-lvbar');
+ const dn=el('button','arma-step','▼'),up=el('button','arma-step','▲');dn.type=up.type='button';dn.setAttribute('aria-label','레벨 -1');up.setAttribute('aria-label','레벨 +1');
+ const range=el('input','arma-range');range.type='range';range.min=1;range.max=MAX;range.value=lv;range.setAttribute('aria-label','레벨');
+ const lvTxt=el('span','arma-lvtxt');
+ const setLv=v=>{lv=Math.min(Math.max(v,1),MAX);armaLv=lv;set('armaLv',lv);range.value=lv;draw()};
+ dn.onclick=()=>setLv(lv-1);up.onclick=()=>setLv(lv+1);range.oninput=()=>setLv(+range.value);
+ bar.append(el('span','arma-lvlabel','레벨'),dn,range,up,lvTxt);
+ const info=el('div','arma-info');
+ // 단계 s(1~3)는 레벨 s×10 에서 돌파
+ const open=i=>lv>=(a.steps[i]?.maxLv??(i+1)*10);
+ const stepOf=()=>a.steps.findIndex(st=>lv<=st.maxLv)+1||a.steps.length;
+ function draw(){
+  pts.querySelectorAll('.arma-pt').forEach((d,i)=>d.classList.toggle('on',i<lv));
+  nodes.forEach((b,i)=>{b.classList.toggle('open',open(i));b.classList.toggle('sel',sel===i)});
+  center.classList.toggle('sel',sel==='center');
+  lvTxt.replaceChildren(el('b','',String(lv).padStart(2,'0')),document.createTextNode(' / '+MAX));
+  info.replaceChildren();
+  if(sel==='center'){
+   const h=el('div','arma-info-head');h.append(el('span','eyebrow','ARMA INSCRIPTA'),el('strong','arma-info-name arma-nm',a.name));info.append(h);
+   if(a.desc)info.append(el('p','arma-desc',a.desc));
+   const meta=el('div','arma-meta');meta.append(el('span','skill-chip','단계 '+ROMAN[stepOf()-1]),el('span','skill-chip','레벨 '+lv+' / '+MAX));info.append(meta);
+   info.append(el('div','arma-sub','특성'));
+   const tl=el('div','arma-traits');a.steps.forEach((st,i)=>{const t=el('button','arma-trait'+(open(i)?' open':''));t.type='button';t.append(el('span','arma-trait-n',ROMAN[i]),el('span','arma-trait-name',st.skill.name),el('span','arma-trait-lv',open(i)?'':'Lv.'+(st.maxLv??(i+1)*10)));t.onclick=()=>{sel=i;draw()};tl.append(t)});info.append(tl);
+   info.append(el('div','arma-sub','능력치 상승'));
+   const g=el('div','arma-stats');const row=a.levels[lv-1]||{};
+   for(const [k,v] of Object.entries(row)){if(!v)continue;const it=el('div','arma-stat');it.append(el('span','',attrs[k]||k),el('b','','+'+fmtNum(v)));g.append(it)}
+   if(!g.childNodes.length)g.append(el('span','arma-none','—'));info.append(g);
+  }else{
+   const st=a.steps[sel],i=sel;
+   const h=el('div','arma-info-head');h.append(el('span','eyebrow','STRENGTHEN '+ROMAN[i]),el('strong','arma-info-name','각인 돌파 '+ROMAN[i]));info.append(h);
+   const card=el('div','arma-skill'+(open(i)?'':' locked'));card.append(skillHex(st.skill.icon,true));
+   const body=el('div','arma-skill-body');body.append(el('strong','skill-name',st.skill.name));
+   const base=(p.skills||[]).find(x=>x.id===st.skill.base);if(base)body.append(el('span','arma-base','강화: '+base.name));
+   const d=el('p','skill-detail');skillText(d,st.skill.desc);body.append(d);card.append(body);info.append(card);
+   info.append(el('p','arma-unlock',open(i)?'해금됨 · 레벨 '+(st.maxLv??(i+1)*10)+' 돌파':'레벨 '+(st.maxLv??(i+1)*10)+'에서 돌파'));
+  }
+ }
+ wrap.append(stage,bar,info);draw();return wrap;
+}
 // ----- 프로필 -----
 async function showDoll(key,{push=true}={}){
  const tok=++routeToken;showOnly('dollView');bgmLeave();voiceStop();closeArchiveMenu();
  if(push)saveRoute({type:'doll',id:key});
  const host=$('#dollView');host.replaceChildren(el('p','loading-note','프로필을 불러오는 중…'));window.scrollTo(0,0);
- try{loadDollIndex().catch(()=>{});let p=dollCache.get(key);if(!p){p=await fetchJSON(dataPath('profiles/'+encodeURIComponent(key)+'.json'));dollCache.set(key,p)}if(tok!==routeToken)return;renderDoll(p)}
+ try{loadDollIndex().catch(()=>{});let p=dollCache.get(key);if(!p){p=await fetchJSON(dataPath('profiles/'+encodeURIComponent(key)+'.json'));dollCache.set(key,p)}
+  const [sk,am]=await Promise.all([loadSkills().catch(()=>null),loadArma().catch(()=>null)]);if(sk&&!p.skills)p.skills=sk.heroes?.[String(p.heroId)]||null;if(am&&!p.arma)p.arma=am.heroes?.[String(p.heroId)]||null;
+  if(tok!==routeToken)return;renderDoll(p)}
  catch(e){if(tok===routeToken){host.replaceChildren(error('프로필을 불러오지 못했어요. ('+e.message+')'))}}
 }
 const illust=(p,img,full)=>img?(p.illustBase||'')+(full?'full/'+img+'.png':'web/'+img+'.webp'):null;
@@ -1784,19 +1911,31 @@ function renderDoll(p){
  info.append(dl);
  if(p.quote)info.append(el('blockquote','doll-quote',cleanTags(p.quote)));
  if(p.oathTitle?.length){const o=el('div','doll-oath');const top=el('div','doll-oath-top');top.append(el('span','doll-oath-label','서약 칭호'));const t=el('span','doll-oath-title');p.oathTitle.forEach((x,i)=>{if(i)t.append(el('i','doll-oath-sep'));t.append(el('span','',x))});top.append(t);o.append(top);if(p.oathDesc){o.append(el('hr','doll-oath-line'),el('p','doll-oath-desc',p.oathDesc))}info.append(o)}
- const chips=(label,arr,kind)=>{if(!arr?.length)return;const w=el('div','doll-chips');w.append(el('span','doll-chips-label',label));arr.forEach(x=>{const c=el('span','doll-chip',x);c.dataset.item=x;w.append(c)});info.append(w);giftLinks(w,p.voiceKey,kind)};
+ // v1.4 좋아함 · 싫어함 · 관계는 목차 「친밀도」 칸으로
+ const affBox=el('div','doll-aff');
+ const chips=(label,arr,kind)=>{if(!arr?.length)return;const w=el('div','doll-chips');w.append(el('span','doll-chips-label',label));arr.forEach(x=>{const c=el('span','doll-chip',x);c.dataset.item=x;w.append(c)});affBox.append(w);giftLinks(w,p.voiceKey,kind)};
  chips('좋아함',p.likes,0);chips('싫어함',p.dislikes,1);
- if(p.relations?.length){const w=el('div','doll-chips');w.append(el('span','doll-chips-label','관계'));for(const r of p.relations){const key=(dollIndex?.dolls||[]).find(d=>d.heroId===r.heroId)?.voiceKey;const c=el(key?'button':'span','doll-chip rel'+(key?' link':''));if(key){c.type='button';c.title=r.name+' 프로필로 이동';c.onclick=()=>showDoll(key)}c.append(el('b','',r.name),document.createTextNode(' '+String(r.text||'').replace(/^"|"$/g,'')));w.append(c)}info.append(w)}
+ if(p.relations?.length){const w=el('div','doll-chips');w.append(el('span','doll-chips-label','관계'));for(const r of p.relations){const key=(dollIndex?.dolls||[]).find(d=>d.heroId===r.heroId)?.voiceKey;const c=el(key?'button':'span','doll-chip rel'+(key?' link':''));if(key){c.type='button';c.title=r.name+' 프로필로 이동';c.onclick=()=>showDoll(key)}c.append(el('b','',r.name),document.createTextNode(' '+String(r.text||'').replace(/^"|"$/g,'')));w.append(c)}affBox.append(w)}
  const car=el('div','doll-career');car.append(el('h4','',window.L?window.L('이력'):'이력'));car.append(p.career?sentenceBlock(p.career):el('p','doll-empty','한국어 번역 준비 중이에요.'));info.append(car);
  hero.append(info);host.append(hero);
- // 2) 인형 스토리
- host.append(foldSection('story','인형 스토리','',inner=>inner.append(storyPanel(p))));
- // 3) 보이스
+ // 2) v1.4 목차: 스킬 · 친밀도 · 보이스 · 스킨 — 누른 칸만 아래에 (마지막 선택 기억)
  const vc=(p.voices||[]).filter(v=>v.group!=='affinity').length+(p.skinVoices||[]).reduce((a,s)=>a+s.voices.length,0);
- if(vc)host.append(foldSection('voice','보이스',vc+'개',inner=>inner.append(voicePanel(p))));
- // 4) 스킨
  const skins=(p.skinList||[]).map(x=>({img:x.img,title:x.name,desc:x.desc,photo:x.photo,photoName:x.photoName}));
- if(skins.length)host.append(foldSection('skin','스킨',skins.length+'벌',inner=>{inner.append(el('p','load-note',LOAD_NOTE),gallery(p,skins,{label:'스킨',cls:'gal-skin'}))}));
+ const parts=[];
+ if(p.skills?.length&&typeof skillPanel==='function')parts.push(['skill','스킬',p.skills.length+'개',box=>box.append(skillPanel(p))]);
+ if(p.arma?.steps?.length)parts.push(['arma','무장각인','',box=>box.append(armaPanel(p))]);
+ parts.push(['affinity','친밀도','',box=>{if(affBox.childNodes.length)box.append(affBox);box.append(storyPanel(p))}]);
+ if(vc)parts.push(['voice','보이스',vc+'개',box=>box.append(voicePanel(p))]);
+ if(skins.length)parts.push(['skin','스킨',skins.length+'벌',box=>{box.append(el('p','load-note',LOAD_NOTE),gallery(p,skins,{label:'스킨',cls:'gal-skin'}))}]);
+ const toc=el('section','doll-toc');const tb=el('div','tb-group doll-toc-bar');tb.append(el('div','tb-label','목차'));
+ const nav=el('nav','cat-tabs doll-toc-tabs');nav.setAttribute('aria-label','목차');tb.append(nav);
+ const body=el('div','doll-toc-body');toc.append(tb,body);host.append(toc);
+ let cur=get('dollTab','affinity');if(!parts.some(x=>x[0]===cur))cur=parts[0]?.[0];
+ const show=id=>{cur=id;set('dollTab',id);voiceStop();
+  nav.querySelectorAll('.cat-tab').forEach(b=>{const on=b.dataset.part===id;b.classList.toggle('selected',on);b.setAttribute('aria-pressed',String(on))});
+  body.replaceChildren();const part=parts.find(x=>x[0]===id);if(part)part[3](body)};
+ for(const [id,name,n] of parts){const b=el('button','cat-tab doll-toc-tab');b.type='button';b.dataset.part=id;b.append(el('span','',name));if(n)b.append(el('span','wr-tab-n',n));b.onclick=()=>show(id);nav.append(b)}
+ if(cur)show(cur);
  window.scrollTo(0,0);
 }
 // 숙소 대화 회차: 목록(분류)에는 없지만 인형 프로필에서 열림 → 앞뒤 · 돌아가기를 그 인형 안에서
