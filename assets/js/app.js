@@ -576,7 +576,12 @@ function renderLanding(host){
  ext.append(chips);host.append(ext);
  // 공지 (리스트)
  const notice=landingCard('home-notice','공지','menu');const list=el('div','notice-list');
- const notices=sortedNotices();
+ // v1.3 업데이트 공지는 가장 최신 하나만 목록에, 지난 것은 오른쪽 위 「이전 기록」에서
+ const allN=sortedNotices(),updates=allN.filter(n=>n.kind==='update');
+ const notices=allN.filter(n=>n.kind!=='update'||n===updates[0]);
+ if(updates.length>1){const b=el('button','notice-history');b.type='button';b.append(document.createTextNode('이전 기록'),el('span','wr-tab-n',String(updates.length-1)));
+  b.onclick=()=>openInfo({title:'업데이트 기록',items:updates.slice(1).map(n=>({title:[noticeDate(n),n.title].filter(Boolean).join(' · '),lines:n.lines||[]}))});
+  notice.querySelector('.home-card-head').append(b)}
  if(!notices.length)list.append(el('p','bm-empty',siteInfo?'등록된 공지가 없습니다.':'공지를 불러오는 중…'));
  for(const n of notices){const b=el('button','notice-row'+(n.pinned?' pinned':''));b.type='button';b.append((()=>{const s=el('span','notice-pin');if(n.pinned)s.append(ic('pin'));return s})(),el('span','notice-date',noticeDate(n)),el('span','notice-title',n.title||''));b.onclick=()=>openNotice(n);list.append(b)}
  notice.append(list);
@@ -591,7 +596,7 @@ function renderLanding(host){
  side.append(pagedCard('home-other',[['외부 URL',sites],['피드백 · 연락처',fbPage]]));
  wrap.append(notice,cal,side);host.append(wrap);
 }
-function sortedNotices(){return [...(siteInfo?.notices||[])].sort((a,b)=>(b.pinned===true)-(a.pinned===true)||String(b.date||'').localeCompare(String(a.date||'')))}
+function sortedNotices(){return (siteInfo?.notices||[]).map((n,i)=>[n,i]).sort(([a,i],[b,j])=>(b.pinned===true)-(a.pinned===true)||String(b.date||'').localeCompare(String(a.date||''))||i-j).map(([n])=>n)}
 function openNotice(n){openInfo({title:n.title,items:[{title:noticeDate(n),lines:n.lines||[]}]});if(n.popup){const box=el('div','popup-links');box.append(...feedbackLinks());$('#infoBody').append(box)}}
 // v0.12.22 팝업 공지 (popup:true): 공지마다 한 번만, 첫 방문 창이 있으면 그 창을 닫은 뒤에
 function maybePopup(){
