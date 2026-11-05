@@ -1685,7 +1685,7 @@ function skillPanel(p){
   const max=sk.maxLv||1;let lv=skillLv==='max'?max:Math.min(+skillLv||max,max);
   const row=el('section','skill-row');
   const head=el('button','skill-head');head.type='button';head.setAttribute('aria-expanded','false');
-  const icw=skillHex(sk.icon);
+  const icw=skillHex(sk.icon,{type:sk.type,cat:sk.cat});
   const mid=el('span','skill-mid');const top=el('span','skill-top');
   top.append(el('span','skill-type t'+sk.type,SKILL_TYPE[sk.type]||''),el('strong','skill-name',sk.name));
   const meta=el('span','skill-meta');
@@ -1707,11 +1707,11 @@ function skillPanel(p){
  }
  return box;
 }
-// 스킬 아이콘 = 게임 육각 틀(skill/_frame) + 아이콘(skill/<이름>). arma=true 면 무장각인 강화 틀(skill/_frame_arma)을 위에
-function skillHex(icon,arma){
- const w=el('span','skill-ic skill-hex'+(arma?' arma':''));const base=itemIconBase();
- if(base){const u=n=>'url("'+base.replace(/\/?$/,'/')+'skill/'+n+'.webp")';w.style.setProperty('--hex-bg',u('_frame'));if(arma)w.style.setProperty('--hex-fr',u('_frame_arma'))}
- w.append(itemIcon(icon?'skill/'+icon:''));return w}
+// 스킬 아이콘 = 게임처럼: 육각 바탕(색 = 스킬 분류 cat: 1 공격 · 2 치료 · 3 보호 · 4 보조) + 흰 테두리(종류별 틀) + 아이콘(pnc-item skill/<이름>)
+// 무장각인으로 강화된 스킬(enh)은 주황 테두리
+function skillHex(icon,o={}){
+ const w=el('span','skill-ic skill-hex t'+(o.type||1)+' c'+(o.cat||1)+(o.enh?' enh':''));
+ w.append(el('span','hex-fill'));const ii=itemIcon(icon?'skill/'+icon:'');w.append(ii,el('span','hex-fr'));return w}
 
 // ----- v1.4 무장각인 (data/<언어>/arma.json · 로고 = pnc-item arma/<heroId>.webp) -----
 let armaData=null;
@@ -1736,7 +1736,7 @@ function armaPanel(p){
  center.append(el('span','arma-dia'),logo);
  const title=el('div','arma-title');title.append(el('strong','arma-name',a.name),el('span','arma-en','ARMA INSCRIPTA'));
  const nodes=a.steps.slice(0,3).map((st,i)=>{const b=el('button','arma-node');b.type='button';Object.assign(b.style,armaPos(...ARMA_NODE[i]));
-  b.append(el('span','arma-node-dia'),el('span','arma-node-n',ROMAN[i]));const hx=skillHex(st.skill.icon,true);hx.classList.add('arma-node-ic');b.append(hx,ic('lock','arma-lock'));
+  b.append(el('span','arma-node-dia'),el('span','arma-node-n',ROMAN[i]));const bt=(p.skills||[]).find(x=>x.id===st.skill.base)?.type;const hx=skillHex(st.skill.icon,{type:bt,cat:st.skill.cat,enh:false});hx.classList.add('arma-node-ic');b.append(hx,ic('lock','arma-lock'));
   b.onclick=()=>{sel=i;draw()};return b});
  center.onclick=()=>{sel='center';draw()};
  stage.append(pts,center,...nodes,title);
@@ -1754,7 +1754,7 @@ function armaPanel(p){
  const stepOf=()=>a.steps.findIndex(st=>lv<=st.maxLv)+1||a.steps.length;
  function draw(){
   pts.querySelectorAll('.arma-pt').forEach((d,i)=>d.classList.toggle('on',i<lv));
-  nodes.forEach((b,i)=>{b.classList.toggle('open',open(i));b.classList.toggle('sel',sel===i)});
+  nodes.forEach((b,i)=>{b.classList.toggle('open',open(i));b.classList.toggle('sel',sel===i);b.querySelector('.skill-hex')?.classList.toggle('enh',open(i))});
   center.classList.toggle('sel',sel==='center');
   lvTxt.replaceChildren(el('b','',String(lv).padStart(2,'0')),document.createTextNode(' / '+MAX));
   info.replaceChildren();
@@ -1771,7 +1771,7 @@ function armaPanel(p){
   }else{
    const st=a.steps[sel],i=sel;
    const h=el('div','arma-info-head');h.append(el('span','eyebrow','STRENGTHEN '+ROMAN[i]),el('strong','arma-info-name','각인 돌파 '+ROMAN[i]));info.append(h);
-   const card=el('div','arma-skill'+(open(i)?'':' locked'));card.append(skillHex(st.skill.icon,true));
+   const card=el('div','arma-skill'+(open(i)?'':' locked'));card.append(skillHex(st.skill.icon,{type:(p.skills||[]).find(x=>x.id===st.skill.base)?.type,cat:st.skill.cat,enh:open(i)}));
    const body=el('div','arma-skill-body');body.append(el('strong','skill-name',st.skill.name));
    const base=(p.skills||[]).find(x=>x.id===st.skill.base);if(base)body.append(el('span','arma-base','강화: '+base.name));
    const d=el('p','skill-detail');skillText(d,st.skill.desc);body.append(d);card.append(body);info.append(card);
