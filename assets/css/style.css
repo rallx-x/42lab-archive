@@ -1306,3 +1306,23 @@ button.doll-chip:hover{border-color:var(--accent)}
 @media(max-width:750px){.skill-hex{width:48px;height:53px}}
 .arma-node .skill-hex{position:relative;width:64%;height:auto;aspect-ratio:60/66}
 .arma-node:not(.open) .skill-hex,.arma-skill.locked .skill-hex{filter:grayscale(1) brightness(.5)}
+
+/* ===== v1.5.4 무장각인 배치를 게임 화면대로 (Ⅰ 왼쪽 · Ⅲ 위 · Ⅱ 오른쪽, 가운데 단계 · 레벨, 아래 이름) ===== */
+.arma-title{left:auto;top:auto;max-width:none;transform:translate(-50%,-50%);text-align:center;justify-items:center;white-space:nowrap}
+.arma-name{font-size:clamp(13px,1.9vw,20px)}
+.arma-en{letter-spacing:.2em;color:color-mix(in srgb,#fff 55%,var(--arma));font-weight:600}
+.arma-c-step{position:absolute;top:22%;left:50%;transform:translateX(-50%);color:#fff;font:700 clamp(12px,2vw,22px)/1 serif;text-shadow:0 0 6px var(--arma);z-index:1}
+.arma-c-lv{position:absolute;bottom:17%;left:50%;transform:translateX(-50%);display:grid;justify-items:center;line-height:1.1;color:#fff;z-index:1}
+.arma-c-lv b{font-size:clamp(11px,1.6vw,18px);font-variant-numeric:tabular-nums}
+.arma-c-lv small{font-size:clamp(7px,.8vw,10px);opacity:.75}
+.arma-logo{width:48%}
+.arma-node{width:7.5%}
+.arma-node-dia{inset:14%;border:2px solid #fff;background:color-mix(in srgb,var(--arma) 22%,#0b0b0f);box-shadow:0 0 0 5px color-mix(in srgb,var(--arma) 18%,transparent)}
+.arma-node:not(.open) .arma-node-dia{border-color:color-mix(in srgb,#fff 35%,transparent);background:#0d0d11cc}
+.arma-node-n{position:relative;top:auto;z-index:1;font:700 clamp(11px,1.7vw,20px)/1 serif}
+.arma-node:not(.open) .arma-node-n{opacity:.35}
+.arma-lock{position:absolute;bottom:-38%;font-size:clamp(9px,1.2vw,14px);opacity:.7}
+.arma-link{position:absolute;transform:translate(-50%,-50%);background:color-mix(in srgb,#fff 70%,var(--arma));opacity:.8;pointer-events:none}
+.arma-link.l,.arma-link.r{width:4%;height:1.5px}
+.arma-link.t{width:1.5px;height:6%}
+@media(max-width:750px){.arma-node{width:10%}}

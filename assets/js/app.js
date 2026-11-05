@@ -1721,7 +1721,8 @@ const ROMAN=['Ⅰ','Ⅱ','Ⅲ'];
 let armaLv=+get('armaLv',30)||30;
 // 1920×1080 화면 가운데 기준 좌표 → 무대 안 % 위치
 const armaPos=(x,y)=>({left:(x+960)/19.2+'%',top:(540-y)/10.8+'%'});
-const ARMA_NODE=[[0,432],[-429,0],[429,0]]; // 게임 배치: 1단계 위 · 2단계 왼쪽 · 3단계 오른쪽
+const ARMA_NODE=[[-429,0],[429,0],[0,432]]; // 게임 화면: Ⅰ 왼쪽 · Ⅱ 오른쪽 · Ⅲ 위
+const ARMA_LINK=[[-330,0,'l'],[330,0,'r'],[0,335,'t']]; // 단계 칸 ↔ 가운데 잇는 선
 function armaPanel(p){
  const a=p.arma,MAX=a.levels?.length||30,attrs=armaData?.attrs||{};
  const ri=ROLE_ORDER.map(l=>l.indexOf(p.role)).find(i=>i>=0);const tone=ROLE_TONE[ri]??ROLE_TONE[2];
@@ -1733,13 +1734,15 @@ function armaPanel(p){
  const center=el('button','arma-center');center.type='button';Object.assign(center.style,armaPos(0,0));
  const logo=el('span','arma-logo');const base=itemIconBase();
  if(base){const im=el('img');im.alt='';im.decoding='async';im.src=base.replace(/\/?$/,'/')+'arma/'+p.heroId+'.webp';im.onerror=()=>im.remove();logo.append(im)}
- center.append(el('span','arma-dia'),logo);
- const title=el('div','arma-title');title.append(el('strong','arma-name',a.name),el('span','arma-en','ARMA INSCRIPTA'));
+ const cStep=el('span','arma-c-step'),cLv=el('span','arma-c-lv');
+ center.append(el('span','arma-dia'),cStep,logo,cLv);
+ const title=el('div','arma-title');Object.assign(title.style,armaPos(0,-330));title.append(el('strong','arma-name',[a.hero,a.name].filter(Boolean).join('·')),el('span','arma-en','- ARMA INSCRIPTA -'));
+ const links=ARMA_LINK.map(([x,y,d])=>{const l=el('span','arma-link '+d);Object.assign(l.style,armaPos(x,y));return l});
  const nodes=a.steps.slice(0,3).map((st,i)=>{const b=el('button','arma-node');b.type='button';Object.assign(b.style,armaPos(...ARMA_NODE[i]));
-  b.append(el('span','arma-node-dia'),el('span','arma-node-n',ROMAN[i]));const bt=(p.skills||[]).find(x=>x.id===st.skill.base)?.type;const hx=skillHex(st.skill.icon,{type:bt,cat:st.skill.cat,enh:false});hx.classList.add('arma-node-ic');b.append(hx,ic('lock','arma-lock'));
+  b.append(el('span','arma-node-dia'),el('span','arma-node-n',ROMAN[i]),ic('lock','arma-lock'));b.setAttribute('aria-label','각인 돌파 '+ROMAN[i]);
   b.onclick=()=>{sel=i;draw()};return b});
  center.onclick=()=>{sel='center';draw()};
- stage.append(pts,center,...nodes,title);
+ stage.append(pts,...links,center,...nodes,title);
  // 레벨 조절
  const bar=el('div','arma-lvbar');
  const dn=el('button','arma-step','▼'),up=el('button','arma-step','▲');dn.type=up.type='button';dn.setAttribute('aria-label','레벨 -1');up.setAttribute('aria-label','레벨 +1');
@@ -1754,8 +1757,9 @@ function armaPanel(p){
  const stepOf=()=>a.steps.findIndex(st=>lv<=st.maxLv)+1||a.steps.length;
  function draw(){
   pts.querySelectorAll('.arma-pt').forEach((d,i)=>d.classList.toggle('on',i<lv));
-  nodes.forEach((b,i)=>{b.classList.toggle('open',open(i));b.classList.toggle('sel',sel===i);b.querySelector('.skill-hex')?.classList.toggle('enh',open(i))});
+  nodes.forEach((b,i)=>{b.classList.toggle('open',open(i));b.classList.toggle('sel',sel===i)});
   center.classList.toggle('sel',sel==='center');
+  cStep.textContent=ROMAN[Math.min(stepOf(),3)-1]||'';cLv.replaceChildren(el('b','',lv+'/'+MAX),el('small','','- 레벨 -'));
   lvTxt.replaceChildren(el('b','',String(lv).padStart(2,'0')),document.createTextNode(' / '+MAX));
   info.replaceChildren();
   if(sel==='center'){
