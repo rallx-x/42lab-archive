@@ -26,6 +26,19 @@
    ]
   },
   {
+   "id": "2026-11-05-v1.3",
+   "date": "2026-11-05",
+   "title": "Update v1.3 · Item cleanup",
+   "lines": [
+    "Items now have \"Algorithms,\" \"Breakthrough Widgets,\" and \"Event Rewards\" tabs.",
+    "Breakthrough Widget boxes are grouped by grade, and Keycards, Search Commands, and Retraining Permits each have one folder.",
+    "Items with the same name and icon are merged into one card with all sources listed. If the description differs by event, see \"By event.\"",
+    "Event Rewards are split into one folder per event.",
+    "Skins inside boxes now show as \"Doll - Skin name.\"",
+    "Card spacing and sizes are now consistent."
+   ]
+  },
+  {
    "id": "2026-11-05-v1.2",
    "date": "2026-11-05",
    "title": "Update v1.2 · Library · Search filters",

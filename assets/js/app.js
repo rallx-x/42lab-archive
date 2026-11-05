@@ -357,7 +357,7 @@ function renderSearch(q,host){
  if(show('doll')&&ex.dolls.length){any=true;const sec=searchSection(host,'인형',ex.dolls.length);const g=el('div','doll-grid');ex.dolls.slice(0,searchKind==='doll'?99:8).forEach(d=>g.append(dollCard(d)));sec.append(g)}
  if(show('item')&&ex.items.length){any=true;const sec=searchSection(host,'아이템',ex.items.length);const list=el('div','search-episodes');
   const lim=searchKind==='item'?200:12;
-  ex.items.slice(0,lim).forEach(o=>{const b=el('button','search-ep search-item');b.type='button';b.append(itemIcon(o.icon,'sm'));const t=el('span','search-item-text');t.append(el('small','',o.kind==='furn'?'숙소':(ITEM_PAGES.find(([pg])=>pg===o.page)||[,''])[1]),el('strong','',o.name));b.append(t);b.onclick=()=>showItem(o.id);list.append(b)});
+  ex.items.slice(0,lim).forEach(o=>{const b=el('button','search-ep search-item');b.type='button';b.append(itemIcon(o.icon,'sm'));const t=el('span','search-item-text');t.append(el('small','',o.kind==='furn'?'숙소':(ITEM_PAGES.find(([pg])=>pg===itemTab(o))||[,''])[1]),el('strong','',o.name));b.append(t);b.onclick=()=>showItem(o.id);list.append(b)});
   if(ex.items.length>lim)list.append(el('p','search-hint','앞의 '+lim+'건만 보여 줍니다. 「아이템」 필터를 누르면 더 볼 수 있어요.'));sec.append(list)}
  if(show('record')&&ex.recs.length){any=true;const sec=searchSection(host,'시계 기록',ex.recs.length);const list=el('div','search-episodes');const tn=new Map((wrData.types||[]).map(t=>[t.id,t.name]));
   ex.recs.forEach(r=>{const b=el('button','search-ep');b.type='button';b.append(el('small','',tn.get(r.type)||''),el('strong','',r.name));b.onclick=()=>r.type===7?showRecord(r.id):openLore(r.name,r.description,r.id);list.append(b)});sec.append(list)}
@@ -1416,7 +1416,8 @@ function renderTips(){
 }
 // ----- v0.12.22 아이템 (#items) — 게임 창고 분류 -----
 // 그림: site_info.home.itemIconBase (Cloudflare 별도 프로젝트) + <icon 이름>.webp. 주소가 없거나 그림이 없으면 글만
-const ITEM_PAGES=[[0,'전체'],[2,'기본 아이템'],[3,'소모 아이템'],[5,'육성재료'],[6,'공장재료'],[7,'기념품'],[100,'숙소']];
+const ITEM_PAGES=[[0,'전체'],[2,'기본 아이템'],[3,'소모 아이템'],[8,'알고리즘'],[9,'돌파 위젯'],[5,'육성재료'],[6,'공장재료'],[7,'기념품'],[10,'이벤트 보상'],[100,'숙소']];
+const EVENT_TAB=10,itemTab=o=>o.tab??o.page;
 const DORM=100;let furnData=null,dormView=get('dormView','cat')==='theme'?'theme':'cat',dormCat=0;
 const loadFurniture=()=>furnData?Promise.resolve(furnData):fetchJSON(dataPath('furniture.json')).then(d=>furnData=d);
 let itemData=null,itemCat=+get('itemCat',0)||0,itemQuery='';
@@ -1435,9 +1436,10 @@ async function showItems({push=true,cat=null}={}){
  try{await Promise.all([loadItems(),loadFurniture().catch(()=>null),loadDollIndex().catch(()=>null)])}catch(e){if(tok===routeToken)host.replaceChildren(error('아이템을 불러오지 못했어요. ('+e.message+')'));return}
  if(tok===routeToken)renderItems();
 }
+const openGroups=new Set();
 function renderItems(){
  const host=$('#dollView');host.replaceChildren();
- const all=itemData.items||[],refs=itemData.refs||{},byId=new Map(all.map(o=>[o.id,o]));
+ const all=itemData.items||[],refs=itemData.refs||{},groups=itemData.groups||{},byId=new Map(all.map(o=>[o.id,o]));
  if(!ITEM_PAGES.some(([pg])=>pg===itemCat)||(itemCat===DORM&&!furnData))itemCat=0;
  const ref=id=>byId.get(id)||refs[String(id)]||{name:String(id)};
  const head=el('div','doll-list-head');const t=el('div');t.append(el('div','eyebrow','DATABASE / ITEMS'),el('h2','','아이템'));head.append(t);
@@ -1445,7 +1447,7 @@ function renderItems(){
  const bar=el('div','doll-controls wr-controls');const tabs=el('div','wr-tabs');tabs.setAttribute('role','tablist');tabs.setAttribute('aria-label','아이템 분류');
  const btns=[];
  for(const [pg,name] of ITEM_PAGES){
-  const n=pg===DORM?(furnData?.items||[]).length:pg===0?all.length:all.filter(o=>o.page===pg).length;if(!n)continue;
+  const n=pg===DORM?(furnData?.items||[]).length:pg===0?all.length:all.filter(o=>itemTab(o)===pg).length;if(!n)continue;
   const b=el('button','cat-tab wr-tab'+(pg===DORM?' wr-tab-dorm':''));b.type='button';b.setAttribute('role','tab');b.append(el('span','',name),el('span','wr-tab-n',String(n)));
   b.onclick=()=>{itemCat=pg;set('itemCat',pg);history.replaceState(history.state,'',location.pathname+location.search+routeHash({type:'items',cat:pg?String(pg):null}));sync();draw()};
   btns.push([pg,b]);tabs.append(b);
@@ -1456,38 +1458,74 @@ function renderItems(){
  si.oninput=()=>{itemQuery=si.value;draw()};sbox.append(el('span','doll-search-prompt','//:_'),si);sw.append(sbox);
  bar.append(tabs,sw);const list=el('div','item-list');host.append(bar,list);
  const opened=new Set();
+ // 펼치기 단추 (구성품 · 선택 가능 · 폴더 · 이벤트별 설명 공용)
+ const toggle=(card,key,label,n,fill,set_=opened)=>{
+  const tg=el('button','item-toggle');tg.type='button';tg.setAttribute('aria-expanded',String(set_.has(key)));
+  tg.append(el('span','',label),el('span','wr-tab-n',String(n)),ic('right','tri'));
+  const panel=el('div','item-panel');
+  const go=on=>{card.classList.toggle('open',on);tg.setAttribute('aria-expanded',String(on));if(on&&!panel.childNodes.length)fill(panel)};
+  tg.onclick=()=>{const on=!card.classList.contains('open');go(on);if(on)set_.add(key);else set_.delete(key)};
+  card.append(tg,panel);if(set_.has(key))go(true);
+ };
+ const chips=(panel,ids)=>{const box=el('div','item-contents');for(const [id,n] of ids){const r=ref(id);const c=el('span','item-chip');c.append(itemIcon(r.icon,'sm'),el('span','item-chip-name',r.name));if(n>0)c.append(el('span','item-chip-n','×'+n));box.append(c)}panel.append(box)};
+ const srcLine=(body,text)=>{const src=el('p','item-src');src.append(el('span','item-src-label','획득처'),el('span','item-src-text',cleanTags(text)));body.append(src)};
+ const fanLines=(body,id)=>{const fans=giftFans(id);
+  for(const [k,label] of [[0,'좋아함'],[1,'싫어함']]){if(!fans[k].length)continue;const row=el('p','item-src item-fans');row.append(el('span','item-src-label',label));const names=el('span','item-src-text');
+   fans[k].forEach((d,i)=>{if(i)names.append(document.createTextNode(', '));const a=el('button','fan-link',d.name);a.type='button';a.onclick=()=>showDoll(d.voiceKey);names.append(a)});row.append(names);body.append(row)}};
+ const boxToggle=(card,o)=>{const cont=o.contents||[],opts=o.options||[];
+  if(cont.length)toggle(card,o.id,'구성품',cont.length,p=>chips(p,cont));
+  else if(opts.length)toggle(card,o.id,'선택 가능',opts.length,p=>chips(p,opts.map(id=>[id,0])))};
+ const shell=(o,ids,cls)=>{const card=el('div','item-card'+(cls?' '+cls:'')+(o.quality?' q'+o.quality:''));card.dataset.ids=ids.join(' ');card.append(linkBtn('#item/'+o.id,o.name));
+  const main=el('div','item-main');main.append(itemIcon(o.icon));const body=el('div','item-body');main.append(body);card.append(main);return [card,body]};
+ const itemCard=o=>{const [card,body]=shell(o,[o.id]);body.append(el('strong','item-name',o.name));
+  if(o.desc)body.append(el('p','item-desc',cleanTags(o.desc)));if(o.source)srcLine(body,o.source);fanLines(body,o.id);boxToggle(card,o);return card};
+ // 이름 · 아이콘이 같은 아이템: 카드 하나, 획득처 모으기, 설명이 다르면 이벤트별로
+ const mergedCard=ms=>{const o=ms[0];const [card,body]=shell(o,ms.map(m=>m.id),'item-merged');
+  const nm=el('strong','item-name',o.name);body.append(nm,el('span','item-badge','×'+ms.length));
+  const descs=[...new Set(ms.map(m=>m.desc||''))];
+  if(descs.length===1&&descs[0])body.append(el('p','item-desc',cleanTags(descs[0])));
+  const srcs=[...new Set(ms.map(m=>m.source).filter(Boolean))];
+  if(srcs.length){const src=el('div','item-src item-src-list');src.append(el('span','item-src-label','획득처'));const ul=el('ul','item-src-text');srcs.forEach(x=>ul.append(el('li','',cleanTags(x))));src.append(ul);body.append(src)}
+  if(descs.length>1)toggle(card,'d'+o.id,'이벤트별 설명',ms.length,p=>{for(const m of ms){const b=el('div','item-variant');b.append(el('small','',cleanTags(m.source||'')),el('p','item-desc',cleanTags(m.desc||'')));p.append(b)}});
+  else boxToggle(card,o);
+  return card};
+ // 폴더: 같은 종류(위젯 등급 · 인증키 · 검색 지령 …) 를 카드 하나에
+ const folderCard=(g,ms)=>{const o=ms[0];const [card,body]=shell({...o,name:groups[g]?.title||o.name},ms.map(m=>m.id),'item-folder');
+  body.append(el('strong','item-name',groups[g]?.title||o.name),el('span','item-badge',ms.length+'개'));
+  body.append(el('p','item-desc item-folder-names',ms.map(m=>m.name).join(' · ')));
+  toggle(card,g,'펼치기',ms.length,p=>{const gl=el('div','item-list item-sub');ms.forEach(m=>gl.append(itemCard(m)));p.append(gl)},openGroups);
+  return card};
+ const grouped=(box,rows)=>{
+  const grid=el('div','item-list'),seen=new Set(),evs=[];
+  for(const o of rows){
+   const g=o.grp;if(!g){grid.append(itemCard(o));continue}
+   if(seen.has(g))continue;seen.add(g);const ms=rows.filter(x=>x.grp===g),kind=groups[g]?.kind;
+   if(kind==='merge')grid.append(ms.length>1?mergedCard(ms):itemCard(ms[0]));
+   else if(kind==='event')evs.push([g,ms]);
+   else grid.append(ms.length>1?folderCard(g,ms):itemCard(ms[0]));
+  }
+  if(grid.childNodes.length)box.append(grid);
+  if(evs.length){const acc=el('div','wr-long ev-list');
+   for(const [g,ms] of evs){const item=el('section','wr-long-item');const h=el('button','wr-long-btn');h.type='button';
+    const nm=el('span','wr-long-title');nm.append(el('strong','',groups[g]?.title||''));h.append(nm,el('span','wr-long-len',ms.length+'개'),ic('right','tri'));
+    const panel=el('div','wr-long-panel');const fill=()=>{if(panel.childNodes.length)return;const gl=el('div','item-list ev-items');ms.forEach(m=>gl.append(itemCard(m)));panel.append(gl)};
+    const go=on=>{item.classList.toggle('open',on);h.setAttribute('aria-expanded',String(on));if(on)fill()};
+    h.onclick=()=>{const on=!item.classList.contains('open');go(on);if(on)openGroups.add(g);else openGroups.delete(g)};
+    if(openGroups.has(g))go(true);item.append(h,panel);acc.append(item)}
+   box.append(acc)}
+ };
  const draw=()=>{
   const q=dnorm(itemQuery);
   list.classList.toggle('dorm-mode',itemCat===DORM);
   if(itemCat===DORM){drawDorm(list,count,q);return}
-  const rows=all.filter(o=>(itemCat===0||o.page===itemCat)&&(!q||dnorm(o.name).includes(q)||dnorm(o.desc).includes(q)));
-  count.textContent=rows.length+'개';list.replaceChildren();
+  list.classList.add('dorm-mode');list.replaceChildren();
+  const rows=all.filter(o=>(itemCat===0||itemTab(o)===itemCat)&&(!q||dnorm(o.name).includes(q)||dnorm(o.desc).includes(q)));
+  count.textContent=rows.length+'개';
   if(!rows.length){list.append(el('p','loading-note',q?'「'+itemQuery.trim()+'」에 맞는 기록이 없어요.':'기록이 없어요.'));return}
-  for(const o of rows){
-   const card=el('div','item-card'+(o.quality?' q'+o.quality:''));card.dataset.id=o.id;card.append(linkBtn('#item/'+o.id,o.name));
-   const main=el('div','item-main');main.append(itemIcon(o.icon));
-   const body=el('div','item-body');body.append(el('strong','item-name',o.name));
-   if(o.desc)body.append(el('p','item-desc',cleanTags(o.desc)));
-   if(o.source){const src=el('p','item-src');src.append(el('span','item-src-label','획득처'),el('span','item-src-text',cleanTags(o.source)));body.append(src)}
-   const fans=giftFans(o.id);
-   for(const [k,label] of [[0,'좋아함'],[1,'싫어함']]){if(!fans[k].length)continue;const row=el('p','item-src item-fans');row.append(el('span','item-src-label',label));const names=el('span','item-src-text');
-    fans[k].forEach((d,i)=>{if(i)names.append(document.createTextNode(', '));const a=el('button','fan-link',d.name);a.type='button';a.onclick=()=>showDoll(d.voiceKey);names.append(a)});row.append(names);body.append(row)}
-   main.append(body);card.append(main);
-   // 랜덤 · 고정 상자 = 구성품(아이콘 · 이름 · 개수) / 선택형 상자 = 선택지(아이콘 · 이름)
-   const cont=o.contents||[],opts=o.options||[];
-   const pick=cont.length?['구성품',cont]:opts.length?['선택 가능',opts.map(id=>[id,0])]:null;
-   if(pick){
-    const [label,listIds]=pick;
-    const tg=el('button','item-toggle');tg.type='button';tg.setAttribute('aria-expanded',String(opened.has(o.id)));
-    tg.append(el('span','',label),el('span','wr-tab-n',String(listIds.length)),ic('right','tri'));
-    const panel=el('div','item-contents');
-    const fill=()=>{if(panel.childNodes.length)return;for(const [id,n] of listIds){const r=ref(id);const c=el('span','item-chip');c.append(itemIcon(r.icon,'sm'),el('span','item-chip-name',r.name));if(n>0)c.append(el('span','item-chip-n','×'+n));panel.append(c)}};
-    if(opened.has(o.id)){card.classList.add('open');fill()}
-    tg.onclick=()=>{const on=!card.classList.contains('open');card.classList.toggle('open',on);tg.setAttribute('aria-expanded',String(on));if(on){opened.add(o.id);fill()}else opened.delete(o.id)};
-    card.append(tg,panel);
-   }
-   list.append(card);
-  }
+  if(q){const grid=el('div','item-list');rows.forEach(o=>grid.append(itemCard(o)));list.append(grid);return}
+  if(itemCat!==0){grouped(list,rows);return}
+  for(const [pg,name] of ITEM_PAGES){if(!pg||pg===DORM)continue;const part=rows.filter(o=>itemTab(o)===pg);if(!part.length)continue;
+   const gh=el('div','doll-group-head');gh.append(el('h3','',name),el('span','doll-group-count',part.length+'개'));list.append(gh);grouped(list,part)}
  };
  sync();draw();focusItemCard();
 }
@@ -1507,18 +1545,18 @@ async function showItem(id,{push=true}={}){
  const it=(itemData.items||[]).find(o=>o.id===id),fu=(furnData?.items||[]).find(o=>o.id===id);
  if(!it&&!fu){await showItems({push});return}
  itemQuery='';focusItem=id;
- if(fu){itemCat=DORM;dormView='cat';dormCat=0}else itemCat=it.page;
+ if(fu){itemCat=DORM;dormView='cat';dormCat=0}else{itemCat=itemTab(it);if(it.grp)openGroups.add(it.grp)}
  await showItems({push:false,cat:String(itemCat)});
  if(push)saveRoute({type:'item',id});
 }
 function focusItemCard(){
  if(focusItem==null)return;const id=focusItem;focusItem=null;
- const c=document.querySelector('.item-card[data-id="'+id+'"]');if(!c)return;
+ const cs=document.querySelectorAll('.item-card[data-ids~="'+id+'"]'),c=cs[cs.length-1];if(!c)return;
  c.scrollIntoView({block:'center'});c.classList.add('item-focus');setTimeout(()=>c.classList.remove('item-focus'),2400);
 }
 // 숙소(가구): [종류별 | 테마별]
 function furnCard(o,catName,themeName){
- const card=el('div','item-card furn-card'+(o.quality?' q'+o.quality:''));card.dataset.id=o.id;card.append(linkBtn('#item/'+o.id,o.name));
+ const card=el('div','item-card furn-card'+(o.quality?' q'+o.quality:''));card.dataset.ids=String(o.id);card.append(linkBtn('#item/'+o.id,o.name));
  const main=el('div','item-main');main.append(itemIcon(o.icon));
  const body=el('div','item-body');body.append(el('strong','item-name',o.name));
  const meta=[catName,o.comfort?'쾌적도 +'+o.comfort:'',o.size?o.size[0]+'×'+o.size[1]:''].filter(Boolean);

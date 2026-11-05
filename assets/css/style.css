@@ -1101,3 +1101,40 @@ button.doll-chip:hover{border-color:var(--accent)}
 .search-tip small{color:var(--sub);font-weight:700;font-size:11px}
 .search-tip p{margin:4px 0 0;font-size:13px;line-height:1.7;white-space:pre-line}
 @media(max-width:750px){.search-filters{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}.search-filter{flex:none}}
+/* ---------- v1.3 아이템: 간격 · 크기 규격 통일 + 폴더 · 합친 카드 ---------- */
+:root{--it-pad:14px 16px;--it-gap:10px;--it-ic:56px;--it-line:1.65}
+.item-list{gap:var(--it-gap)}
+.item-card,.furn-card{padding:var(--it-pad);gap:8px}
+.item-main{gap:14px}
+.item-ic{width:var(--it-ic);height:var(--it-ic);padding:4px}
+.item-ic img{width:100%;height:100%;object-fit:contain}
+.item-ic.sm{width:30px;height:30px;padding:2px}
+.item-name{font-size:15px;line-height:1.4;display:inline}
+.item-desc{margin:6px 0 0;font-size:13px;line-height:var(--it-line)}
+.item-src{margin:6px 0 0;font-size:12px;line-height:1.6;display:grid;grid-template-columns:4.2em 1fr;gap:8px;align-items:start}
+.item-src-label{white-space:nowrap}
+.furn-meta{margin-top:4px}
+.item-toggle{margin-top:2px;height:30px;padding:0 11px}
+.item-panel{display:none}
+.item-card.open>.item-panel{display:block}
+.item-contents{display:flex;flex-wrap:wrap;gap:6px}
+.item-chip{min-height:30px;padding:3px 10px 3px 4px}
+.item-chip .item-ic.sm.empty{display:none}
+.item-chip:not(:has(.item-ic:not(.empty))){padding-left:10px}
+.item-badge{display:inline-block;margin-left:8px;padding:1px 7px;border-radius:10px;font-size:11px;font-weight:800;color:var(--accent);border:1px solid color-mix(in srgb,var(--accent) 45%,transparent);vertical-align:2px}
+.item-folder{background:color-mix(in srgb,var(--accent) 4%,var(--panel))}
+.item-folder .item-folder-names{color:var(--sub);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.item-folder.open .item-folder-names{display:none}
+.item-list>.item-folder.open{grid-column:1/-1}
+.item-sub{margin-top:4px}
+.item-sub .item-card{background:var(--bg)}
+.item-src-list ul{margin:0;padding:0;list-style:none}
+.item-src-list li{margin:0 0 2px}
+.item-variant{border-top:1px dashed var(--line);padding:8px 0 2px}
+.item-variant small{color:var(--accent);font-weight:700;font-size:11px}
+.item-variant .item-desc{margin-top:2px}
+.ev-list{margin-top:14px}
+.ev-items{padding:12px 14px 16px}
+.item-list.dorm-mode>.doll-group-head{margin:26px 2px 12px}
+.item-list.dorm-mode>.doll-group-head:first-child{margin-top:4px}
+.item-list>.item-merged.open{grid-column:1/-1}
