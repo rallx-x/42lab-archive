@@ -1690,7 +1690,7 @@ function skillPanel(p){
   top.append(el('span','skill-type t'+sk.type,SKILL_TYPE[sk.type]||''),el('strong','skill-name',sk.name));
   const meta=el('span','skill-meta');
   const preAt=l=>{if(!sk.pre)return null;let v=sk.pre[0];(sk.preLv||[]).forEach((L,i)=>{if(l>=L)v=sk.pre[i]});return v};
-  const drawMeta=()=>{meta.replaceChildren();const pv=preAt(lv);if(pv!=null)meta.append(el('span','skill-chip','예충전 '+fmtNum(pv)+'초'));if(sk.cd)meta.append(el('span','skill-chip','⏳ '+fmtNum(sk.cd)+'초'))};
+  const drawMeta=()=>{icw.classList.toggle('max',lv>=max);meta.replaceChildren();const pv=preAt(lv);if(pv!=null)meta.append(el('span','skill-chip','예충전 '+fmtNum(pv)+'초'));if(sk.cd)meta.append(el('span','skill-chip','⏳ '+fmtNum(sk.cd)+'초'))};
   drawMeta();top.append(meta);
   const brief=el('span','skill-brief');skillText(brief,sk.brief);
   mid.append(top,brief);head.append(icw,mid,ic('right','tri'));
@@ -1707,10 +1707,11 @@ function skillPanel(p){
  }
  return box;
 }
-// 스킬 아이콘 = 게임처럼: 육각 바탕(색 = 스킬 분류 cat: 1 공격 · 2 치료 · 3 보호 · 4 보조) + 흰 테두리(종류별 틀) + 아이콘(pnc-item skill/<이름>)
+// 스킬 아이콘 = 게임처럼: 육각 바탕 + 흰 테두리(종류별 틀) + 아이콘(pnc-item skill/<이름>)
+// MAX 레벨(max)이면 빨간 바탕에 흰 그림, 아니면 어두운 바탕에 분류 색 그림(cat: 1 공격 빨강 · 2 치료 초록 · 3 보호 파랑 · 4 보조 노랑)
 // 무장각인으로 강화된 스킬(enh)은 주황 테두리
 function skillHex(icon,o={}){
- const w=el('span','skill-ic skill-hex t'+(o.type||1)+' c'+(o.cat||1)+(o.enh?' enh':''));
+ const w=el('span','skill-ic skill-hex t'+(o.type||1)+' c'+(o.cat||1)+(o.enh?' enh':'')+(o.max!==false?' max':''));
  w.append(el('span','hex-fill'));const ii=itemIcon(icon?'skill/'+icon:'');w.append(ii,el('span','hex-fr'));return w}
 
 // ----- v1.4 무장각인 (data/<언어>/arma.json · 로고 = pnc-item arma/<heroId>.webp) -----
