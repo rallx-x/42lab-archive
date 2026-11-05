@@ -1436,7 +1436,7 @@ const loadItems=()=>itemData?Promise.resolve(itemData):fetchJSON(dataPath('items
 const itemIconBase=()=>siteInfo?.home?.itemIconBase||'';
 function itemIcon(icon,cls){
  const box=el('span','item-ic'+(cls?' '+cls:''));const base=itemIconBase();
- if(base&&icon){const im=el('img');im.alt='';im.loading='lazy';im.decoding='async';im.src=base.replace(/\/?$/,'/')+encodeURIComponent(icon)+'.webp';im.onerror=()=>{im.remove();box.classList.add('empty')};box.append(im)}else box.classList.add('empty');
+ if(base&&icon){const im=el('img');im.alt='';im.loading='lazy';im.decoding='async';im.src=base.replace(/\/?$/,'/')+String(icon).split('/').map(encodeURIComponent).join('/')+'.webp';im.onerror=()=>{im.remove();box.classList.add('empty')};box.append(im)}else box.classList.add('empty');
  return box;
 }
 async function showItems({push=true,cat=null}={}){
@@ -1658,7 +1658,7 @@ function skillPanel(p){
   const max=sk.maxLv||1;let lv=skillLv==='max'?max:Math.min(+skillLv||max,max);
   const row=el('section','skill-row');
   const head=el('button','skill-head');head.type='button';head.setAttribute('aria-expanded','false');
-  const icw=el('span','skill-ic');icw.append(itemIcon(sk.icon));
+  const icw=skillHex(sk.icon);
   const mid=el('span','skill-mid');const top=el('span','skill-top');
   top.append(el('span','skill-type t'+sk.type,SKILL_TYPE[sk.type]||''),el('strong','skill-name',sk.name));
   const meta=el('span','skill-meta');
@@ -1680,13 +1680,86 @@ function skillPanel(p){
  }
  return box;
 }
+// 스킬 아이콘 = 게임 육각 틀(skill/_frame) + 아이콘(skill/<이름>). arma=true 면 무장각인 강화 틀(skill/_frame_arma)을 위에
+function skillHex(icon,arma){
+ const w=el('span','skill-ic skill-hex'+(arma?' arma':''));const base=itemIconBase();
+ if(base){const u=n=>'url("'+base.replace(/\/?$/,'/')+'skill/'+n+'.webp")';w.style.setProperty('--hex-bg',u('_frame'));if(arma)w.style.setProperty('--hex-fr',u('_frame_arma'))}
+ w.append(itemIcon(icon?'skill/'+icon:''));return w}
+
+// ----- v1.4 무장각인 (data/<언어>/arma.json · 로고 = pnc-item arma/<heroId>.webp) -----
+let armaData=null;
+const loadArma=()=>armaData?Promise.resolve(armaData):fetchJSON(dataPath('arma.json')).then(d=>armaData=d);
+const ROLE_TONE=['#3d8bff','#ff8a2a','#ff4f45','#a66bff','#3fc46b']; // 수위 · 전사 · 사수 · 해결사 · 치료사
+const ROMAN=['Ⅰ','Ⅱ','Ⅲ'];
+let armaLv=+get('armaLv',30)||30;
+// 1920×1080 화면 가운데 기준 좌표 → 무대 안 % 위치
+const armaPos=(x,y)=>({left:(x+960)/19.2+'%',top:(540-y)/10.8+'%'});
+const ARMA_NODE=[[0,432],[-429,0],[429,0]]; // 게임 배치: 1단계 위 · 2단계 왼쪽 · 3단계 오른쪽
+function armaPanel(p){
+ const a=p.arma,MAX=a.levels?.length||30,attrs=armaData?.attrs||{};
+ const ri=ROLE_ORDER.map(l=>l.indexOf(p.role)).find(i=>i>=0);const tone=ROLE_TONE[ri]??ROLE_TONE[2];
+ let lv=Math.min(Math.max(armaLv,1),MAX),sel='center';
+ const wrap=el('div','arma');wrap.style.setProperty('--arma',tone);
+ if(a.fan)wrap.append(fanNote());
+ const stage=el('div','arma-stage');
+ const pts=el('div','arma-pts');(armaData?.points||[]).forEach(([x,y])=>{const d=el('span','arma-pt');Object.assign(d.style,armaPos(x,y));pts.append(d)});
+ const center=el('button','arma-center');center.type='button';Object.assign(center.style,armaPos(0,0));
+ const logo=el('span','arma-logo');const base=itemIconBase();
+ if(base){const im=el('img');im.alt='';im.decoding='async';im.src=base.replace(/\/?$/,'/')+'arma/'+p.heroId+'.webp';im.onerror=()=>im.remove();logo.append(im)}
+ center.append(el('span','arma-dia'),logo);
+ const title=el('div','arma-title');title.append(el('strong','arma-name',a.name),el('span','arma-en','ARMA INSCRIPTA'));
+ const nodes=a.steps.slice(0,3).map((st,i)=>{const b=el('button','arma-node');b.type='button';Object.assign(b.style,armaPos(...ARMA_NODE[i]));
+  b.append(el('span','arma-node-dia'),el('span','arma-node-n',ROMAN[i]));const hx=skillHex(st.skill.icon,true);hx.classList.add('arma-node-ic');b.append(hx,ic('lock','arma-lock'));
+  b.onclick=()=>{sel=i;draw()};return b});
+ center.onclick=()=>{sel='center';draw()};
+ stage.append(pts,center,...nodes,title);
+ // 레벨 조절
+ const bar=el('div','arma-lvbar');
+ const dn=el('button','arma-step','▼'),up=el('button','arma-step','▲');dn.type=up.type='button';dn.setAttribute('aria-label','레벨 -1');up.setAttribute('aria-label','레벨 +1');
+ const range=el('input','arma-range');range.type='range';range.min=1;range.max=MAX;range.value=lv;range.setAttribute('aria-label','레벨');
+ const lvTxt=el('span','arma-lvtxt');
+ const setLv=v=>{lv=Math.min(Math.max(v,1),MAX);armaLv=lv;set('armaLv',lv);range.value=lv;draw()};
+ dn.onclick=()=>setLv(lv-1);up.onclick=()=>setLv(lv+1);range.oninput=()=>setLv(+range.value);
+ bar.append(el('span','arma-lvlabel','레벨'),dn,range,up,lvTxt);
+ const info=el('div','arma-info');
+ // 단계 s(1~3)는 레벨 s×10 에서 돌파
+ const open=i=>lv>=(a.steps[i]?.maxLv??(i+1)*10);
+ const stepOf=()=>a.steps.findIndex(st=>lv<=st.maxLv)+1||a.steps.length;
+ function draw(){
+  pts.querySelectorAll('.arma-pt').forEach((d,i)=>d.classList.toggle('on',i<lv));
+  nodes.forEach((b,i)=>{b.classList.toggle('open',open(i));b.classList.toggle('sel',sel===i)});
+  center.classList.toggle('sel',sel==='center');
+  lvTxt.replaceChildren(el('b','',String(lv).padStart(2,'0')),document.createTextNode(' / '+MAX));
+  info.replaceChildren();
+  if(sel==='center'){
+   const h=el('div','arma-info-head');h.append(el('span','eyebrow','ARMA INSCRIPTA'),el('strong','arma-info-name arma-nm',a.name));info.append(h);
+   if(a.desc)info.append(el('p','arma-desc',a.desc));
+   const meta=el('div','arma-meta');meta.append(el('span','skill-chip','단계 '+ROMAN[stepOf()-1]),el('span','skill-chip','레벨 '+lv+' / '+MAX));info.append(meta);
+   info.append(el('div','arma-sub','특성'));
+   const tl=el('div','arma-traits');a.steps.forEach((st,i)=>{const t=el('button','arma-trait'+(open(i)?' open':''));t.type='button';t.append(el('span','arma-trait-n',ROMAN[i]),el('span','arma-trait-name',st.skill.name),el('span','arma-trait-lv',open(i)?'':'Lv.'+(st.maxLv??(i+1)*10)));t.onclick=()=>{sel=i;draw()};tl.append(t)});info.append(tl);
+   info.append(el('div','arma-sub','능력치 상승'));
+   const g=el('div','arma-stats');const row=a.levels[lv-1]||{};
+   for(const [k,v] of Object.entries(row)){if(!v)continue;const it=el('div','arma-stat');it.append(el('span','',attrs[k]||k),el('b','','+'+fmtNum(v)));g.append(it)}
+   if(!g.childNodes.length)g.append(el('span','arma-none','—'));info.append(g);
+  }else{
+   const st=a.steps[sel],i=sel;
+   const h=el('div','arma-info-head');h.append(el('span','eyebrow','STRENGTHEN '+ROMAN[i]),el('strong','arma-info-name','각인 돌파 '+ROMAN[i]));info.append(h);
+   const card=el('div','arma-skill'+(open(i)?'':' locked'));card.append(skillHex(st.skill.icon,true));
+   const body=el('div','arma-skill-body');body.append(el('strong','skill-name',st.skill.name));
+   const base=(p.skills||[]).find(x=>x.id===st.skill.base);if(base)body.append(el('span','arma-base','강화: '+base.name));
+   const d=el('p','skill-detail');skillText(d,st.skill.desc);body.append(d);card.append(body);info.append(card);
+   info.append(el('p','arma-unlock',open(i)?'해금됨 · 레벨 '+(st.maxLv??(i+1)*10)+' 돌파':'레벨 '+(st.maxLv??(i+1)*10)+'에서 돌파'));
+  }
+ }
+ wrap.append(stage,bar,info);draw();return wrap;
+}
 // ----- 프로필 -----
 async function showDoll(key,{push=true}={}){
  const tok=++routeToken;showOnly('dollView');bgmLeave();voiceStop();closeArchiveMenu();
  if(push)saveRoute({type:'doll',id:key});
  const host=$('#dollView');host.replaceChildren(el('p','loading-note','프로필을 불러오는 중…'));window.scrollTo(0,0);
  try{loadDollIndex().catch(()=>{});let p=dollCache.get(key);if(!p){p=await fetchJSON(dataPath('profiles/'+encodeURIComponent(key)+'.json'));dollCache.set(key,p)}
-  const sk=await loadSkills().catch(()=>null);if(sk&&!p.skills)p.skills=sk.heroes?.[String(p.heroId)]||null;
+  const [sk,am]=await Promise.all([loadSkills().catch(()=>null),loadArma().catch(()=>null)]);if(sk&&!p.skills)p.skills=sk.heroes?.[String(p.heroId)]||null;if(am&&!p.arma)p.arma=am.heroes?.[String(p.heroId)]||null;
   if(tok!==routeToken)return;renderDoll(p)}
  catch(e){if(tok===routeToken){host.replaceChildren(error('프로필을 불러오지 못했어요. ('+e.message+')'))}}
 }
@@ -1850,6 +1923,7 @@ function renderDoll(p){
  const skins=(p.skinList||[]).map(x=>({img:x.img,title:x.name,desc:x.desc,photo:x.photo,photoName:x.photoName}));
  const parts=[];
  if(p.skills?.length&&typeof skillPanel==='function')parts.push(['skill','스킬',p.skills.length+'개',box=>box.append(skillPanel(p))]);
+ if(p.arma?.steps?.length)parts.push(['arma','무장각인','',box=>box.append(armaPanel(p))]);
  parts.push(['affinity','친밀도','',box=>{if(affBox.childNodes.length)box.append(affBox);box.append(storyPanel(p))}]);
  if(vc)parts.push(['voice','보이스',vc+'개',box=>box.append(voicePanel(p))]);
  if(skins.length)parts.push(['skin','스킨',skins.length+'벌',box=>{box.append(el('p','load-note',LOAD_NOTE),gallery(p,skins,{label:'스킨',cls:'gal-skin'}))}]);

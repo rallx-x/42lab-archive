@@ -247,6 +247,11 @@ const D=[
 ['목차','目次','Contents','目錄','目录'],
 ['친밀도','親密度','Intimacy','親密度','亲密度'],
 ['스킬','スキル','Skills','技能','技能'],
+['무장각인','武装刻印','Arma Inscripta','武裝刻印','武装刻印'],
+['특성','特性','Traits','特性','特性'],
+['능력치 상승','ステータス上昇','Stat Bonus','屬性提升','属性提升'],
+['레벨 -1','レベル -1','Level -1','等級 -1','等级 -1'],
+['레벨 +1','レベル +1','Level +1','等級 +1','等级 +1'],
 ['이전 기록','過去の記録','History','過往記錄','过往记录'],
 ['업데이트 기록','アップデート履歴','Update history','更新記錄','更新记录'],
 ['그 외 가구','その他の家具','Other furniture','其他家具','其他家具'],
@@ -377,6 +382,12 @@ const P=[
 [/^(\d+)세트$/,'$1セット','$1 sets','$1 套','$1 套'],
 [/^앞의 (\d+)건만 보여 줍니다\. 「아이템」 필터를 누르면 더 볼 수 있어요\.$/,'最初の $1 件のみ表示しています。「アイテム」で絞り込むと続きを見られます。','Showing the first $1. Choose the "Items" filter to see more.','僅顯示前 $1 筆。點選「道具」篩選可查看更多。','仅显示前 $1 条。点选「道具」筛选可查看更多。'],
 [/^로딩 팁을 불러오지 못했어요\. \((.+)\)$/,'ロード画面のTipsを読み込めませんでした。（$1）','Could not load loading tips. ($1)','無法載入載入提示。（$1）','无法加载加载提示。（$1）'],
+[/^각인 돌파 ([ⅠⅡⅢ])$/,'刻印突破 $1','Breakthrough $1','刻印突破 $1','刻印突破 $1'],
+[/^단계 ([ⅠⅡⅢ])$/,'段階 $1','Stage $1','階段 $1','阶段 $1'],
+[/^레벨 (\d+) \/ (\d+)$/,'レベル $1 / $2','Level $1 / $2','等級 $1 / $2','等级 $1 / $2'],
+[/^해금됨 · 레벨 (\d+) 돌파$/,'解放済み · レベル$1で突破','Unlocked · breakthrough at Lv.$1','已解鎖 · 等級$1突破','已解锁 · 等级$1突破'],
+[/^레벨 (\d+)에서 돌파$/,'レベル$1で突破','Breakthrough at Lv.$1','等級$1突破','等级$1突破'],
+[/^강화: (.+)$/,'強化：$1','Enhances: $1','強化：$1','强化：$1'],
 [/^예충전 ([\d.]+)초$/,'初期チャージ $1秒','Pre-charge $1s','預充能 $1秒','预充能 $1秒'],
 [/^⏳ ([\d.]+)초$/,'⏳ $1秒','⏳ $1s','⏳ $1秒','⏳ $1秒'],
 [/^숙소 · (.+)$/,'宿舎 · $1','Dorm · $1','宿舍 · $1','宿舍 · $1'],
@@ -421,7 +432,7 @@ function tr(s){
 window.L=s=>tr(s)??s;
 window.tr18n=tr;
 /* 이야기 본문은 건너뜀 */
-const SKIP='.skill-brief,.skill-detail,.skill-name,.item-folder-names,.item-variant,.search-tip p,.search-item-text strong,.fan-link,.item-name,.item-desc,.item-src-text,.wr-long-title,.dorm-theme-info,.item-chip-name,.wr-body,.tip-card,.wr-tab-name,.bubble,.center-item,.chat .name,.option,.choice-spoken,.voice-text,.doll-quote,.doll-career,.doll-story-body,.doll-chip,#stream .entry,#epTitle,#epDesc,#loreText,.notice-line,code,pre';
+const SKIP='.arma-name,.arma-nm,.arma-desc,.arma-trait-name,.arma-stat span,.skill-brief,.skill-detail,.skill-name,.item-folder-names,.item-variant,.search-tip p,.search-item-text strong,.fan-link,.item-name,.item-desc,.item-src-text,.wr-long-title,.dorm-theme-info,.item-chip-name,.wr-body,.tip-card,.wr-tab-name,.bubble,.center-item,.chat .name,.option,.choice-spoken,.voice-text,.doll-quote,.doll-career,.doll-story-body,.doll-chip,#stream .entry,#epTitle,#epDesc,#loreText,.notice-line,code,pre';
 const ATTRS=['title','aria-label','placeholder','alt'];
 function skip(n){const e=n.nodeType===1?n:n.parentElement;return !e||!!e.closest(SKIP)}
 function doText(t){if(skip(t))return;const r=tr(t.nodeValue);if(r!=null&&r!==t.nodeValue)t.nodeValue=r}
