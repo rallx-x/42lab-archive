@@ -207,6 +207,39 @@ const D=[
 ['건너뛰기','スキップ','Skip','跳過','跳过'],
 ['확인','確認','OK','確定','确定'],
 ['고르지 않으면 무작위로 정해져요. 사용자 창에서 언제든 바꿀 수 있어요.','選ばない場合はランダムで決まります。ユーザー画面でいつでも変更できます。','If you skip, one is picked at random. You can change it anytime under User.','若不選擇將隨機決定，之後可隨時在使用者視窗更改。','若不选择将随机决定，之后可随时在用户窗口更改。'],
+// 시계 기록 목록 (v0.12.22) — 메뉴 이름 = 게임 표기 (한국 UI 「시계 기록」, 그 외는 분류 7 서버 원문)
+['시계 기록','視界記録',"Perception's Record",'視界記錄','视界记录'],
+['시계 기록 분류','視界記録の分類',"Perception's Record categories",'視界記錄分類','视界记录分类'],
+['시계 기록을 불러오는 중…','視界記録を読み込み中…',"Loading Perception's Record…",'正在載入視界記錄…','正在加载视界记录…'],
+['시계 기록 찾기','視界記録を探す',"Search Perception's Record",'搜尋視界記錄','搜索视界记录'],
+['이름 · 내용','名前・内容','Name · text','名稱・內容','名称・内容'],
+['기록이 없어요.','記録がありません。','No records.','沒有記錄。','没有记录。'],
+['한국어 원문','韓国語原文','Korean text','韓文原文','韩文原文'],
+['전체','すべて','All','全部','全部'],
+['로딩 팁','ロード画面のTips','Loading Tips','載入提示','加载提示'],
+['로딩 팁 분류','ロード画面のTipsの分類','Loading Tip categories','載入提示分類','加载提示分类'],
+['로딩 팁을 불러오는 중…','ロード画面のTipsを読み込み中…','Loading tips…','正在載入載入提示…','正在加载加载提示…'],
+['로딩 팁 찾기','ロード画面のTipsを探す','Search loading tips','搜尋載入提示','搜索加载提示'],
+['인형','人形','Dolls','人形','人形'],
+['섹터','セクター','Sectors','磁區','扇区'],
+// 아이템 (v0.12.22) — 창고 분류 이름 〔일 · 영 · 번체 · 간체는 임시 번역, 마인드맵 파편은 서버 원문〕
+['아이템','アイテム','Items','道具','道具'],
+['아이템 분류','アイテムの分類','Item categories','道具分類','道具分类'],
+['아이템을 불러오는 중…','アイテムを読み込み中…','Loading items…','正在載入道具…','正在加载道具…'],
+['아이템 찾기','アイテムを探す','Search items','搜尋道具','搜索道具'],
+['기본 아이템','基本アイテム','Basic Items','基礎道具','基础道具'],
+['소모 아이템','消耗アイテム','Consumables','消耗道具','消耗道具'],
+['마인드맵 파편','メンタルの欠片','Neural Fragment','心智碎片','心智碎片'],
+['육성재료','育成素材','Upgrade Materials','培養材料','培养材料'],
+['공장재료','工場素材','Factory Materials','工廠材料','工厂材料'],
+['숙소','宿舎','Dorm','宿舍','宿舍'],
+['종류별','種類別','By type','依種類','按种类'],
+['테마별','テーマ別','By theme','依主題','按主题'],
+['테마','テーマ','Theme','主題','主题'],
+['기념품','記念品','Souvenirs','紀念品','纪念品'],
+['획득처','入手方法','Source','獲取途徑','获取途径'],
+['구성품','内容','Contents','內容物','内容物'],
+['고를 수 있는 아이템 목록은 준비 중이에요.','選べるアイテムの一覧は準備中です。','The list of selectable items is coming soon.','可選道具清單準備中。','可选道具列表准备中。'],
 // 인형
 ['인형 기록을 불러오는 중…','人形記録を読み込み中…','Loading Doll records…','正在載入人形記錄…','正在加载人形记录…'],
 ['인형이 없어요.','人形がいません。','No Dolls.','沒有人形。','没有人形。'],
@@ -321,6 +354,13 @@ const P=[
 [/^ · 지금: (.+)$/,' · 再生中：$1',' · Now: $1',' · 正在播放：$1',' · 正在播放：$1'],
 [/^ · 재생할 수 없어요$/,' · 再生できません',' · Cannot play',' · 無法播放',' · 无法播放'],
 [/^(.+) · 준비 중$/,'$1 · 準備中','$1 · coming soon','$1 · 準備中','$1 · 准备中'],
+[/^아이템을 불러오지 못했어요\. \((.+)\)$/,'アイテムを読み込めませんでした。（$1）','Could not load items. ($1)','無法載入道具。（$1）','无法加载道具。（$1）'],
+[/^쾌적도 \+(\d+)$/,'快適度 +$1','Comfort +$1','舒適度 +$1','舒适度 +$1'],
+[/^(\d+)세트$/,'$1セット','$1 sets','$1 套','$1 套'],
+[/^로딩 팁을 불러오지 못했어요\. \((.+)\)$/,'ロード画面のTipsを読み込めませんでした。（$1）','Could not load loading tips. ($1)','無法載入載入提示。（$1）','无法加载加载提示。（$1）'],
+[/^시계 기록을 불러오지 못했어요\. \((.+)\)$/,'視界記録を読み込めませんでした。（$1）',"Could not load Perception's Record. ($1)",'無法載入視界記錄。（$1）','无法加载视界记录。（$1）'],
+[/^([\d,]+)자$/,'$1字','$1 chars','$1字','$1字'],
+[/^「(.+)」에 맞는 기록이 없어요\.$/,'「$1」に合う記録はありません。','No records match "$1".','沒有符合「$1」的記錄。','没有符合「$1」的记录。'],
 [/^인형 기록을 불러오지 못했어요\. \((.+)\)$/,'人形記録を読み込めませんでした。（$1）','Could not load Doll records. ($1)','無法載入人形記錄。（$1）','无法加载人形记录。（$1）'],
 [/^프로필을 불러오지 못했어요\. \((.+)\)$/,'プロフィールを読み込めませんでした。（$1）','Could not load the profile. ($1)','無法載入檔案。（$1）','无法加载档案。（$1）'],
 [/^「(.+)」에 맞는 인형이 없어요\.$/,'「$1」に合う人形はいません。','No Dolls match "$1".','沒有符合「$1」的人形。','没有符合「$1」的人形。'],
@@ -358,7 +398,7 @@ function tr(s){
 window.L=s=>tr(s)??s;
 window.tr18n=tr;
 /* 이야기 본문은 건너뜀 */
-const SKIP='.bubble,.center-item,.chat .name,.option,.choice-spoken,.voice-text,.doll-quote,.doll-career,.doll-story-body,.doll-chip,#stream .entry,#epTitle,#epDesc,#loreText,.notice-line,code,pre';
+const SKIP='.item-name,.item-desc,.item-src-text,.wr-long-title,.dorm-theme-info,.item-chip-name,.wr-body,.tip-card,.wr-tab-name,.bubble,.center-item,.chat .name,.option,.choice-spoken,.voice-text,.doll-quote,.doll-career,.doll-story-body,.doll-chip,#stream .entry,#epTitle,#epDesc,#loreText,.notice-line,code,pre';
 const ATTRS=['title','aria-label','placeholder','alt'];
 function skip(n){const e=n.nodeType===1?n:n.parentElement;return !e||!!e.closest(SKIP)}
 function doText(t){if(skip(t))return;const r=tr(t.nodeValue);if(r!=null&&r!==t.nodeValue)t.nodeValue=r}

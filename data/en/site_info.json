@@ -13,6 +13,33 @@
  ],
  "notices": [
   {
+   "id": "2026-11-05-mail",
+   "date": "2026-11-05",
+   "popup": true,
+   "title": "Now Collecting In-Game Mail",
+   "lines": [
+    "We are preparing to back up the mail received in the game.",
+    "If you still have mail saved, please send screenshots showing the \"send date (including time)\" and the \"full text\" through the feedback form or by email.",
+    "Mail from every server will be recorded, and other languages will be added as \"fan translations.\"",
+    "Feel free to hide personal information such as your account name or UID.",
+    "We'd appreciate the help of all Professors. Thank you."
+   ]
+  },
+  {
+   "id": "2026-11-05-v1.1",
+   "date": "2026-11-05",
+   "title": "Update v1.1 · Perception's Record · Loading Tips · Items",
+   "lines": [
+    "The ☰ menu (top left) now has \"Perception's Record,\" \"Loading Tips,\" and \"Items.\"",
+    "Perception's Record: the 79 terms you could only see through orange words in stories, now listed by category. Long records in 《》 can be expanded one at a time.",
+    "Loading Tips: 64 loading-screen tips, grouped into Dolls, Sectors, and Others.",
+    "Items: names, descriptions, and sources, sorted like the in-game warehouse. Box items can be expanded to show their contents.",
+    "Items › Dorm: browse 541 furniture pieces by type or by theme.",
+    "Gift preferences (likes · dislikes) on Doll profiles now show item icons.",
+    "All text is taken from each server's client. Please report errors through the feedback form."
+   ]
+  },
+  {
    "id": "2026-10-30-welcome",
    "date": "2026-10-30",
    "pinned": true,
@@ -206,7 +233,8 @@
     "url": "https://pnc-chess.pages.dev/"
    }
   ],
-  "bgmBase": "https://42lab-bgm.pages.dev/"
+  "bgmBase": "https://42lab-bgm.pages.dev/",
+  "itemIconBase": "https://pnc-item.pages.dev/"
  },
- "updated": "2026-10-30"
+ "updated": "2026-11-05"
 }
