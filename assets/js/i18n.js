@@ -207,6 +207,14 @@ const D=[
 ['건너뛰기','スキップ','Skip','跳過','跳过'],
 ['확인','確認','OK','確定','确定'],
 ['고르지 않으면 무작위로 정해져요. 사용자 창에서 언제든 바꿀 수 있어요.','選ばない場合はランダムで決まります。ユーザー画面でいつでも変更できます。','If you skip, one is picked at random. You can change it anytime under User.','若不選擇將隨機決定，之後可隨時在使用者視窗更改。','若不选择将随机决定，之后可随时在用户窗口更改。'],
+// 세계기록 목록 (v0.12.22) — 메뉴 이름은 〔미확정: 서버별 공식 명칭으로 교체〕
+['세계기록','世界記録','World Records','世界記錄','世界记录'],
+['세계기록 분류','世界記録の分類','World Record categories','世界記錄分類','世界记录分类'],
+['세계기록을 불러오는 중…','世界記録を読み込み中…','Loading World Records…','正在載入世界記錄…','正在加载世界记录…'],
+['세계기록 찾기','世界記録を探す','Search World Records','搜尋世界記錄','搜索世界记录'],
+['이름 · 내용','名前・内容','Name · text','名稱・內容','名称・内容'],
+['기록이 없어요.','記録がありません。','No records.','沒有記錄。','没有记录。'],
+['한국어 원문','韓国語原文','Korean text','韓文原文','韩文原文'],
 // 인형
 ['인형 기록을 불러오는 중…','人形記録を読み込み中…','Loading Doll records…','正在載入人形記錄…','正在加载人形记录…'],
 ['인형이 없어요.','人形がいません。','No Dolls.','沒有人形。','没有人形。'],
@@ -321,6 +329,8 @@ const P=[
 [/^ · 지금: (.+)$/,' · 再生中：$1',' · Now: $1',' · 正在播放：$1',' · 正在播放：$1'],
 [/^ · 재생할 수 없어요$/,' · 再生できません',' · Cannot play',' · 無法播放',' · 无法播放'],
 [/^(.+) · 준비 중$/,'$1 · 準備中','$1 · coming soon','$1 · 準備中','$1 · 准备中'],
+[/^세계기록을 불러오지 못했어요\. \((.+)\)$/,'世界記録を読み込めませんでした。（$1）','Could not load World Records. ($1)','無法載入世界記錄。（$1）','无法加载世界记录。（$1）'],
+[/^「(.+)」에 맞는 기록이 없어요\.$/,'「$1」に合う記録はありません。','No records match "$1".','沒有符合「$1」的記錄。','没有符合「$1」的记录。'],
 [/^인형 기록을 불러오지 못했어요\. \((.+)\)$/,'人形記録を読み込めませんでした。（$1）','Could not load Doll records. ($1)','無法載入人形記錄。（$1）','无法加载人形记录。（$1）'],
 [/^프로필을 불러오지 못했어요\. \((.+)\)$/,'プロフィールを読み込めませんでした。（$1）','Could not load the profile. ($1)','無法載入檔案。（$1）','无法加载档案。（$1）'],
 [/^「(.+)」에 맞는 인형이 없어요\.$/,'「$1」に合う人形はいません。','No Dolls match "$1".','沒有符合「$1」的人形。','没有符合「$1」的人形。'],
@@ -358,7 +368,7 @@ function tr(s){
 window.L=s=>tr(s)??s;
 window.tr18n=tr;
 /* 이야기 본문은 건너뜀 */
-const SKIP='.bubble,.center-item,.chat .name,.option,.choice-spoken,.voice-text,.doll-quote,.doll-career,.doll-story-body,.doll-chip,#stream .entry,#epTitle,#epDesc,#loreText,.notice-line,code,pre';
+const SKIP='.wr-body,.wr-tab-name,.bubble,.center-item,.chat .name,.option,.choice-spoken,.voice-text,.doll-quote,.doll-career,.doll-story-body,.doll-chip,#stream .entry,#epTitle,#epDesc,#loreText,.notice-line,code,pre';
 const ATTRS=['title','aria-label','placeholder','alt'];
 function skip(n){const e=n.nodeType===1?n:n.parentElement;return !e||!!e.closest(SKIP)}
 function doText(t){if(skip(t))return;const r=tr(t.nodeValue);if(r!=null&&r!==t.nodeValue)t.nodeValue=r}

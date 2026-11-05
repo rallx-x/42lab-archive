@@ -68,6 +68,7 @@ const groupKey=g=>String(g.id||g.key);
 function routeHash(route){
  if(route.type==='episode')return '#ep/'+encodeURIComponent(route.id);
  if(route.type==='dolls')return '#dolls';
+ if(route.type==='records')return '#records'+(route.cat?'/'+encodeURIComponent(route.cat):'');
  if(route.type==='doll')return '#doll/'+encodeURIComponent(route.id);
  if(route.type==='chapter')return '#chapter/'+encodeURIComponent(route.category)+':'+encodeURIComponent(route.id);
  // v0.9.0: #home = 첫 화면(공지·일러스트·피드백), #home/<분류> = 그 분류의 스토리 목록 (#home/all = 전체 기록)
@@ -78,6 +79,7 @@ function parseRoute(){
  try{
   if(raw.startsWith('ep/'))return {type:'episode',id:decodeURIComponent(raw.slice(3))};
   if(raw==='dolls')return {type:'dolls'};
+  if(raw==='records'||raw.startsWith('records/'))return {type:'records',cat:raw.startsWith('records/')?decodeURIComponent(raw.slice(8)):null};
   if(raw.startsWith('doll/'))return {type:'doll',id:decodeURIComponent(raw.slice(5))};
   if(raw.startsWith('chapter/')){
    let part=raw.slice(8),colon=part.indexOf(':');
@@ -129,6 +131,7 @@ async function restoreRoute(){
   }
  }
  if(route.type==='dolls'){showDolls({push:false});return}
+ if(route.type==='records'){showRecords({push:false,cat:route.cat});return}
  if(route.type==='doll'){showDoll(route.id,{push:false});return}
  if(route.type==='chapter'&&showChapter(route.id,route.category,{push:false}))return;
  showHome(route.category||null,{push:false,shelf:route.shelf||null});
@@ -611,6 +614,8 @@ function renderArchiveMenu(){
  host.append(allRow);
  // v0.10.0 인형 기록
  const dollLink=el('button','archive-menu-link archive-menu-home archive-menu-dolls','인형 기록');dollLink.type='button';dollLink.onclick=()=>{closeArchiveMenu();$('#search').value='';showDolls()};host.append(dollLink);
+ // v0.12.22 세계기록 목록
+ const wrLink=el('button','archive-menu-link archive-menu-home archive-menu-dolls','세계기록');wrLink.type='button';wrLink.onclick=()=>{closeArchiveMenu();$('#search').value='';showRecords()};host.append(wrLink);
 }
 $('#menuBtn').onclick=()=>{const menu=$('#archiveMenu');if(!menu.classList.contains('open')){renderArchiveMenu();menu.classList.add('open');menu.removeAttribute('aria-hidden');$('#menuBtn').setAttribute('aria-expanded','true');$('#menuBtn').classList.add('is-open')}else closeArchiveMenu()};
 $('#archiveMenuClose').onclick=closeArchiveMenu;
@@ -638,7 +643,8 @@ function spans(parent,unit){
   });
  }
 }
-function showLore(id){let record=(data.worldRecords||{})[String(id)]||{};$('#loreTitle').textContent=record.name||'세계기록 '+id;$('#loreText').textContent=record.description||'설명 정보가 없습니다.';$('#lore').showModal()}
+function showLore(id){let record=(data.worldRecords||{})[String(id)]||{};openLore(record.name||'세계기록 '+id,record.description)}
+function openLore(name,desc){$('#loreTitle').textContent=name;$('#loreText').textContent=cleanTags(desc)||'설명 정보가 없습니다.';$('#lore').showModal()}
 let imageMap={},speakerAliases={};
 const SYSTEM_SPEAKERS=new Set(['시스템','시스템 음성','통신 시스템']);
 function isProfessor(who){return who?.isProfessor===true}
@@ -1185,6 +1191,53 @@ function dollCard(d){
  info.append(el('span','doll-card-meta',[d.company,d.role].filter(Boolean).join(' · ')));
  const foot=el('span','doll-card-foot');foot.append(el('span','doll-stars',starText(d.stars)));info.append(foot);
  b.append(face,info);b.onclick=()=>showDoll(d.voiceKey);return b;
+}
+// ----- v0.12.22 세계기록 목록 (#records) -----
+let wrData=null,wrCat=get('wrCat',0),wrQuery='';
+const loadRecords=()=>wrData?Promise.resolve(wrData):fetchJSON(dataPath('world_records.json')).then(d=>wrData=d);
+async function showRecords({push=true,cat=null}={}){
+ const tok=++routeToken;showOnly('dollView');bgmLeave();voiceStop();closeArchiveMenu();$('#crumb').textContent='세계기록';
+ if(cat!=null&&/^\d+$/.test(cat))wrCat=+cat;
+ if(push)saveRoute({type:'records',cat:wrCat?String(wrCat):null});
+ const host=$('#dollView');host.replaceChildren(el('p','loading-note','세계기록을 불러오는 중…'));window.scrollTo(0,0);
+ try{await loadRecords()}catch(e){if(tok===routeToken)host.replaceChildren(error('세계기록을 불러오지 못했어요. ('+e.message+')'));return}
+ if(tok===routeToken)renderRecords();
+}
+function renderRecords(){
+ const host=$('#dollView');host.replaceChildren();
+ const all=wrData.records||[],types=wrData.types||[],tname=new Map(types.map(t=>[t.id,t.name]));
+ if(!types.some(t=>t.id===wrCat&&(t.id===0||all.some(r=>r.type===t.id))))wrCat=0;
+ const head=el('div','doll-list-head');const t=el('div');t.append(el('div','eyebrow','DATABASE / WORLD RECORDS'),el('h2','','세계기록'));head.append(t);
+ const count=el('span','section-sub');head.append(count);host.append(head);
+ const bar=el('div','doll-controls wr-controls');const tabs=el('div','wr-tabs');tabs.setAttribute('role','tablist');tabs.setAttribute('aria-label','세계기록 분류');
+ const tabBtns=[];
+ for(const ty of types){
+  const n=ty.id===0?all.length:all.filter(r=>r.type===ty.id).length;if(!n)continue;
+  const b=el('button','cat-tab wr-tab');b.type='button';b.setAttribute('role','tab');b.append(el('span','wr-tab-name',ty.name),el('span','wr-tab-n',String(n)));
+  b.onclick=()=>{wrCat=ty.id;set('wrCat',wrCat);history.replaceState(history.state,'',location.pathname+location.search+routeHash({type:'records',cat:wrCat?String(wrCat):null}));sync();draw()};
+  tabBtns.push([ty.id,b]);tabs.append(b);
+ }
+ const sync=()=>tabBtns.forEach(([id,b])=>{b.classList.toggle('selected',id===wrCat);b.setAttribute('aria-selected',String(id===wrCat))});
+ const sw=el('label','doll-ctl doll-search-wrap');sw.append(el('span','doll-ctl-label','기록 찾기'));
+ const sbox=el('span','doll-search');const si=el('input');si.type='search';si.placeholder='이름 · 내용';si.value=wrQuery;si.setAttribute('aria-label','세계기록 찾기');si.autocomplete='off';
+ si.oninput=()=>{wrQuery=si.value;draw()};sbox.append(el('span','doll-search-prompt','//:_'),si);sw.append(sbox);
+ bar.append(tabs,sw);
+ const list=el('div','wr-list');host.append(bar,list);
+ const draw=()=>{
+  const q=dnorm(wrQuery);
+  const rows=all.filter(r=>(wrCat===0||r.type===wrCat)&&(!q||dnorm(r.name).includes(q)||dnorm(r.description).includes(q)));
+  count.textContent=rows.length+'개';list.replaceChildren();
+  if(!rows.length){list.append(el('p','loading-note',q?'「'+wrQuery.trim()+'」에 맞는 기록이 없어요.':'기록이 없어요.'));return}
+  for(const r of rows){
+   const b=el('button','wr-card');b.type='button';
+   const top=el('div','wr-card-top');top.append(el('span','wr-no',String(r.id).padStart(2,'0')));
+   if(wrCat===0&&tname.has(r.type))top.append(el('span','wr-type',tname.get(r.type)));
+   if(r.src==='ko'&&dataLang()!=='ko')top.append(el('span','wr-src','한국어 원문'));
+   const body=el('div','wr-body');body.append(el('strong','wr-name',r.name),el('small','wr-desc',cleanTags(r.description).replace(/\s+/g,' ')));
+   b.append(top,body);b.onclick=()=>openLore(r.name,r.description);list.append(b);
+  }
+ };
+ sync();draw();
 }
 // ----- 프로필 -----
 async function showDoll(key,{push=true}={}){
