@@ -1063,3 +1063,22 @@ button.doll-chip:hover{border-color:var(--accent)}
 .dorm-theme-info{margin:0 0 12px;color:var(--sub);font-size:13px;line-height:1.7}
 @media(max-width:750px){.dorm-cats{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}.dorm-cat{flex:none}}
 .item-list.dorm-mode{display:block}
+/* v1.2 메뉴 자료실 묶음 */
+.archive-menu-section{margin:18px 10px 2px;padding-top:12px;border-top:1px solid var(--line);font-size:10px;font-weight:800;letter-spacing:.16em;color:var(--accent)}
+/* v1.2 항목 주소 · 링크 복사 · 긴 글 읽기 화면 */
+.item-card{position:relative}
+.item-link{position:absolute;top:10px;right:10px;width:30px;height:30px;padding:0;display:grid;place-items:center;border-radius:8px;opacity:.45;background:transparent;border-color:transparent}
+.item-link:hover,.item-link:focus-visible{opacity:1;border-color:var(--line);background:var(--panel)}
+.item-link .ic{width:14px;height:14px}
+.item-card .item-body{padding-right:22px}
+.item-card.item-focus{border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 30%,transparent);transition:box-shadow .3s}
+.lore-link{position:static;opacity:.8;margin-top:14px;width:auto;height:auto;padding:7px 12px;border-color:var(--line);display:inline-flex;gap:6px}
+.lore-link::after{content:attr(title);font-size:12px;font-weight:700}
+.wr-long-row{width:100%;display:flex;align-items:center;gap:12px;text-align:left;padding:15px 16px}
+.wr-long-row:hover{border-color:var(--accent)}
+.record-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin:18px 0 4px;max-width:820px}
+.record-head h2{font-size:26px;margin:6px 0 0;line-height:1.35}
+.record-head .item-link{position:static;opacity:.8;border-color:var(--line)}
+.record-text{margin-top:18px;background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:22px 26px 28px;max-width:820px}
+.record-foot{margin-top:22px}
+@media(max-width:750px){.record-text{padding:16px 16px 22px}.record-head h2{font-size:21px}}
