@@ -1,0 +1,38 @@
+{
+ "_note": "본섭(중국) 전용 인형 스킬 팬 번역 (Claude AI, 2026-11-05). 수치 · 아이콘 · 쿨타임은 data/zh/skills.json 에서 그대로 가져오고, 이름 · 간략 · 상세만 여기 글로 바꿈. tw 는 간체 원문을 번체 글자로 변환(fan_skills.py).",
+ "1093": {
+  "109301": {
+   "ko": {"name": "디지털 보호막·SHEILD",
+          "brief": "전투 시작 시 모든 아군 인형에게 <Color=#44b164>보호막</color>을 부여한다. 아군 인형이 피해를 줄 때 <Color=#b99534>고정피해</color>를 추가로 준다. 아군 유닛이 보호막을 가지고 있으면 물리방어와 연산방어가 상승한다. 자신의 일반공격은 체력이 가장 낮은 아군 인형을 <Color=#44b164>치료</color>하도록 바뀌고, 일반공격을 일정 횟수 할 때마다 모든 아군 인형에게 <Color=#44b164>보호막</color>을 부여한다. 자신의 고유 스킬로 아군에게 보호막을 부여할 때 치료 효과 증가가 적용되며 과부하를 무시한다.",
+          "detail": "전투 시작 시 모든 아군 인형에게 <Color=#44b164>공격력 {0}%의 보호막</color>을 부여한다. 아군 인형이 피해를 줄 때 <Color=#b99534>현재 보호막 {1}%만큼의 추가 고정피해</color>를 준다(최대 에니악 공격력의 {2}배, 유닛마다 최소 발동 간격 {7}초). 아군 유닛이 보호막을 가지고 있으면 물리방어와 연산방어가 {3}% 상승한다. 자신의 일반공격은 체력이 가장 낮은 아군 인형을 <Color=#44b164>치료</color>하여 공격력 {4}%만큼 체력을 회복시키도록 바뀌고, 일반공격을 {6}번 할 때마다 모든 아군 인형에게 <Color=#44b164>공격력 {5}%의 보호막</color>을 부여한다. 자신의 고유 스킬로 아군에게 보호막을 부여할 때 치료 효과 증가가 적용되며 과부하를 무시한다."},
+   "ja": {"name": "デジタルシールド·SHEILD",
+          "brief": "開幕時、味方人形全員に<Color=#44b164>シールド</color>を付与する。味方人形がダメージを与える時、<Color=#b99534>絶対ダメージ</color>を追加で与える。味方ユニットがシールドを持っている間、物理防御と演算防御が上昇する。自身の通常攻撃はHPが最も低い味方人形を<Color=#44b164>治療</color>するものに変わり、通常攻撃を一定回数行うたびに味方人形全員に<Color=#44b164>シールド</color>を付与する。自身の源生スキルで味方にシールドを付与する時、治療効果上昇の影響を受け、オーバーロードを無視する。",
+          "detail": "開幕時、味方人形全員に<Color=#44b164>攻撃力{0}%のシールド</color>を付与する。味方人形がダメージを与える時、<Color=#b99534>現在のシールド値{1}%分の追加絶対ダメージ</color>を与える（エニアックの攻撃力の{2}倍まで、ユニットごとの最短発動間隔{7}秒）。味方ユニットがシールドを持っている間、物理防御と演算防御が{3}%上昇する。自身の通常攻撃はHPが最も低い味方人形を<Color=#44b164>治療</color>して攻撃力{4}%分のHPを回復するものに変わり、通常攻撃を{6}回行うたびに味方人形全員に<Color=#44b164>攻撃力{5}%のシールド</color>を付与する。自身の源生スキルで味方にシールドを付与する時、治療効果上昇の影響を受け、オーバーロードを無視する。"},
+   "en": {"name": "Digital Shield·SHEILD",
+          "brief": "At the start of battle, grants a <Color=#44b164>Shield</color> to all allied Dolls. When allied Dolls deal damage, they deal additional <Color=#b99534>Absolute Damage</color>. Allied units gain Physical DEF and Operand DEF while they have a Shield. ENIAC's Basic Attacks instead <Color=#44b164>heal</color> the allied Doll with the lowest HP, and every few Basic Attacks grant a <Color=#44b164>Shield</color> to all allied Dolls. Shields granted by ENIAC's Innate skills benefit from Healing Effect bonuses and ignore Overload.",
+          "detail": "At the start of battle, grants all allied Dolls a <Color=#44b164>Shield equal to {0}% of ATK</color>. When allied Dolls deal damage, they deal <Color=#b99534>additional Absolute Damage equal to {1}% of their current Shield</color> (up to {2}× ENIAC's ATK; minimum interval of {7}s per unit). Allied units gain {3}% Physical DEF and Operand DEF while they have a Shield. ENIAC's Basic Attacks instead <Color=#44b164>heal</color> the allied Doll with the lowest HP for {4}% of ATK, and every {6} Basic Attacks grant all allied Dolls a <Color=#44b164>Shield equal to {5}% of ATK</color>. Shields granted by ENIAC's Innate skills benefit from Healing Effect bonuses and ignore Overload."}
+  },
+  "109302": {
+   "ko": {"name": "결정 응역·CRYSTAL",
+          "brief": "대상 주위 1칸 안의 적이 현재 체력의 일부를 보호막으로 전환하고 「결정」 상태가 된다.\n「결정」: 받는 물리피해가 증가하며, <Color=#ed372e>제어</color> 효과를 받을 때마다 이 수치가 추가로 증가하고 지속 시간이 갱신된다. 추가 증가는 최대 5번.",
+          "detail": "대상 주위 1칸 안의 적이 현재 체력의 {0}%를 보호막으로 전환하고 {1}초간 「결정」 상태가 된다.\n「결정」: 받는 물리피해가 {2}% 증가하며, <Color=#ed372e>제어</color> 효과를 받을 때마다 이 수치가 {2}%씩 추가로 증가하고 지속 시간이 갱신된다. 추가 증가는 최대 5번."},
+   "ja": {"name": "晶構凝域·CRYSTAL",
+          "brief": "対象の周囲1マス内の敵に、現在HPの一部をシールドに変換させ、「結晶」状態にする。\n「結晶」：受ける物理ダメージが増加し、<Color=#ed372e>牽制</color>効果を受けるたびにこの数値がさらに増加し、持続時間が更新される。追加増加は最大5回。",
+          "detail": "対象の周囲1マス内の敵に、現在HPの{0}%をシールドに変換させ、{1}秒間「結晶」状態にする。\n「結晶」：受ける物理ダメージが{2}%増加し、<Color=#ed372e>牽制</color>効果を受けるたびにこの数値がさらに{2}%増加し、持続時間が更新される。追加増加は最大5回。"},
+   "en": {"name": "Crystal Domain·CRYSTAL",
+          "brief": "Enemies within 1 tile of the target convert part of their current HP into Shield and become [Crystallized].\n[Crystallized]: Physical Damage taken is increased. Each time they are hit by a <Color=#ed372e>control</color> effect, this value increases further and the duration refreshes, up to 5 extra times.",
+          "detail": "Enemies within 1 tile of the target convert {0}% of their current HP into Shield and become [Crystallized] for {1}s.\n[Crystallized]: Physical Damage taken +{2}%. Each time they are hit by a <Color=#ed372e>control</color> effect, this value increases by another {2}% and the duration refreshes, up to 5 extra times."}
+  },
+  "109303": {
+   "ko": {"name": "근원 수해·AEON",
+          "brief": "모든 아군 인형에게 <Color=#44b164>보호막</color>을 부여하고, 모든 적이 현재 체력의 일부를 보호막으로 전환하며 「궁극 결정」 상태가 된다.\n「궁극 결정」: 받는 물리피해가 증가하고 <Color=#ed372e>기절</color>한다.",
+          "detail": "모든 아군 인형에게 <Color=#44b164>공격력 {0}%의 보호막</color>을 부여하고, 모든 적이 현재 체력의 {1}%를 보호막으로 전환하며 {3}초간 「궁극 결정」 상태가 된다.\n「궁극 결정」: 받는 물리피해가 {2}% 증가하고 <Color=#ed372e>기절</color>한다."},
+   "ja": {"name": "根源数海·AEON",
+          "brief": "味方人形全員に<Color=#44b164>シールド</color>を付与し、敵全員に現在HPの一部をシールドに変換させ、「究極結晶」状態にする。\n「究極結晶」：受ける物理ダメージが増加し、<Color=#ed372e>眩暈</color>状態になる。",
+          "detail": "味方人形全員に<Color=#44b164>攻撃力{0}%のシールド</color>を付与し、敵全員に現在HPの{1}%をシールドに変換させ、{3}秒間「究極結晶」状態にする。\n「究極結晶」：受ける物理ダメージが{2}%増加し、<Color=#ed372e>眩暈</color>状態になる。"},
+   "en": {"name": "Primordial Data Sea·AEON",
+          "brief": "Grants a <Color=#44b164>Shield</color> to all allied Dolls, makes all enemies convert part of their current HP into Shield, and applies [Ultimate Crystallization].\n[Ultimate Crystallization]: Physical Damage taken is increased, and the target is <Color=#ed372e>Stunned</color>.",
+          "detail": "Grants all allied Dolls a <Color=#44b164>Shield equal to {0}% of ATK</color>, makes all enemies convert {1}% of their current HP into Shield, and applies [Ultimate Crystallization] for {3}s.\n[Ultimate Crystallization]: Physical Damage taken +{2}%, and the target is <Color=#ed372e>Stunned</color>."}
+  }
+ }
+}

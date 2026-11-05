@@ -240,6 +240,10 @@ const D=[
 ['이벤트 보상','イベント報酬','Event Rewards','活動獎勵','活动奖励'],
 ['펼치기','開く','Expand','展開','展开'],
 ['이벤트별 설명','イベント別の説明','By event','依活動說明','按活动说明'],
+['패시브','パッシブ','Passive','被動','被动'],
+['자동','オート','Auto','自動','自动'],
+['궁극기','必殺技','Ultimate','終極技','终极技'],
+['레벨','レベル','Level','等級','等级'],
 ['목차','目次','Contents','目錄','目录'],
 ['친밀도','親密度','Intimacy','親密度','亲密度'],
 ['스킬','スキル','Skills','技能','技能'],
@@ -373,6 +377,8 @@ const P=[
 [/^(\d+)세트$/,'$1セット','$1 sets','$1 套','$1 套'],
 [/^앞의 (\d+)건만 보여 줍니다\. 「아이템」 필터를 누르면 더 볼 수 있어요\.$/,'最初の $1 件のみ表示しています。「アイテム」で絞り込むと続きを見られます。','Showing the first $1. Choose the "Items" filter to see more.','僅顯示前 $1 筆。點選「道具」篩選可查看更多。','仅显示前 $1 条。点选「道具」筛选可查看更多。'],
 [/^로딩 팁을 불러오지 못했어요\. \((.+)\)$/,'ロード画面のTipsを読み込めませんでした。（$1）','Could not load loading tips. ($1)','無法載入載入提示。（$1）','无法加载加载提示。（$1）'],
+[/^예충전 ([\d.]+)초$/,'初期チャージ $1秒','Pre-charge $1s','預充能 $1秒','预充能 $1秒'],
+[/^⏳ ([\d.]+)초$/,'⏳ $1秒','⏳ $1s','⏳ $1秒','⏳ $1秒'],
 [/^숙소 · (.+)$/,'宿舎 · $1','Dorm · $1','宿舍 · $1','宿舍 · $1'],
 [/^시계 기록 · (.+)$/,'視界記録 · $1',"Perception's Record · $1",'視界記錄 · $1','视界记录 · $1'],
 [/^시계 기록을 불러오지 못했어요\. \((.+)\)$/,'視界記録を読み込めませんでした。（$1）',"Could not load Perception's Record. ($1)",'無法載入視界記錄。（$1）','无法加载视界记录。（$1）'],
@@ -415,7 +421,7 @@ function tr(s){
 window.L=s=>tr(s)??s;
 window.tr18n=tr;
 /* 이야기 본문은 건너뜀 */
-const SKIP='.item-folder-names,.item-variant,.search-tip p,.search-item-text strong,.fan-link,.item-name,.item-desc,.item-src-text,.wr-long-title,.dorm-theme-info,.item-chip-name,.wr-body,.tip-card,.wr-tab-name,.bubble,.center-item,.chat .name,.option,.choice-spoken,.voice-text,.doll-quote,.doll-career,.doll-story-body,.doll-chip,#stream .entry,#epTitle,#epDesc,#loreText,.notice-line,code,pre';
+const SKIP='.skill-brief,.skill-detail,.skill-name,.item-folder-names,.item-variant,.search-tip p,.search-item-text strong,.fan-link,.item-name,.item-desc,.item-src-text,.wr-long-title,.dorm-theme-info,.item-chip-name,.wr-body,.tip-card,.wr-tab-name,.bubble,.center-item,.chat .name,.option,.choice-spoken,.voice-text,.doll-quote,.doll-career,.doll-story-body,.doll-chip,#stream .entry,#epTitle,#epDesc,#loreText,.notice-line,code,pre';
 const ATTRS=['title','aria-label','placeholder','alt'];
 function skip(n){const e=n.nodeType===1?n:n.parentElement;return !e||!!e.closest(SKIP)}
 function doText(t){if(skip(t))return;const r=tr(t.nodeValue);if(r!=null&&r!==t.nodeValue)t.nodeValue=r}

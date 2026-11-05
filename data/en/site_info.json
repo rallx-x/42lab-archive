@@ -26,6 +26,19 @@
    ]
   },
   {
+   "id": "2026-11-05-v1.4",
+   "date": "2026-11-05",
+   "kind": "update",
+   "title": "Update v1.4 · Doll skills · Profile contents",
+   "lines": [
+    "Doll profiles now have \"Contents\" at the bottom: Skills · Intimacy · Voice · Outfits.",
+    "Skills: brief descriptions of Passive, Auto, and Ultimate skills. Press ▶ for the detailed text and values per level (Lv1–MAX), plus cooldown and pre-charge.",
+    "Press colored words in skill text (True Damage, Super Armor, etc.) to see what the term means.",
+    "Likes, dislikes, and relationships moved to \"Intimacy.\"",
+    "ENIAC's skills are fan translations of the CN server text."
+   ]
+  },
+  {
    "id": "2026-11-05-v1.3",
    "date": "2026-11-05",
    "title": "Update v1.3 · Item cleanup",

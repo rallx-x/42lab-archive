@@ -735,7 +735,7 @@ function spans(parent,unit){
  }
 }
 function showLore(id){let record=(data.worldRecords||{})[String(id)]||{};openLore(record.name||'세계기록 '+id,record.description,id)}
-function openLore(name,desc,id){$('#loreTitle').textContent=name;$('#loreText').textContent=cleanTags(desc)||'설명 정보가 없습니다.';
+function openLore(name,desc,id,eyebrow,tone){const dl=$('#lore');dl.querySelector('.eyebrow').textContent=eyebrow||'WORLD RECORD';dl.dataset.tone=tone||'';$('#loreTitle').textContent=name;$('#loreText').textContent=cleanTags(desc)||'설명 정보가 없습니다.';
  const f=$('#lore form');f.querySelector('.lore-link')?.remove();
  if(id!=null){const b=linkBtn('#record/'+id,name);b.classList.add('lore-link');f.append(b)}
  $('#lore').showModal()}
@@ -1628,12 +1628,66 @@ function giftLinks(w,vk,kind){loadItems().then(d=>{
 }).catch(()=>giftIcons(w))}
 // 선물 칸 아이콘 (그림 주소가 있을 때만, 아이템 이름으로 연결)
 function giftIcons(w){if(!itemIconBase())return;loadItems().then(d=>{const m=new Map((d.items||[]).filter(o=>o.page===2).map(o=>[o.name,o.icon]));w.querySelectorAll('.doll-chip[data-item]').forEach(c=>{const icon=m.get(c.dataset.item);if(icon&&!c.querySelector('.item-ic'))c.prepend(itemIcon(icon,'chip'))})}).catch(()=>{})}
+// ----- v1.4 인형 스킬 (data/<언어>/skills.json) -----
+let skillData=null;
+const loadSkills=()=>skillData?Promise.resolve(skillData):fetchJSON(dataPath('skills.json')).then(d=>skillData=d);
+const SKILL_TYPE={1:'자동',2:'패시브',3:'궁극기'},SKILL_ORDER={2:0,1:1,3:2};
+const TERM_TONE={1:'green',2:'red',3:'orange'};
+let skillLv=get('skillLv','max');
+function skillTerm(text){const terms=skillData?.terms||[];const t=text.replace(/\s+/g,'');let best=null;
+ for(const x of terms){const n=x.name.replace(/\s+/g,'');if(!n)continue;if((t===n||t.includes(n))&&(!best||n.length>best.name.replace(/\s+/g,'').length))best=x}return best}
+// 색 글자 = 게임 표기 그대로, 용어 사전에 있는 말이면 누르면 설명 창
+function skillText(parent,text){
+ const src=String(text||'').replace(/<cmdr>/gi,()=>nick()).replace(/\\n/g,'\n').replace(/\s+$/,'');
+ const re=/<color=(#[0-9a-fA-F]{6,8})>([\s\S]*?)<\/color>/gi;let last=0,m;
+ const plain=t=>t.replace(/<\/?(?:color|i|b|size)(?:=[^>]*)?>/gi,'');
+ const put=t=>{if(t)parent.append(document.createTextNode(plain(t)))};
+ while((m=re.exec(src))){put(src.slice(last,m.index));const word=plain(m[2]);const term=skillTerm(word);
+  const sp=el(term?'button':'span','skill-hl'+(term?' skill-term':''),word);sp.style.setProperty('--hl',m[1].slice(0,7));
+  if(term){sp.type='button';sp.onclick=e=>{e.stopPropagation();openLore(term.name,term.desc,null,'SKILL TERM',TERM_TONE[term.color]||'')}}
+  parent.append(sp);last=re.lastIndex}
+ put(src.slice(last));
+}
+const fmtNum=v=>v==null?'?':(Math.round(v*100)/100).toLocaleString(window.UI_LOCALE||'ko-KR',{maximumFractionDigits:2});
+function skillDetail(sk,lv){return String(sk.detail||'').replace(/\{(\d+)\}/g,(_,i)=>{const row=sk.vals?.[+i];return row?fmtNum(row[Math.min(lv,row.length)-1]):'{'+i+'}'})}
+function skillPanel(p){
+ const box=el('div','skill-list');
+ const list=[...(p.skills||[])].sort((a,b)=>(SKILL_ORDER[a.type]??9)-(SKILL_ORDER[b.type]??9));
+ if(list.some(x=>x.fan))box.append(fanNote());
+ for(const sk of list){
+  const max=sk.maxLv||1;let lv=skillLv==='max'?max:Math.min(+skillLv||max,max);
+  const row=el('section','skill-row');
+  const head=el('button','skill-head');head.type='button';head.setAttribute('aria-expanded','false');
+  const icw=el('span','skill-ic');icw.append(itemIcon(sk.icon));
+  const mid=el('span','skill-mid');const top=el('span','skill-top');
+  top.append(el('span','skill-type t'+sk.type,SKILL_TYPE[sk.type]||''),el('strong','skill-name',sk.name));
+  const meta=el('span','skill-meta');
+  const preAt=l=>{if(!sk.pre)return null;let v=sk.pre[0];(sk.preLv||[]).forEach((L,i)=>{if(l>=L)v=sk.pre[i]});return v};
+  const drawMeta=()=>{meta.replaceChildren();const pv=preAt(lv);if(pv!=null)meta.append(el('span','skill-chip','예충전 '+fmtNum(pv)+'초'));if(sk.cd)meta.append(el('span','skill-chip','⏳ '+fmtNum(sk.cd)+'초'))};
+  drawMeta();top.append(meta);
+  const brief=el('span','skill-brief');skillText(brief,sk.brief);
+  mid.append(top,brief);head.append(icw,mid,ic('right','tri'));
+  const panel=el('div','skill-panel');
+  const fill=()=>{panel.replaceChildren();
+   const lvbar=el('div','skill-lv');lvbar.append(el('span','skill-lv-label','레벨'));
+   for(let i=1;i<=max;i++){const b=el('button','skill-lv-btn'+(i===lv?' on':''),i===max?'MAX':String(i));b.type='button';b.onclick=e=>{e.stopPropagation();lv=i;skillLv=i===max?'max':String(i);set('skillLv',skillLv);drawMeta();fill()};lvbar.append(b)}
+   const det=el('p','skill-detail');skillText(det,skillDetail(sk,lv));
+   panel.append(lvbar,det);
+   if(sk.cut){/* 궁극기 컷씬: 영상 변환 후 연결 */}
+  };
+  head.onclick=()=>{const on=!row.classList.contains('open');row.classList.toggle('open',on);head.setAttribute('aria-expanded',String(on));if(on)fill()};
+  row.append(head,panel);box.append(row);
+ }
+ return box;
+}
 // ----- 프로필 -----
 async function showDoll(key,{push=true}={}){
  const tok=++routeToken;showOnly('dollView');bgmLeave();voiceStop();closeArchiveMenu();
  if(push)saveRoute({type:'doll',id:key});
  const host=$('#dollView');host.replaceChildren(el('p','loading-note','프로필을 불러오는 중…'));window.scrollTo(0,0);
- try{loadDollIndex().catch(()=>{});let p=dollCache.get(key);if(!p){p=await fetchJSON(dataPath('profiles/'+encodeURIComponent(key)+'.json'));dollCache.set(key,p)}if(tok!==routeToken)return;renderDoll(p)}
+ try{loadDollIndex().catch(()=>{});let p=dollCache.get(key);if(!p){p=await fetchJSON(dataPath('profiles/'+encodeURIComponent(key)+'.json'));dollCache.set(key,p)}
+  const sk=await loadSkills().catch(()=>null);if(sk&&!p.skills)p.skills=sk.heroes?.[String(p.heroId)]||null;
+  if(tok!==routeToken)return;renderDoll(p)}
  catch(e){if(tok===routeToken){host.replaceChildren(error('프로필을 불러오지 못했어요. ('+e.message+')'))}}
 }
 const illust=(p,img,full)=>img?(p.illustBase||'')+(full?'full/'+img+'.png':'web/'+img+'.webp'):null;

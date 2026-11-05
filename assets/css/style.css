@@ -1170,3 +1170,30 @@ button.doll-chip:hover{border-color:var(--accent)}
 .doll-aff{display:flex;flex-direction:column;gap:10px;margin-bottom:22px;padding:16px 18px;background:var(--panel);border:1px solid var(--line);border-radius:16px}
 .doll-aff .doll-chips{margin:0}
 @media(max-width:750px){.doll-toc-tab{min-width:0;flex:none}}
+/* v1.4 인형 스킬 */
+.skill-list{display:flex;flex-direction:column;gap:10px}
+.skill-row{background:var(--panel);border:1px solid var(--line);border-radius:16px;overflow:hidden}
+.skill-row.open{border-color:color-mix(in srgb,var(--accent) 45%,var(--line))}
+.skill-head{width:100%;display:flex;align-items:flex-start;gap:14px;text-align:left;border:0;border-radius:0;background:none;padding:14px 16px}
+.skill-head .tri{flex:none;margin-top:6px;transition:transform .2s}
+.skill-row.open .skill-head .tri{transform:rotate(90deg)}
+.skill-ic .item-ic{width:60px;height:60px;border-radius:14px}
+.skill-mid{flex:1;min-width:0;display:flex;flex-direction:column;gap:6px}
+.skill-top{display:flex;align-items:center;flex-wrap:wrap;gap:8px}
+.skill-type{font-size:11px;font-weight:800;padding:2px 8px;border-radius:4px;color:#fff;background:#5a6270}
+.skill-type.t1{background:#1e8ee0}.skill-type.t3{background:#f08a24}
+.skill-name{font-size:16px}
+.skill-meta{margin-left:auto;display:flex;gap:6px}
+.skill-chip{font-size:11px;font-weight:700;padding:2px 8px;border-radius:4px;background:var(--mono);color:var(--sub);white-space:nowrap}
+.skill-brief{font-size:14px;line-height:1.75;white-space:pre-line}
+.skill-panel{display:none;border-top:1px solid var(--line);padding:12px 16px 16px 90px}
+.skill-row.open .skill-panel{display:block}
+.skill-lv{display:flex;flex-wrap:wrap;align-items:center;gap:4px;margin-bottom:10px}
+.skill-lv-label{font-size:10px;font-weight:800;letter-spacing:.12em;color:var(--sub);margin-right:6px}
+.skill-lv-btn{padding:3px 9px;font-size:12px;border-radius:6px;min-width:34px}
+.skill-lv-btn.on{border-color:var(--accent);color:var(--accent-text,var(--accent));background:color-mix(in srgb,var(--accent) 12%,var(--panel))}
+.skill-detail{margin:0;font-size:14px;line-height:1.8;white-space:pre-line}
+.skill-hl{color:color-mix(in srgb,var(--hl) 80%,var(--ink));font-weight:700}
+.skill-term{border:0;background:none;padding:0;font:inherit;font-weight:700;cursor:pointer;text-decoration:underline;text-decoration-style:dotted;text-underline-offset:3px}
+#lore[data-tone=green] .eyebrow{color:#2f9e55}#lore[data-tone=red] .eyebrow{color:#d64545}#lore[data-tone=orange] .eyebrow{color:#e0862a}
+@media(max-width:750px){.skill-panel{padding:12px 14px 16px}.skill-meta{margin-left:0}.skill-ic .item-ic{width:48px;height:48px}}
