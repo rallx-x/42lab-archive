@@ -215,6 +215,13 @@ const D=[
 ['이름 · 내용','名前・内容','Name · text','名稱・內容','名称・内容'],
 ['기록이 없어요.','記録がありません。','No records.','沒有記錄。','没有记录。'],
 ['한국어 원문','韓国語原文','Korean text','韓文原文','韩文原文'],
+['전체','すべて','All','全部','全部'],
+['로딩 팁','ロード画面のTips','Loading Tips','載入提示','加载提示'],
+['로딩 팁 분류','ロード画面のTipsの分類','Loading Tip categories','載入提示分類','加载提示分类'],
+['로딩 팁을 불러오는 중…','ロード画面のTipsを読み込み中…','Loading tips…','正在載入載入提示…','正在加载加载提示…'],
+['로딩 팁 찾기','ロード画面のTipsを探す','Search loading tips','搜尋載入提示','搜索加载提示'],
+['인형','人形','Dolls','人形','人形'],
+['섹터','セクター','Sectors','磁區','扇区'],
 // 인형
 ['인형 기록을 불러오는 중…','人形記録を読み込み中…','Loading Doll records…','正在載入人形記錄…','正在加载人形记录…'],
 ['인형이 없어요.','人形がいません。','No Dolls.','沒有人形。','没有人形。'],
@@ -329,6 +336,7 @@ const P=[
 [/^ · 지금: (.+)$/,' · 再生中：$1',' · Now: $1',' · 正在播放：$1',' · 正在播放：$1'],
 [/^ · 재생할 수 없어요$/,' · 再生できません',' · Cannot play',' · 無法播放',' · 无法播放'],
 [/^(.+) · 준비 중$/,'$1 · 準備中','$1 · coming soon','$1 · 準備中','$1 · 准备中'],
+[/^로딩 팁을 불러오지 못했어요\. \((.+)\)$/,'ロード画面のTipsを読み込めませんでした。（$1）','Could not load loading tips. ($1)','無法載入載入提示。（$1）','无法加载加载提示。（$1）'],
 [/^세계기록을 불러오지 못했어요\. \((.+)\)$/,'世界記録を読み込めませんでした。（$1）','Could not load World Records. ($1)','無法載入世界記錄。（$1）','无法加载世界记录。（$1）'],
 [/^「(.+)」에 맞는 기록이 없어요\.$/,'「$1」に合う記録はありません。','No records match "$1".','沒有符合「$1」的記錄。','没有符合「$1」的记录。'],
 [/^인형 기록을 불러오지 못했어요\. \((.+)\)$/,'人形記録を読み込めませんでした。（$1）','Could not load Doll records. ($1)','無法載入人形記錄。（$1）','无法加载人形记录。（$1）'],
@@ -368,7 +376,7 @@ function tr(s){
 window.L=s=>tr(s)??s;
 window.tr18n=tr;
 /* 이야기 본문은 건너뜀 */
-const SKIP='.wr-body,.wr-tab-name,.bubble,.center-item,.chat .name,.option,.choice-spoken,.voice-text,.doll-quote,.doll-career,.doll-story-body,.doll-chip,#stream .entry,#epTitle,#epDesc,#loreText,.notice-line,code,pre';
+const SKIP='.wr-body,.tip-card,.wr-tab-name,.bubble,.center-item,.chat .name,.option,.choice-spoken,.voice-text,.doll-quote,.doll-career,.doll-story-body,.doll-chip,#stream .entry,#epTitle,#epDesc,#loreText,.notice-line,code,pre';
 const ATTRS=['title','aria-label','placeholder','alt'];
 function skip(n){const e=n.nodeType===1?n:n.parentElement;return !e||!!e.closest(SKIP)}
 function doText(t){if(skip(t))return;const r=tr(t.nodeValue);if(r!=null&&r!==t.nodeValue)t.nodeValue=r}

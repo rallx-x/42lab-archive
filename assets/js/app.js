@@ -68,6 +68,7 @@ const groupKey=g=>String(g.id||g.key);
 function routeHash(route){
  if(route.type==='episode')return '#ep/'+encodeURIComponent(route.id);
  if(route.type==='dolls')return '#dolls';
+ if(route.type==='tips')return '#tips'+(route.cat?'/'+encodeURIComponent(route.cat):'');
  if(route.type==='records')return '#records'+(route.cat?'/'+encodeURIComponent(route.cat):'');
  if(route.type==='doll')return '#doll/'+encodeURIComponent(route.id);
  if(route.type==='chapter')return '#chapter/'+encodeURIComponent(route.category)+':'+encodeURIComponent(route.id);
@@ -79,6 +80,7 @@ function parseRoute(){
  try{
   if(raw.startsWith('ep/'))return {type:'episode',id:decodeURIComponent(raw.slice(3))};
   if(raw==='dolls')return {type:'dolls'};
+  if(raw==='tips'||raw.startsWith('tips/'))return {type:'tips',cat:raw.startsWith('tips/')?decodeURIComponent(raw.slice(5)):null};
   if(raw==='records'||raw.startsWith('records/'))return {type:'records',cat:raw.startsWith('records/')?decodeURIComponent(raw.slice(8)):null};
   if(raw.startsWith('doll/'))return {type:'doll',id:decodeURIComponent(raw.slice(5))};
   if(raw.startsWith('chapter/')){
@@ -132,6 +134,7 @@ async function restoreRoute(){
  }
  if(route.type==='dolls'){showDolls({push:false});return}
  if(route.type==='records'){showRecords({push:false,cat:route.cat});return}
+ if(route.type==='tips'){showTips({push:false,cat:route.cat});return}
  if(route.type==='doll'){showDoll(route.id,{push:false});return}
  if(route.type==='chapter'&&showChapter(route.id,route.category,{push:false}))return;
  showHome(route.category||null,{push:false,shelf:route.shelf||null});
@@ -616,6 +619,7 @@ function renderArchiveMenu(){
  const dollLink=el('button','archive-menu-link archive-menu-home archive-menu-dolls','인형 기록');dollLink.type='button';dollLink.onclick=()=>{closeArchiveMenu();$('#search').value='';showDolls()};host.append(dollLink);
  // v0.12.22 세계기록 목록
  const wrLink=el('button','archive-menu-link archive-menu-home archive-menu-dolls','세계기록');wrLink.type='button';wrLink.onclick=()=>{closeArchiveMenu();$('#search').value='';showRecords()};host.append(wrLink);
+ const tipLink=el('button','archive-menu-link archive-menu-home archive-menu-dolls','로딩 팁');tipLink.type='button';tipLink.onclick=()=>{closeArchiveMenu();$('#search').value='';showTips()};host.append(tipLink);
 }
 $('#menuBtn').onclick=()=>{const menu=$('#archiveMenu');if(!menu.classList.contains('open')){renderArchiveMenu();menu.classList.add('open');menu.removeAttribute('aria-hidden');$('#menuBtn').setAttribute('aria-expanded','true');$('#menuBtn').classList.add('is-open')}else closeArchiveMenu()};
 $('#archiveMenuClose').onclick=closeArchiveMenu;
@@ -1235,6 +1239,48 @@ function renderRecords(){
    if(r.src==='ko'&&dataLang()!=='ko')top.append(el('span','wr-src','한국어 원문'));
    const body=el('div','wr-body');body.append(el('strong','wr-name',r.name),el('small','wr-desc',cleanTags(r.description).replace(/\s+/g,' ')));
    b.append(top,body);b.onclick=()=>openLore(r.name,r.description);list.append(b);
+  }
+ };
+ sync();draw();
+}
+// ----- v0.12.22 로딩 팁 (#tips) — 글만 (배경 그림 없음) -----
+const TIP_GROUPS=[['all','전체'],['doll','인형'],['sector','섹터'],['etc','그 외']];
+let tipData=null,tipCat=get('tipCat','all'),tipQuery='';
+async function showTips({push=true,cat=null}={}){
+ const tok=++routeToken;showOnly('dollView');bgmLeave();voiceStop();closeArchiveMenu();$('#crumb').textContent='로딩 팁';
+ if(cat&&TIP_GROUPS.some(([g])=>g===cat))tipCat=cat;
+ if(push)saveRoute({type:'tips',cat:tipCat==='all'?null:tipCat});
+ const host=$('#dollView');host.replaceChildren(el('p','loading-note','로딩 팁을 불러오는 중…'));window.scrollTo(0,0);
+ try{if(!tipData)tipData=await fetchJSON(dataPath('loading_tips.json'))}catch(e){if(tok===routeToken)host.replaceChildren(error('로딩 팁을 불러오지 못했어요. ('+e.message+')'));return}
+ if(tok===routeToken)renderTips();
+}
+function renderTips(){
+ const host=$('#dollView');host.replaceChildren();
+ const all=tipData.tips||[];
+ const head=el('div','doll-list-head');const t=el('div');t.append(el('div','eyebrow','DATABASE / LOADING TIPS'),el('h2','','로딩 팁'));head.append(t);
+ const count=el('span','section-sub');head.append(count);host.append(head);
+ const bar=el('div','doll-controls wr-controls');const tabs=el('div','wr-tabs');tabs.setAttribute('role','tablist');tabs.setAttribute('aria-label','로딩 팁 분류');
+ const btns=[];
+ for(const [g,name] of TIP_GROUPS){
+  const n=g==='all'?all.length:all.filter(x=>x.group===g).length;if(!n)continue;
+  const b=el('button','cat-tab wr-tab');b.type='button';b.setAttribute('role','tab');b.append(el('span','',name),el('span','wr-tab-n',String(n)));
+  b.onclick=()=>{tipCat=g;set('tipCat',g);history.replaceState(history.state,'',location.pathname+location.search+routeHash({type:'tips',cat:g==='all'?null:g}));sync();draw()};
+  btns.push([g,b]);tabs.append(b);
+ }
+ const sync=()=>btns.forEach(([g,b])=>{b.classList.toggle('selected',g===tipCat);b.setAttribute('aria-selected',String(g===tipCat))});
+ const sw=el('label','doll-ctl doll-search-wrap');sw.append(el('span','doll-ctl-label','기록 찾기'));
+ const sbox=el('span','doll-search');const si=el('input');si.type='search';si.placeholder='이름 · 내용';si.value=tipQuery;si.setAttribute('aria-label','로딩 팁 찾기');si.autocomplete='off';
+ si.oninput=()=>{tipQuery=si.value;draw()};sbox.append(el('span','doll-search-prompt','//:_'),si);sw.append(sbox);
+ bar.append(tabs,sw);const list=el('div','wr-list tip-list');host.append(bar,list);
+ const draw=()=>{
+  const q=dnorm(tipQuery);
+  const rows=all.filter(x=>(tipCat==='all'||x.group===tipCat)&&(!q||dnorm(x.title).includes(q)||dnorm(x.text).includes(q)));
+  count.textContent=rows.length+'개';list.replaceChildren();
+  if(!rows.length){list.append(el('p','loading-note',q?'「'+tipQuery.trim()+'」에 맞는 기록이 없어요.':'기록이 없어요.'));return}
+  for(const x of rows){
+   const c=el('div','wr-card tip-card');const top=el('div','wr-card-top');top.append(el('span','wr-no',String(x.id).padStart(2,'0')));
+   const body=el('div','wr-body');body.append(el('strong','wr-name tip-title',x.title));body.append(el('p','tip-text',cleanTags(x.text)));
+   c.append(top,body);list.append(c);
   }
  };
  sync();draw();
