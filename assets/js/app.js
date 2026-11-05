@@ -70,6 +70,7 @@ function routeHash(route){
  if(route.type==='dolls')return '#dolls';
  if(route.type==='record')return '#record/'+encodeURIComponent(route.id);
  if(route.type==='item')return '#item/'+encodeURIComponent(route.id);
+ if(route.type==='dorm')return '#dorm/'+encodeURIComponent(route.id);
  if(route.type==='items')return '#items'+(route.cat?'/'+encodeURIComponent(route.cat):'');
  if(route.type==='tips')return '#tips'+(route.cat?'/'+encodeURIComponent(route.cat):'');
  if(route.type==='records')return '#records'+(route.cat?'/'+encodeURIComponent(route.cat):'');
@@ -85,6 +86,7 @@ function parseRoute(){
   if(raw==='dolls')return {type:'dolls'};
   if(raw.startsWith('record/'))return {type:'record',id:decodeURIComponent(raw.slice(7))};
   if(raw.startsWith('item/'))return {type:'item',id:decodeURIComponent(raw.slice(5))};
+  if(raw.startsWith('dorm/'))return {type:'dorm',id:decodeURIComponent(raw.slice(5))};
   if(raw==='items'||raw.startsWith('items/'))return {type:'items',cat:raw.startsWith('items/')?decodeURIComponent(raw.slice(6)):null};
   if(raw==='tips'||raw.startsWith('tips/'))return {type:'tips',cat:raw.startsWith('tips/')?decodeURIComponent(raw.slice(5)):null};
   if(raw==='records'||raw.startsWith('records/'))return {type:'records',cat:raw.startsWith('records/')?decodeURIComponent(raw.slice(8)):null};
@@ -153,6 +155,7 @@ async function restoreRoute(){
  if(route.type==='dolls'){await showDolls({push:false});return}
  if(route.type==='record'){await showRecord(route.id,{push:false});return}
  if(route.type==='item'){await showItem(route.id,{push:false});return}
+ if(route.type==='dorm'){await showDormTheme(route.id,{push:false});return}
  if(route.type==='records'){await showRecords({push:false,cat:route.cat});return}
  if(route.type==='tips'){await showTips({push:false,cat:route.cat});return}
  if(route.type==='items'){await showItems({push:false,cat:route.cat});return}
@@ -357,7 +360,7 @@ function renderSearch(q,host){
  if(show('doll')&&ex.dolls.length){any=true;const sec=searchSection(host,'인형',ex.dolls.length);const g=el('div','doll-grid');ex.dolls.slice(0,searchKind==='doll'?99:8).forEach(d=>g.append(dollCard(d)));sec.append(g)}
  if(show('item')&&ex.items.length){any=true;const sec=searchSection(host,'아이템',ex.items.length);const list=el('div','search-episodes');
   const lim=searchKind==='item'?200:12;
-  ex.items.slice(0,lim).forEach(o=>{const b=el('button','search-ep search-item');b.type='button';b.append(itemIcon(o.icon,'sm'));const t=el('span','search-item-text');t.append(el('small','',o.kind==='furn'?'숙소':(ITEM_PAGES.find(([pg])=>pg===o.page)||[,''])[1]),el('strong','',o.name));b.append(t);b.onclick=()=>showItem(o.id);list.append(b)});
+  ex.items.slice(0,lim).forEach(o=>{const b=el('button','search-ep search-item');b.type='button';b.append(itemIcon(o.icon,'sm'));const t=el('span','search-item-text');t.append(el('small','',o.kind==='furn'?'숙소':(ITEM_PAGES.find(([pg])=>pg===itemTab(o))||[,''])[1]),el('strong','',o.name));b.append(t);b.onclick=()=>showItem(o.id);list.append(b)});
   if(ex.items.length>lim)list.append(el('p','search-hint','앞의 '+lim+'건만 보여 줍니다. 「아이템」 필터를 누르면 더 볼 수 있어요.'));sec.append(list)}
  if(show('record')&&ex.recs.length){any=true;const sec=searchSection(host,'시계 기록',ex.recs.length);const list=el('div','search-episodes');const tn=new Map((wrData.types||[]).map(t=>[t.id,t.name]));
   ex.recs.forEach(r=>{const b=el('button','search-ep');b.type='button';b.append(el('small','',tn.get(r.type)||''),el('strong','',r.name));b.onclick=()=>r.type===7?showRecord(r.id):openLore(r.name,r.description,r.id);list.append(b)});sec.append(list)}
@@ -573,7 +576,12 @@ function renderLanding(host){
  ext.append(chips);host.append(ext);
  // 공지 (리스트)
  const notice=landingCard('home-notice','공지','menu');const list=el('div','notice-list');
- const notices=sortedNotices();
+ // v1.3 업데이트 공지는 가장 최신 하나만 목록에, 지난 것은 오른쪽 위 「이전 기록」에서
+ const allN=sortedNotices(),updates=allN.filter(n=>n.kind==='update');
+ const notices=allN.filter(n=>n.kind!=='update'||n===updates[0]);
+ if(updates.length>1){const b=el('button','notice-history');b.type='button';b.append(document.createTextNode('이전 기록'),el('span','wr-tab-n',String(updates.length-1)));
+  b.onclick=()=>openInfo({title:'업데이트 기록',items:updates.slice(1).map(n=>({title:[noticeDate(n),n.title].filter(Boolean).join(' · '),lines:n.lines||[]}))});
+  notice.querySelector('.home-card-head').append(b)}
  if(!notices.length)list.append(el('p','bm-empty',siteInfo?'등록된 공지가 없습니다.':'공지를 불러오는 중…'));
  for(const n of notices){const b=el('button','notice-row'+(n.pinned?' pinned':''));b.type='button';b.append((()=>{const s=el('span','notice-pin');if(n.pinned)s.append(ic('pin'));return s})(),el('span','notice-date',noticeDate(n)),el('span','notice-title',n.title||''));b.onclick=()=>openNotice(n);list.append(b)}
  notice.append(list);
@@ -588,7 +596,7 @@ function renderLanding(host){
  side.append(pagedCard('home-other',[['외부 URL',sites],['피드백 · 연락처',fbPage]]));
  wrap.append(notice,cal,side);host.append(wrap);
 }
-function sortedNotices(){return [...(siteInfo?.notices||[])].sort((a,b)=>(b.pinned===true)-(a.pinned===true)||String(b.date||'').localeCompare(String(a.date||'')))}
+function sortedNotices(){return (siteInfo?.notices||[]).map((n,i)=>[n,i]).sort(([a,i],[b,j])=>(b.pinned===true)-(a.pinned===true)||String(b.date||'').localeCompare(String(a.date||''))||i-j).map(([n])=>n)}
 function openNotice(n){openInfo({title:n.title,items:[{title:noticeDate(n),lines:n.lines||[]}]});if(n.popup){const box=el('div','popup-links');box.append(...feedbackLinks());$('#infoBody').append(box)}}
 // v0.12.22 팝업 공지 (popup:true): 공지마다 한 번만, 첫 방문 창이 있으면 그 창을 닫은 뒤에
 function maybePopup(){
@@ -681,6 +689,8 @@ function renderArchiveMenu(){
   arrow.onclick=()=>{const ex=row.classList.toggle('expanded');arrow.setAttribute('aria-expanded',String(ex))};
   fill(inner);line.append(label,arrow);row.append(line,children);return row;
  };
+ // v1.3 메뉴: 홈 / 기록 열람(전체 기록 ▶ · 인형 기록) / 자료실(시계 기록 ▶ · 로딩 팁 · 아이템)
+ host.append(el('div','archive-menu-section','기록 열람'));
  const allRow=foldRow('전체 기록',()=>{closeArchiveMenu();$('#search').value='';showHome('all')},inner=>{
   for(const [id,name] of storyCategories.filter(([id])=>id!=='all')){
    inner.append(foldRow(name,()=>{closeArchiveMenu();showHome(id)},box=>{
@@ -691,9 +701,10 @@ function renderArchiveMenu(){
  host.append(allRow);
  // v0.10.0 인형 기록
  const dollLink=el('button','archive-menu-link archive-menu-home archive-menu-dolls','인형 기록');dollLink.type='button';dollLink.onclick=()=>{closeArchiveMenu();$('#search').value='';showDolls()};host.append(dollLink);
- // v1.2 자료실 묶음: 시계 기록 · 로딩 팁 · 아이템
  host.append(el('div','archive-menu-section','자료실'));
- const wrLink=el('button','archive-menu-link archive-menu-home archive-menu-dolls','시계 기록');wrLink.type='button';wrLink.onclick=()=>{closeArchiveMenu();$('#search').value='';showRecords()};host.append(wrLink);
+ const recFill=box=>{const put=()=>{box.replaceChildren();for(const t of (wrData?.types||[]).filter(t=>t.id)){const n=(wrData.records||[]).filter(r=>r.type===t.id).length;if(!n)continue;const link=el('button','archive-menu-chapter',t.name);link.type='button';link.onclick=()=>{closeArchiveMenu();$('#search').value='';showRecords({cat:String(t.id)})};box.append(link)}};
+  if(wrData)put();else loadRecords().then(put).catch(()=>{})};
+ host.append(foldRow('시계 기록',()=>{closeArchiveMenu();$('#search').value='';showRecords({cat:'0'})},recFill,'archive-menu-top'));
  const tipLink=el('button','archive-menu-link archive-menu-home archive-menu-dolls','로딩 팁');tipLink.type='button';tipLink.onclick=()=>{closeArchiveMenu();$('#search').value='';showTips()};host.append(tipLink);
  const itemLink=el('button','archive-menu-link archive-menu-home archive-menu-dolls','아이템');itemLink.type='button';itemLink.onclick=()=>{closeArchiveMenu();$('#search').value='';showItems()};host.append(itemLink);
 }
@@ -1416,7 +1427,8 @@ function renderTips(){
 }
 // ----- v0.12.22 아이템 (#items) — 게임 창고 분류 -----
 // 그림: site_info.home.itemIconBase (Cloudflare 별도 프로젝트) + <icon 이름>.webp. 주소가 없거나 그림이 없으면 글만
-const ITEM_PAGES=[[0,'전체'],[2,'기본 아이템'],[3,'소모 아이템'],[5,'육성재료'],[6,'공장재료'],[7,'기념품'],[100,'숙소']];
+const ITEM_PAGES=[[0,'전체'],[2,'기본 아이템'],[3,'소모 아이템'],[8,'알고리즘'],[9,'돌파 위젯'],[5,'육성재료'],[6,'공장재료'],[7,'기념품'],[10,'이벤트 보상'],[100,'숙소']];
+const EVENT_TAB=10,itemTab=o=>o.tab??o.page;
 const DORM=100;let furnData=null,dormView=get('dormView','cat')==='theme'?'theme':'cat',dormCat=0;
 const loadFurniture=()=>furnData?Promise.resolve(furnData):fetchJSON(dataPath('furniture.json')).then(d=>furnData=d);
 let itemData=null,itemCat=+get('itemCat',0)||0,itemQuery='';
@@ -1435,9 +1447,10 @@ async function showItems({push=true,cat=null}={}){
  try{await Promise.all([loadItems(),loadFurniture().catch(()=>null),loadDollIndex().catch(()=>null)])}catch(e){if(tok===routeToken)host.replaceChildren(error('아이템을 불러오지 못했어요. ('+e.message+')'));return}
  if(tok===routeToken)renderItems();
 }
+const openGroups=new Set();
 function renderItems(){
  const host=$('#dollView');host.replaceChildren();
- const all=itemData.items||[],refs=itemData.refs||{},byId=new Map(all.map(o=>[o.id,o]));
+ const all=itemData.items||[],refs=itemData.refs||{},groups=itemData.groups||{},byId=new Map(all.map(o=>[o.id,o]));
  if(!ITEM_PAGES.some(([pg])=>pg===itemCat)||(itemCat===DORM&&!furnData))itemCat=0;
  const ref=id=>byId.get(id)||refs[String(id)]||{name:String(id)};
  const head=el('div','doll-list-head');const t=el('div');t.append(el('div','eyebrow','DATABASE / ITEMS'),el('h2','','아이템'));head.append(t);
@@ -1445,7 +1458,7 @@ function renderItems(){
  const bar=el('div','doll-controls wr-controls');const tabs=el('div','wr-tabs');tabs.setAttribute('role','tablist');tabs.setAttribute('aria-label','아이템 분류');
  const btns=[];
  for(const [pg,name] of ITEM_PAGES){
-  const n=pg===DORM?(furnData?.items||[]).length:pg===0?all.length:all.filter(o=>o.page===pg).length;if(!n)continue;
+  const n=pg===DORM?(furnData?.items||[]).length:pg===0?all.length:all.filter(o=>itemTab(o)===pg).length;if(!n)continue;
   const b=el('button','cat-tab wr-tab'+(pg===DORM?' wr-tab-dorm':''));b.type='button';b.setAttribute('role','tab');b.append(el('span','',name),el('span','wr-tab-n',String(n)));
   b.onclick=()=>{itemCat=pg;set('itemCat',pg);history.replaceState(history.state,'',location.pathname+location.search+routeHash({type:'items',cat:pg?String(pg):null}));sync();draw()};
   btns.push([pg,b]);tabs.append(b);
@@ -1456,38 +1469,74 @@ function renderItems(){
  si.oninput=()=>{itemQuery=si.value;draw()};sbox.append(el('span','doll-search-prompt','//:_'),si);sw.append(sbox);
  bar.append(tabs,sw);const list=el('div','item-list');host.append(bar,list);
  const opened=new Set();
+ // 펼치기 단추 (구성품 · 선택 가능 · 폴더 · 이벤트별 설명 공용)
+ const toggle=(card,key,label,n,fill,set_=opened)=>{
+  const tg=el('button','item-toggle');tg.type='button';tg.setAttribute('aria-expanded',String(set_.has(key)));
+  tg.append(el('span','',label),el('span','wr-tab-n',String(n)),ic('right','tri'));
+  const panel=el('div','item-panel');
+  const go=on=>{card.classList.toggle('open',on);tg.setAttribute('aria-expanded',String(on));if(on&&!panel.childNodes.length)fill(panel)};
+  tg.onclick=()=>{const on=!card.classList.contains('open');go(on);if(on)set_.add(key);else set_.delete(key)};
+  card.append(tg,panel);if(set_.has(key))go(true);
+ };
+ const chips=(panel,ids)=>{const box=el('div','item-contents');for(const [id,n] of ids){const r=ref(id);const c=el('span','item-chip');c.append(itemIcon(r.icon,'sm'),el('span','item-chip-name',r.name));if(n>0)c.append(el('span','item-chip-n','×'+n));box.append(c)}panel.append(box)};
+ const srcLine=(body,text)=>{const src=el('p','item-src');src.append(el('span','item-src-label','획득처'),el('span','item-src-text',cleanTags(text)));body.append(src)};
+ const fanLines=(body,id)=>{const fans=giftFans(id);
+  for(const [k,label] of [[0,'좋아함'],[1,'싫어함']]){if(!fans[k].length)continue;const row=el('p','item-src item-fans');row.append(el('span','item-src-label',label));const names=el('span','item-src-text');
+   fans[k].forEach((d,i)=>{if(i)names.append(document.createTextNode(', '));const a=el('button','fan-link',d.name);a.type='button';a.onclick=()=>showDoll(d.voiceKey);names.append(a)});row.append(names);body.append(row)}};
+ const boxToggle=(card,o)=>{const cont=o.contents||[],opts=o.options||[];
+  if(cont.length)toggle(card,o.id,'구성품',cont.length,p=>chips(p,cont));
+  else if(opts.length)toggle(card,o.id,'선택 가능',opts.length,p=>chips(p,opts.map(id=>[id,0])))};
+ const shell=(o,ids,cls)=>{const card=el('div','item-card'+(cls?' '+cls:'')+(o.quality?' q'+o.quality:''));card.dataset.ids=ids.join(' ');card.append(linkBtn('#item/'+o.id,o.name));
+  const main=el('div','item-main');main.append(itemIcon(o.icon));const body=el('div','item-body');main.append(body);card.append(main);return [card,body]};
+ const itemCard=o=>{const [card,body]=shell(o,[o.id]);body.append(el('strong','item-name',o.name));
+  if(o.desc)body.append(el('p','item-desc',cleanTags(o.desc)));if(o.source)srcLine(body,o.source);fanLines(body,o.id);boxToggle(card,o);return card};
+ // 이름 · 아이콘이 같은 아이템: 카드 하나, 획득처 모으기, 설명이 다르면 이벤트별로
+ const mergedCard=ms=>{const o=ms[0];const [card,body]=shell(o,ms.map(m=>m.id),'item-merged');
+  const nm=el('strong','item-name',o.name);body.append(nm,el('span','item-badge','×'+ms.length));
+  const descs=[...new Set(ms.map(m=>m.desc||''))];
+  if(descs.length===1&&descs[0])body.append(el('p','item-desc',cleanTags(descs[0])));
+  const srcs=[...new Set(ms.map(m=>m.source).filter(Boolean))];
+  if(srcs.length){const src=el('div','item-src item-src-list');src.append(el('span','item-src-label','획득처'));const ul=el('ul','item-src-text');srcs.forEach(x=>ul.append(el('li','',cleanTags(x))));src.append(ul);body.append(src)}
+  if(descs.length>1)toggle(card,'d'+o.id,'이벤트별 설명',ms.length,p=>{for(const m of ms){const b=el('div','item-variant');b.append(el('small','',cleanTags(m.source||'')),el('p','item-desc',cleanTags(m.desc||'')));p.append(b)}});
+  else boxToggle(card,o);
+  return card};
+ // 폴더: 같은 종류(위젯 등급 · 인증키 · 검색 지령 …) 를 카드 하나에
+ const folderCard=(g,ms)=>{const o=ms[0];const [card,body]=shell({...o,name:groups[g]?.title||o.name},ms.map(m=>m.id),'item-folder');
+  body.append(el('strong','item-name',groups[g]?.title||o.name),el('span','item-badge',ms.length+'개'));
+  body.append(el('p','item-desc item-folder-names',ms.map(m=>m.name).join(' · ')));
+  toggle(card,g,'펼치기',ms.length,p=>{const gl=el('div','item-list item-sub');ms.forEach(m=>gl.append(itemCard(m)));p.append(gl)},openGroups);
+  return card};
+ const grouped=(box,rows)=>{
+  const grid=el('div','item-list'),seen=new Set(),evs=[];
+  for(const o of rows){
+   const g=o.grp;if(!g){grid.append(itemCard(o));continue}
+   if(seen.has(g))continue;seen.add(g);const ms=rows.filter(x=>x.grp===g),kind=groups[g]?.kind;
+   if(kind==='merge')grid.append(ms.length>1?mergedCard(ms):itemCard(ms[0]));
+   else if(kind==='event')evs.push([g,ms]);
+   else grid.append(ms.length>1?folderCard(g,ms):itemCard(ms[0]));
+  }
+  if(grid.childNodes.length)box.append(grid);
+  if(evs.length){const acc=el('div','wr-long ev-list');
+   for(const [g,ms] of evs){const item=el('section','wr-long-item');const h=el('button','wr-long-btn');h.type='button';
+    const nm=el('span','wr-long-title');nm.append(el('strong','',groups[g]?.title||''));h.append(nm,el('span','wr-long-len',ms.length+'개'),ic('right','tri'));
+    const panel=el('div','wr-long-panel');const fill=()=>{if(panel.childNodes.length)return;const gl=el('div','item-list ev-items');ms.forEach(m=>gl.append(itemCard(m)));panel.append(gl)};
+    const go=on=>{item.classList.toggle('open',on);h.setAttribute('aria-expanded',String(on));if(on)fill()};
+    h.onclick=()=>{const on=!item.classList.contains('open');go(on);if(on)openGroups.add(g);else openGroups.delete(g)};
+    if(openGroups.has(g))go(true);item.append(h,panel);acc.append(item)}
+   box.append(acc)}
+ };
  const draw=()=>{
   const q=dnorm(itemQuery);
   list.classList.toggle('dorm-mode',itemCat===DORM);
   if(itemCat===DORM){drawDorm(list,count,q);return}
-  const rows=all.filter(o=>(itemCat===0||o.page===itemCat)&&(!q||dnorm(o.name).includes(q)||dnorm(o.desc).includes(q)));
-  count.textContent=rows.length+'개';list.replaceChildren();
+  list.classList.add('dorm-mode');list.replaceChildren();
+  const rows=all.filter(o=>(itemCat===0||itemTab(o)===itemCat)&&(!q||dnorm(o.name).includes(q)||dnorm(o.desc).includes(q)));
+  count.textContent=rows.length+'개';
   if(!rows.length){list.append(el('p','loading-note',q?'「'+itemQuery.trim()+'」에 맞는 기록이 없어요.':'기록이 없어요.'));return}
-  for(const o of rows){
-   const card=el('div','item-card'+(o.quality?' q'+o.quality:''));card.dataset.id=o.id;card.append(linkBtn('#item/'+o.id,o.name));
-   const main=el('div','item-main');main.append(itemIcon(o.icon));
-   const body=el('div','item-body');body.append(el('strong','item-name',o.name));
-   if(o.desc)body.append(el('p','item-desc',cleanTags(o.desc)));
-   if(o.source){const src=el('p','item-src');src.append(el('span','item-src-label','획득처'),el('span','item-src-text',cleanTags(o.source)));body.append(src)}
-   const fans=giftFans(o.id);
-   for(const [k,label] of [[0,'좋아함'],[1,'싫어함']]){if(!fans[k].length)continue;const row=el('p','item-src item-fans');row.append(el('span','item-src-label',label));const names=el('span','item-src-text');
-    fans[k].forEach((d,i)=>{if(i)names.append(document.createTextNode(', '));const a=el('button','fan-link',d.name);a.type='button';a.onclick=()=>showDoll(d.voiceKey);names.append(a)});row.append(names);body.append(row)}
-   main.append(body);card.append(main);
-   // 랜덤 · 고정 상자 = 구성품(아이콘 · 이름 · 개수) / 선택형 상자 = 선택지(아이콘 · 이름)
-   const cont=o.contents||[],opts=o.options||[];
-   const pick=cont.length?['구성품',cont]:opts.length?['선택 가능',opts.map(id=>[id,0])]:null;
-   if(pick){
-    const [label,listIds]=pick;
-    const tg=el('button','item-toggle');tg.type='button';tg.setAttribute('aria-expanded',String(opened.has(o.id)));
-    tg.append(el('span','',label),el('span','wr-tab-n',String(listIds.length)),ic('right','tri'));
-    const panel=el('div','item-contents');
-    const fill=()=>{if(panel.childNodes.length)return;for(const [id,n] of listIds){const r=ref(id);const c=el('span','item-chip');c.append(itemIcon(r.icon,'sm'),el('span','item-chip-name',r.name));if(n>0)c.append(el('span','item-chip-n','×'+n));panel.append(c)}};
-    if(opened.has(o.id)){card.classList.add('open');fill()}
-    tg.onclick=()=>{const on=!card.classList.contains('open');card.classList.toggle('open',on);tg.setAttribute('aria-expanded',String(on));if(on){opened.add(o.id);fill()}else opened.delete(o.id)};
-    card.append(tg,panel);
-   }
-   list.append(card);
-  }
+  if(q){const grid=el('div','item-list');rows.forEach(o=>grid.append(itemCard(o)));list.append(grid);return}
+  if(itemCat!==0){grouped(list,rows);return}
+  for(const [pg,name] of ITEM_PAGES){if(!pg||pg===DORM)continue;const part=rows.filter(o=>itemTab(o)===pg);if(!part.length)continue;
+   const gh=el('div','doll-group-head');gh.append(el('h3','',name),el('span','doll-group-count',part.length+'개'));list.append(gh);grouped(list,part)}
  };
  sync();draw();focusItemCard();
 }
@@ -1507,60 +1556,67 @@ async function showItem(id,{push=true}={}){
  const it=(itemData.items||[]).find(o=>o.id===id),fu=(furnData?.items||[]).find(o=>o.id===id);
  if(!it&&!fu){await showItems({push});return}
  itemQuery='';focusItem=id;
- if(fu){itemCat=DORM;dormView='cat';dormCat=0}else itemCat=it.page;
+ if(fu){await showDormTheme(fu.themes?.[0]??'etc',{push:false});if(push)saveRoute({type:'item',id});focusItemCard();return}
+ itemCat=itemTab(it);if(it.grp)openGroups.add(it.grp);
  await showItems({push:false,cat:String(itemCat)});
  if(push)saveRoute({type:'item',id});
 }
 function focusItemCard(){
  if(focusItem==null)return;const id=focusItem;focusItem=null;
- const c=document.querySelector('.item-card[data-id="'+id+'"]');if(!c)return;
+ const cs=document.querySelectorAll('.item-card[data-ids~="'+id+'"]'),c=cs[cs.length-1];if(!c)return;
  c.scrollIntoView({block:'center'});c.classList.add('item-focus');setTimeout(()=>c.classList.remove('item-focus'),2400);
 }
 // 숙소(가구): [종류별 | 테마별]
-function furnCard(o,catName,themeName){
- const card=el('div','item-card furn-card'+(o.quality?' q'+o.quality:''));card.dataset.id=o.id;card.append(linkBtn('#item/'+o.id,o.name));
+function furnCard(o,catName,themeName,inTheme){
+ const card=el('div','item-card furn-card'+(o.quality?' q'+o.quality:''));card.dataset.ids=String(o.id);card.append(linkBtn('#item/'+o.id,o.name));
  const main=el('div','item-main');main.append(itemIcon(o.icon));
  const body=el('div','item-body');body.append(el('strong','item-name',o.name));
  const meta=[catName,o.comfort?'쾌적도 +'+o.comfort:'',o.size?o.size[0]+'×'+o.size[1]:''].filter(Boolean);
  if(meta.length){const m=el('span','furn-meta');meta.forEach((t,i)=>{if(i)m.append(document.createTextNode(' · '));m.append(el('span','',t))});body.append(m)}
  if(o.desc)body.append(el('p','item-desc',cleanTags(o.desc).trim()));
- if(o.themes?.length){const t=el('p','item-src');t.append(el('span','item-src-label','테마'),el('span','item-src-text',o.themes.map(themeName).join(', ')));body.append(t)}
+ if(o.themes?.length&&!inTheme){const t=el('p','item-src');t.append(el('span','item-src-label','테마'),el('span','item-src-text',o.themes.map(themeName).join(', ')));body.append(t)}
  if(o.source){const src=el('p','item-src');src.append(el('span','item-src-label','획득처'),el('span','item-src-text',cleanTags(o.source)));body.append(src)}
  main.append(body);card.append(main);return card;
 }
+// v1.3 숙소: 테마로만. 작은 폴더(이름 · 개수) → 누르면 테마 페이지 (#dorm/<id>). 테마 없는 가구는 「그 외 가구」
+const DORM_ETC='etc';
+function dormThemes(){const d=furnData||{items:[],themes:[]};const byId=new Map(d.items.map(o=>[o.id,o]));
+ const out=d.themes.map(t=>({id:String(t.id),name:t.name,info:t.info,pics:t.pics||[],items:t.items.map(i=>byId.get(i)).filter(Boolean)}));
+ const etc=d.items.filter(o=>!o.themes?.length);if(etc.length)out.push({id:DORM_ETC,name:'그 외 가구',info:'',pics:[],items:etc});
+ return out}
 function drawDorm(list,count,q){
- const d=furnData||{items:[],categories:[],themes:[]};
- const cats=new Map(d.categories.map(c=>[c.id,c.name])),ths=new Map(d.themes.map(t=>[t.id,t])),byId=new Map(d.items.map(o=>[o.id,o]));
- const themeName=id=>ths.get(id)?.name||String(id);
- const hit=o=>!q||dnorm(o.name).includes(q)||dnorm(o.desc).includes(q);
- const bar=el('div','dorm-bar');
- const views=el('div','dorm-views');
- for(const [v,name] of [['cat','종류별'],['theme','테마별']]){const b=el('button','dorm-view'+(dormView===v?' selected':''),name);b.type='button';b.onclick=()=>{dormView=v;set('dormView',v);drawDorm(list,count,q)};views.append(b)}
- bar.append(views);list.replaceChildren(bar);
- if(dormView==='cat'){
-  const chips=el('div','dorm-cats');
-  for(const [id,name] of [[0,'전체'],...d.categories.map(c=>[c.id,c.name])]){const n=id?d.items.filter(o=>o.cat===id).length:d.items.length;const b=el('button','dorm-cat'+(dormCat===id?' selected':''));b.type='button';b.append(el('span','',name),el('span','wr-tab-n',String(n)));b.onclick=()=>{dormCat=id;drawDorm(list,count,q)};chips.append(b)}
-  bar.append(chips);
-  const rows=d.items.filter(o=>(!dormCat||o.cat===dormCat)&&hit(o));count.textContent=rows.length+'개';
+ const d=furnData||{items:[],categories:[]};const cats=new Map(d.categories.map(c=>[c.id,c.name]));
+ list.replaceChildren();
+ if(q){const rows=d.items.filter(o=>dnorm(o.name).includes(q)||dnorm(o.desc).includes(q));count.textContent=rows.length+'개';
   const grid=el('div','item-list');list.append(grid);
-  if(!rows.length){grid.append(el('p','loading-note',q?'「'+itemQuery.trim()+'」에 맞는 기록이 없어요.':'기록이 없어요.'));return}
-  for(const o of rows)grid.append(furnCard(o,cats.get(o.cat),themeName));
-  return;
- }
- const box=el('div','wr-long');list.append(box);let shown=0;
- for(const t of d.themes){
-  const its=t.items.map(id=>byId.get(id)).filter(Boolean);
-  if(q&&!dnorm(t.name).includes(q)&&!its.some(hit))continue;shown++;
-  const item=el('section','wr-long-item');const h=el('button','wr-long-btn');h.type='button';h.setAttribute('aria-expanded','false');
-  const nm=el('span','wr-long-title');nm.append(el('strong','',t.name));h.append(nm,el('span','wr-long-len',its.length+'개'),ic('right','tri'));
-  const panel=el('div','wr-long-panel');
-  const fill=()=>{if(panel.childNodes.length)return;const inner=el('div','dorm-theme');if(t.info)inner.append(el('p','dorm-theme-info',cleanTags(t.info)));const g=el('div','item-list');its.forEach(o=>g.append(furnCard(o,cats.get(o.cat),themeName)));inner.append(g);panel.append(inner)};
-  if(q){item.classList.add('open');h.setAttribute('aria-expanded','true');fill()}
-  h.onclick=()=>{const on=!item.classList.contains('open');item.classList.toggle('open',on);h.setAttribute('aria-expanded',String(on));if(on)fill()};
-  item.append(h,panel);box.append(item);
- }
- count.textContent=shown+'세트';
- if(!shown)box.append(el('p','loading-note','「'+itemQuery.trim()+'」에 맞는 기록이 없어요.'));
+  if(!rows.length){grid.append(el('p','loading-note','「'+itemQuery.trim()+'」에 맞는 기록이 없어요.'));return}
+  const tn=new Map(d.themes.map(t=>[t.id,t.name]));rows.forEach(o=>grid.append(furnCard(o,cats.get(o.cat),id=>tn.get(id)||String(id))));return}
+ const ths=dormThemes();count.textContent=ths.length+'세트';
+ const grid=el('div','dorm-tiles');list.append(grid);
+ for(const t of ths){const b=el('button','dorm-tile'+(t.id===DORM_ETC?' dorm-tile-etc':''));b.type='button';
+  const ics=el('span','dorm-tile-ics');t.items.slice(0,4).forEach(o=>ics.append(itemIcon(o.icon,'sm')));
+  const tx=el('span','dorm-tile-text');tx.append(el('strong','',t.name),el('small','',t.items.length+'개'));
+  b.append(ics,tx);b.onclick=()=>showDormTheme(t.id);grid.append(b)}
+}
+async function showDormTheme(id,{push=true}={}){
+ const tok=++routeToken;showOnly('dollView');bgmLeave();voiceStop();closeArchiveMenu();
+ const host=$('#dollView');host.replaceChildren(el('p','loading-note','아이템을 불러오는 중…'));window.scrollTo(0,0);
+ try{await Promise.all([loadItems(),loadFurniture()])}catch(e){if(tok===routeToken)host.replaceChildren(error('아이템을 불러오지 못했어요. ('+e.message+')'));return}
+ if(tok!==routeToken)return;
+ const t=dormThemes().find(x=>x.id===String(id));if(!t){itemCat=DORM;await showItems({push});return}
+ if(push)saveRoute({type:'dorm',id:t.id});
+ $('#crumb').textContent='숙소 · '+t.name;host.replaceChildren();
+ const d=furnData;const cats=new Map(d.categories.map(c=>[c.id,c.name])),tn=new Map(d.themes.map(x=>[x.id,x.name]));
+ const back=el('button','folder-back');back.type='button';back.append(ic('left'),document.createTextNode(' 숙소'));
+ back.onclick=()=>{if(navCount>0)history.back();else{itemCat=DORM;showItems()}};
+ const head=el('div','record-head');const h=el('div');h.append(el('div','eyebrow','DORM / THEME'),el('h2','',t.name));head.append(h,linkBtn('#dorm/'+t.id,t.name));
+ host.append(back,head);
+ if(t.info)host.append(el('p','dorm-theme-info dorm-page-info',cleanTags(t.info)));
+ // 3D 프리셋 뷰 자리: site_info.home.dormPicBase 가 있으면 테마 그림(pics)을 띄움 (그림은 나중에)
+ const base=siteInfo?.home?.dormPicBase;
+ if(base&&t.pics.length){const pv=el('div','dorm-preview');t.pics.forEach(n=>{const im=el('img');im.alt='';im.loading='lazy';im.src=base.replace(/\/?$/,'/')+encodeURIComponent(n)+'.webp';im.onerror=()=>im.remove();pv.append(im)});host.append(pv)}
+ const sub=el('span','section-sub',t.items.length+'개');host.append(sub);
+ const grid=el('div','item-list dorm-page-list');t.items.forEach(o=>grid.append(furnCard(o,cats.get(o.cat),x=>tn.get(x)||String(x),t.id!==DORM_ETC)));host.append(grid);
 }
 // v1.2 프로필 선물 칸 → 아이템 (누르면 아이템 칸으로). 연결 정보가 있으면 그 순서 · 이름으로 다시 그림
 function giftLinks(w,vk,kind){loadItems().then(d=>{

@@ -26,6 +26,20 @@
    ]
   },
   {
+   "id": "2026-11-05-v1.3",
+   "date": "2026-11-05",
+   "title": "Update v1.3 · Item cleanup",
+   "lines": [
+    "Items now have \"Algorithms,\" \"Breakthrough Widgets,\" and \"Event Rewards\" tabs.",
+    "Breakthrough Widget boxes are grouped by grade, and Keycards, Search Commands, and Retraining Permits each have one folder.",
+    "Items with the same name and icon are merged into one card with all sources listed. If the description differs by event, see \"By event.\"",
+    "Event Rewards are split into one folder per event.",
+    "Skins inside boxes now show as \"Doll - Skin name.\"",
+    "Card spacing and sizes are now consistent."
+   ],
+   "kind": "update"
+  },
+  {
    "id": "2026-11-05-v1.2",
    "date": "2026-11-05",
    "title": "Update v1.2 · Library · Search filters",
@@ -36,7 +50,8 @@
     "Each record and item now has its own link. Use the share button on a card to copy it.",
     "Gift items show which Dolls like or dislike them, and gifts on Doll profiles link to the item.",
     "Self-select boxes show \"Choose one,\" and random boxes show their \"Contents.\""
-   ]
+   ],
+   "kind": "update"
   },
   {
    "id": "2026-11-05-v1.1",
@@ -50,7 +65,8 @@
     "Items › Dorm: browse 541 furniture pieces by type or by theme.",
     "Gift preferences (likes · dislikes) on Doll profiles now show item icons.",
     "All text is taken from each server's client. Please report errors through the feedback form."
-   ]
+   ],
+   "kind": "update"
   },
   {
    "id": "2026-10-30-welcome",
@@ -116,7 +132,8 @@
     "The user button at the top right shows your professor name, last record and bookmarks in one place.",
     "Settings include brightness, font, theme and language.",
     "Please report bugs through the feedback form."
-   ]
+   ],
+   "kind": "update"
   },
   {
    "id": "2026-10-22-update",
@@ -127,7 +144,8 @@
     "Search a character name to see the chapters they appear in most.",
     "You can also search occasions and themes like \"Valentine\" or \"Summer\".",
     "Fixed text looking too small on phones."
-   ]
+   ],
+   "kind": "update"
   },
   {
    "id": "guide",
@@ -168,7 +186,8 @@
     "Brightness and themes: Light · Dim · Dark (+ hidden themes)",
     "Reading modes: Normal · Easy-read",
     "Continue reading: remembers where you left off."
-   ]
+   ],
+   "kind": "update"
   }
  ],
  "home": {
