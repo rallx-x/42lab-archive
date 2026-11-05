@@ -1003,3 +1003,20 @@ button.doll-chip:hover{border-color:var(--accent)}
 .tip-card{min-height:0;background:var(--panel);border:1px solid var(--line)}
 .tip-title{font-size:12px;color:var(--sub);font-weight:700}
 .tip-text{margin:6px 0 0;line-height:1.75;font-size:14px;white-space:pre-line;overflow-wrap:anywhere}
+/* v0.12.22 시계 기록: 《》 긴 글은 펼쳐 보기 */
+.wr-records{display:flex;flex-direction:column}
+.wr-long-head{margin-top:30px}
+.wr-long{display:flex;flex-direction:column;gap:8px}
+.wr-long-item{background:var(--panel);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.wr-long-item.open{border-color:color-mix(in srgb,var(--accent) 45%,var(--line))}
+.wr-long-btn{width:100%;display:flex;align-items:center;gap:12px;text-align:left;border:0;border-radius:0;padding:15px 16px;background:none}
+.wr-long-title{flex:1;min-width:0;display:flex;align-items:baseline;gap:10px}
+.wr-long-title strong{font-size:15px;line-height:1.45}
+.wr-long-len{font-size:11px;color:var(--sub);white-space:nowrap}
+.wr-long-btn .tri{transition:transform .2s}
+.wr-long-item.open .wr-long-btn .tri{transform:rotate(90deg)}
+.wr-long-panel{display:none;border-top:1px solid var(--line)}
+.wr-long-item.open .wr-long-panel{display:block}
+.wr-long-text{padding:16px 20px 22px;font-size:var(--fs);line-height:var(--lh,1.8);white-space:pre-wrap;overflow-wrap:anywhere;max-width:760px}
+.wr-hl{color:color-mix(in srgb,var(--hl) 70%,var(--ink));font-weight:700}
+.wr-long-title .wr-no{flex:none;white-space:nowrap}

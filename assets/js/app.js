@@ -617,8 +617,8 @@ function renderArchiveMenu(){
  host.append(allRow);
  // v0.10.0 인형 기록
  const dollLink=el('button','archive-menu-link archive-menu-home archive-menu-dolls','인형 기록');dollLink.type='button';dollLink.onclick=()=>{closeArchiveMenu();$('#search').value='';showDolls()};host.append(dollLink);
- // v0.12.22 세계기록 목록
- const wrLink=el('button','archive-menu-link archive-menu-home archive-menu-dolls','세계기록');wrLink.type='button';wrLink.onclick=()=>{closeArchiveMenu();$('#search').value='';showRecords()};host.append(wrLink);
+ // v0.12.22 시계 기록 목록
+ const wrLink=el('button','archive-menu-link archive-menu-home archive-menu-dolls','시계 기록');wrLink.type='button';wrLink.onclick=()=>{closeArchiveMenu();$('#search').value='';showRecords()};host.append(wrLink);
  const tipLink=el('button','archive-menu-link archive-menu-home archive-menu-dolls','로딩 팁');tipLink.type='button';tipLink.onclick=()=>{closeArchiveMenu();$('#search').value='';showTips()};host.append(tipLink);
 }
 $('#menuBtn').onclick=()=>{const menu=$('#archiveMenu');if(!menu.classList.contains('open')){renderArchiveMenu();menu.classList.add('open');menu.removeAttribute('aria-hidden');$('#menuBtn').setAttribute('aria-expanded','true');$('#menuBtn').classList.add('is-open')}else closeArchiveMenu()};
@@ -1196,24 +1196,32 @@ function dollCard(d){
  const foot=el('span','doll-card-foot');foot.append(el('span','doll-stars',starText(d.stars)));info.append(foot);
  b.append(face,info);b.onclick=()=>showDoll(d.voiceKey);return b;
 }
-// ----- v0.12.22 세계기록 목록 (#records) -----
+// 게임 글의 <color=#..>…</color> 를 색 글자로 (나머지 꼬리표는 지움, innerHTML 쓰지 않음)
+function richText(parent,text){
+ const src=String(text||'').replace(/<cmdr>/gi,()=>nick());
+ const re=/<color=(#[0-9a-fA-F]{6,8})>([\s\S]*?)<\/color>/gi;let last=0,m;
+ const plain=t=>t.replace(/<\/?(?:color|i|b|size)(?:=[^>]*)?>/gi,'');
+ while((m=re.exec(src))){if(m.index>last)parent.append(document.createTextNode(plain(src.slice(last,m.index))));const sp=el('span','wr-hl',plain(m[2]));sp.style.setProperty('--hl',m[1].slice(0,7));parent.append(sp);last=re.lastIndex}
+ if(last<src.length)parent.append(document.createTextNode(plain(src.slice(last))));
+}
+// ----- v0.12.22 시계 기록 목록 (#records) -----
 let wrData=null,wrCat=get('wrCat',0),wrQuery='';
 const loadRecords=()=>wrData?Promise.resolve(wrData):fetchJSON(dataPath('world_records.json')).then(d=>wrData=d);
 async function showRecords({push=true,cat=null}={}){
- const tok=++routeToken;showOnly('dollView');bgmLeave();voiceStop();closeArchiveMenu();$('#crumb').textContent='세계기록';
+ const tok=++routeToken;showOnly('dollView');bgmLeave();voiceStop();closeArchiveMenu();$('#crumb').textContent='시계 기록';
  if(cat!=null&&/^\d+$/.test(cat))wrCat=+cat;
  if(push)saveRoute({type:'records',cat:wrCat?String(wrCat):null});
- const host=$('#dollView');host.replaceChildren(el('p','loading-note','세계기록을 불러오는 중…'));window.scrollTo(0,0);
- try{await loadRecords()}catch(e){if(tok===routeToken)host.replaceChildren(error('세계기록을 불러오지 못했어요. ('+e.message+')'));return}
+ const host=$('#dollView');host.replaceChildren(el('p','loading-note','시계 기록을 불러오는 중…'));window.scrollTo(0,0);
+ try{await loadRecords()}catch(e){if(tok===routeToken)host.replaceChildren(error('시계 기록을 불러오지 못했어요. ('+e.message+')'));return}
  if(tok===routeToken)renderRecords();
 }
 function renderRecords(){
  const host=$('#dollView');host.replaceChildren();
  const all=wrData.records||[],types=wrData.types||[],tname=new Map(types.map(t=>[t.id,t.name]));
  if(!types.some(t=>t.id===wrCat&&(t.id===0||all.some(r=>r.type===t.id))))wrCat=0;
- const head=el('div','doll-list-head');const t=el('div');t.append(el('div','eyebrow','DATABASE / WORLD RECORDS'),el('h2','','세계기록'));head.append(t);
+ const head=el('div','doll-list-head');const t=el('div');t.append(el('div','eyebrow','DATABASE / PERCEPTION RECORDS'),el('h2','','시계 기록'));head.append(t);
  const count=el('span','section-sub');head.append(count);host.append(head);
- const bar=el('div','doll-controls wr-controls');const tabs=el('div','wr-tabs');tabs.setAttribute('role','tablist');tabs.setAttribute('aria-label','세계기록 분류');
+ const bar=el('div','doll-controls wr-controls');const tabs=el('div','wr-tabs');tabs.setAttribute('role','tablist');tabs.setAttribute('aria-label','시계 기록 분류');
  const tabBtns=[];
  for(const ty of types){
   const n=ty.id===0?all.length:all.filter(r=>r.type===ty.id).length;if(!n)continue;
@@ -1223,22 +1231,41 @@ function renderRecords(){
  }
  const sync=()=>tabBtns.forEach(([id,b])=>{b.classList.toggle('selected',id===wrCat);b.setAttribute('aria-selected',String(id===wrCat))});
  const sw=el('label','doll-ctl doll-search-wrap');sw.append(el('span','doll-ctl-label','기록 찾기'));
- const sbox=el('span','doll-search');const si=el('input');si.type='search';si.placeholder='이름 · 내용';si.value=wrQuery;si.setAttribute('aria-label','세계기록 찾기');si.autocomplete='off';
+ const sbox=el('span','doll-search');const si=el('input');si.type='search';si.placeholder='이름 · 내용';si.value=wrQuery;si.setAttribute('aria-label','시계 기록 찾기');si.autocomplete='off';
  si.oninput=()=>{wrQuery=si.value;draw()};sbox.append(el('span','doll-search-prompt','//:_'),si);sw.append(sbox);
  bar.append(tabs,sw);
- const list=el('div','wr-list');host.append(bar,list);
+ const list=el('div','wr-records');host.append(bar,list);
+ // 《》 긴 글(분류 7 시계기록)은 카드와 나눠서, 하나씩 펼쳐 보는 줄로
+ const LONG=7,opened=new Set();
  const draw=()=>{
   const q=dnorm(wrQuery);
   const rows=all.filter(r=>(wrCat===0||r.type===wrCat)&&(!q||dnorm(r.name).includes(q)||dnorm(r.description).includes(q)));
   count.textContent=rows.length+'개';list.replaceChildren();
   if(!rows.length){list.append(el('p','loading-note',q?'「'+wrQuery.trim()+'」에 맞는 기록이 없어요.':'기록이 없어요.'));return}
-  for(const r of rows){
-   const b=el('button','wr-card');b.type='button';
-   const top=el('div','wr-card-top');top.append(el('span','wr-no',String(r.id).padStart(2,'0')));
-   if(wrCat===0&&tname.has(r.type))top.append(el('span','wr-type',tname.get(r.type)));
-   if(r.src==='ko'&&dataLang()!=='ko')top.append(el('span','wr-src','한국어 원문'));
-   const body=el('div','wr-body');body.append(el('strong','wr-name',r.name),el('small','wr-desc',cleanTags(r.description).replace(/\s+/g,' ')));
-   b.append(top,body);b.onclick=()=>openLore(r.name,r.description);list.append(b);
+  const short=rows.filter(r=>r.type!==LONG),long=rows.filter(r=>r.type===LONG);
+  if(short.length){const grid=el('div','wr-list');list.append(grid);
+   for(const r of short){
+    const b=el('button','wr-card');b.type='button';
+    const top=el('div','wr-card-top');top.append(el('span','wr-no',String(r.id).padStart(2,'0')));
+    if(wrCat===0&&tname.has(r.type))top.append(el('span','wr-type',tname.get(r.type)));
+    if(r.src==='ko'&&dataLang()!=='ko')top.append(el('span','wr-src','한국어 원문'));
+    const body=el('div','wr-body');body.append(el('strong','wr-name',r.name),el('small','wr-desc',cleanTags(r.description).replace(/\s+/g,' ')));
+    b.append(top,body);b.onclick=()=>openLore(r.name,r.description);grid.append(b);
+   }}
+  if(long.length){
+   if(short.length){const gh=el('div','doll-group-head wr-long-head');gh.append(el('h3','wr-body',tname.get(LONG)||''),el('span','doll-group-count',long.length+'개'));list.append(gh)}
+   const box=el('div','wr-long');list.append(box);
+   for(const r of long){
+    const item=el('section','wr-long-item'+(opened.has(r.id)?' open':''));
+    const h=el('button','wr-long-btn');h.type='button';h.setAttribute('aria-expanded',String(opened.has(r.id)));
+    const nm=el('span','wr-body wr-long-title');nm.append(el('span','wr-no',String(r.id).padStart(2,'0')),el('strong','',r.name));
+    h.append(nm,el('span','wr-long-len',r.description.length.toLocaleString(window.UI_LOCALE||'ko-KR')+'자'),ic('right','tri'));
+    const panel=el('div','wr-long-panel');
+    const fill=()=>{if(!panel.childNodes.length){const txt=el('div','wr-body wr-long-text');richText(txt,r.description);panel.append(txt)}};
+    if(opened.has(r.id))fill();
+    h.onclick=()=>{const on=!item.classList.contains('open');item.classList.toggle('open',on);h.setAttribute('aria-expanded',String(on));if(on){opened.add(r.id);fill()}else opened.delete(r.id)};
+    item.append(h,panel);box.append(item);
+   }
   }
  };
  sync();draw();
