@@ -212,6 +212,9 @@ const D=[
 ['기록 찾기 분류','記録検索の分類','Search categories','搜尋分類','搜索分类'],
 ['자료실','資料室','Library','資料室','资料室'],
 ['바로가기','クイックアクセス','Quick Access','快速前往','快速前往'],
+['모두 펼치기','すべて開く','Expand all','全部展開','全部展开'],
+['프로필','プロフィール','Profile','檔案','档案'],
+['모두 접기','すべて閉じる','Collapse all','全部收合','全部收起'],
 ['게임 속 세계 기록 · 장문 기록','ゲーム内の世界記録 · 長文記録','In-game world records · long records','遊戲內的世界紀錄 · 長篇紀錄','游戏内的世界记录 · 长篇记录'],
 ['로딩 화면에 나오는 인형 · 섹터 팁','ロード画面の人形 · セクターTIPS','Doll and sector tips from loading screens','載入畫面的人形 · 區域提示','加载画面的人形 · 区域提示'],
 ['창고 · 숙소 가구 · 이벤트 보상','倉庫 · 寮の家具 · イベント報酬','Warehouse · dorm furniture · event rewards','倉庫 · 宿舍家具 · 活動獎勵','仓库 · 宿舍家具 · 活动奖励'],
@@ -436,7 +439,7 @@ function tr(s){
 window.L=s=>tr(s)??s;
 window.tr18n=tr;
 /* 이야기 본문은 건너뜀 */
-const SKIP='.arc-chip,.arma-name,.arma-nm,.arma-desc,.arma-trait-name,.arma-stat span,.skill-brief,.skill-detail,.skill-name,.item-folder-names,.item-variant,.search-tip p,.search-item-text strong,.fan-link,.item-name,.item-desc,.item-src-text,.wr-long-title,.dorm-theme-info,.item-chip-name,.wr-body,.tip-card,.wr-tab-name,.bubble,.center-item,.chat .name,.option,.choice-spoken,.voice-text,.doll-quote,.doll-career,.doll-story-body,.doll-chip,#stream .entry,#epTitle,#epDesc,#loreText,.notice-line,code,pre';
+const SKIP='.doll-mini-name,.doll-story-peek,.arc-chip,.arma-name,.arma-nm,.arma-desc,.arma-trait-name,.arma-stat span,.skill-brief,.skill-detail,.skill-name,.item-folder-names,.item-variant,.search-tip p,.search-item-text strong,.fan-link,.item-name,.item-desc,.item-src-text,.wr-long-title,.dorm-theme-info,.item-chip-name,.wr-body,.tip-card,.wr-tab-name,.bubble,.center-item,.chat .name,.option,.choice-spoken,.voice-text,.doll-quote,.doll-career,.doll-story-body,.doll-chip,#stream .entry,#epTitle,#epDesc,#loreText,.notice-line,code,pre';
 const ATTRS=['title','aria-label','placeholder','alt'];
 function skip(n){const e=n.nodeType===1?n:n.parentElement;return !e||!!e.closest(SKIP)}
 function doText(t){if(skip(t))return;const r=tr(t.nodeValue);if(r!=null&&r!==t.nodeValue)t.nodeValue=r}

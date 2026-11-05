@@ -1273,3 +1273,23 @@ button.doll-chip:hover{border-color:var(--accent)}
 .arc-chip{padding:6px 12px;border-radius:999px;font-size:13px}
 .archive-menu-section-link{display:block;width:calc(100% - 20px);text-align:left;background:none;border:0;cursor:pointer}
 .archive-menu-section-link:hover{text-decoration:underline}
+
+/* ===== v1.5.1 인형 이야기 접기 · 펼치기 ===== */
+.story-allbar{display:flex;justify-content:flex-end;margin:0 0 4px}
+.story-all{padding:6px 14px;border-radius:999px;font-size:12px}
+.doll-story.fold{padding:0}
+.doll-story.fold .doll-story-head{width:100%;display:flex;align-items:center;gap:8px;margin:0;padding:14px 4px;border:0;border-radius:0;background:none;text-align:left;cursor:pointer}
+.doll-story.fold .doll-story-head:hover{background:color-mix(in srgb,var(--accent) 5%,transparent)}
+.doll-story-peek{flex:1;min-width:0;color:var(--sub);font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.doll-story.open .doll-story-peek{visibility:hidden}
+.doll-story.fold .doll-story-head .tri{flex:none;font-size:10px;color:var(--sub);transition:transform .2s}
+.doll-story.open .doll-story-head .tri{transform:rotate(90deg)}
+.doll-story-fold{display:none;padding:0 4px 16px}
+.doll-story.open .doll-story-fold{display:block}
+
+/* ===== v1.5.1 목차를 위로 · [프로필] 칸 ===== */
+.doll-toc{margin-top:8px}
+.doll-mini{display:grid;gap:2px;margin:0 0 14px}
+.doll-mini[hidden]{display:none}
+.doll-mini-name{font-size:26px;line-height:1.2}
+.doll-toc-body>.doll-hero{margin-top:0}
