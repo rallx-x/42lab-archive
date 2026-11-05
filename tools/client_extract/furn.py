@@ -12,7 +12,8 @@ for lang,d in [('ko','out/configs'),('ja','out_jp/configs'),('en','out_en/config
         ids=[];seen=set()
         for x in map(int,re.findall(r'(72\d{4})',str(v['theme_coord']))):
             if x in fur and x not in seen:seen.add(x);ids.append(x)
-        themes.append({'id':k,'name':T(v['theme_name']),'info':T(v['theme_info']),'items':ids})
+        pics=[x for x in (v.get('theme_pic'),v.get('theme_pic2'),v.get('theme_pic3')) if isinstance(x,str) and x]
+        themes.append({'id':k,'name':T(v['theme_name']),'info':T(v['theme_info']),'items':ids,**({'pics':pics} if pics else {})})
         for x in ids:fth.setdefault(x,[]).append(k)
     items=[]
     for k,f in sorted(fur.items(),key=lambda x:(x[1]['category'],it.get(x[0],{}).get('order_sort',0),x[0])):

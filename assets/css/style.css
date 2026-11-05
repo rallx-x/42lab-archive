@@ -1138,3 +1138,20 @@ button.doll-chip:hover{border-color:var(--accent)}
 .item-list.dorm-mode>.doll-group-head{margin:26px 2px 12px}
 .item-list.dorm-mode>.doll-group-head:first-child{margin-top:4px}
 .item-list>.item-merged.open{grid-column:1/-1}
+/* v1.3 숙소: 테마 폴더 · 테마 페이지 */
+.dorm-tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px}
+.dorm-tile{display:flex;align-items:center;gap:12px;text-align:left;padding:12px 14px;border-radius:14px;min-height:72px}
+.dorm-tile:hover{border-color:var(--accent)}
+.dorm-tile-ics{flex:none;display:grid;grid-template-columns:repeat(2,22px);grid-auto-rows:22px;gap:2px}
+.dorm-tile-ics .item-ic.sm{width:22px;height:22px;padding:0;border-radius:5px}
+.dorm-tile-ics .item-ic.sm.empty{display:grid}
+.dorm-tile-ics .item-ic.sm.empty::before{font-size:10px}
+.dorm-tile-text{display:flex;flex-direction:column;gap:2px;min-width:0}
+.dorm-tile-text strong{font-size:14px;line-height:1.35}
+.dorm-tile-text small{font-size:11px;color:var(--sub)}
+.dorm-tile-etc{border-style:dashed}
+.dorm-page-info{max-width:820px;margin:6px 0 14px}
+.dorm-preview{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px;margin:0 0 16px}
+.dorm-preview img{width:100%;border-radius:14px;border:1px solid var(--line);background:var(--mono)}
+.dorm-page-list{margin-top:12px}
+@media(max-width:750px){.dorm-tiles{grid-template-columns:1fr 1fr}}

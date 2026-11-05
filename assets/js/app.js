@@ -70,6 +70,7 @@ function routeHash(route){
  if(route.type==='dolls')return '#dolls';
  if(route.type==='record')return '#record/'+encodeURIComponent(route.id);
  if(route.type==='item')return '#item/'+encodeURIComponent(route.id);
+ if(route.type==='dorm')return '#dorm/'+encodeURIComponent(route.id);
  if(route.type==='items')return '#items'+(route.cat?'/'+encodeURIComponent(route.cat):'');
  if(route.type==='tips')return '#tips'+(route.cat?'/'+encodeURIComponent(route.cat):'');
  if(route.type==='records')return '#records'+(route.cat?'/'+encodeURIComponent(route.cat):'');
@@ -85,6 +86,7 @@ function parseRoute(){
   if(raw==='dolls')return {type:'dolls'};
   if(raw.startsWith('record/'))return {type:'record',id:decodeURIComponent(raw.slice(7))};
   if(raw.startsWith('item/'))return {type:'item',id:decodeURIComponent(raw.slice(5))};
+  if(raw.startsWith('dorm/'))return {type:'dorm',id:decodeURIComponent(raw.slice(5))};
   if(raw==='items'||raw.startsWith('items/'))return {type:'items',cat:raw.startsWith('items/')?decodeURIComponent(raw.slice(6)):null};
   if(raw==='tips'||raw.startsWith('tips/'))return {type:'tips',cat:raw.startsWith('tips/')?decodeURIComponent(raw.slice(5)):null};
   if(raw==='records'||raw.startsWith('records/'))return {type:'records',cat:raw.startsWith('records/')?decodeURIComponent(raw.slice(8)):null};
@@ -153,6 +155,7 @@ async function restoreRoute(){
  if(route.type==='dolls'){await showDolls({push:false});return}
  if(route.type==='record'){await showRecord(route.id,{push:false});return}
  if(route.type==='item'){await showItem(route.id,{push:false});return}
+ if(route.type==='dorm'){await showDormTheme(route.id,{push:false});return}
  if(route.type==='records'){await showRecords({push:false,cat:route.cat});return}
  if(route.type==='tips'){await showTips({push:false,cat:route.cat});return}
  if(route.type==='items'){await showItems({push:false,cat:route.cat});return}
@@ -1545,7 +1548,8 @@ async function showItem(id,{push=true}={}){
  const it=(itemData.items||[]).find(o=>o.id===id),fu=(furnData?.items||[]).find(o=>o.id===id);
  if(!it&&!fu){await showItems({push});return}
  itemQuery='';focusItem=id;
- if(fu){itemCat=DORM;dormView='cat';dormCat=0}else{itemCat=itemTab(it);if(it.grp)openGroups.add(it.grp)}
+ if(fu){await showDormTheme(fu.themes?.[0]??'etc',{push:false});if(push)saveRoute({type:'item',id});focusItemCard();return}
+ itemCat=itemTab(it);if(it.grp)openGroups.add(it.grp);
  await showItems({push:false,cat:String(itemCat)});
  if(push)saveRoute({type:'item',id});
 }
@@ -1555,50 +1559,56 @@ function focusItemCard(){
  c.scrollIntoView({block:'center'});c.classList.add('item-focus');setTimeout(()=>c.classList.remove('item-focus'),2400);
 }
 // 숙소(가구): [종류별 | 테마별]
-function furnCard(o,catName,themeName){
+function furnCard(o,catName,themeName,inTheme){
  const card=el('div','item-card furn-card'+(o.quality?' q'+o.quality:''));card.dataset.ids=String(o.id);card.append(linkBtn('#item/'+o.id,o.name));
  const main=el('div','item-main');main.append(itemIcon(o.icon));
  const body=el('div','item-body');body.append(el('strong','item-name',o.name));
  const meta=[catName,o.comfort?'쾌적도 +'+o.comfort:'',o.size?o.size[0]+'×'+o.size[1]:''].filter(Boolean);
  if(meta.length){const m=el('span','furn-meta');meta.forEach((t,i)=>{if(i)m.append(document.createTextNode(' · '));m.append(el('span','',t))});body.append(m)}
  if(o.desc)body.append(el('p','item-desc',cleanTags(o.desc).trim()));
- if(o.themes?.length){const t=el('p','item-src');t.append(el('span','item-src-label','테마'),el('span','item-src-text',o.themes.map(themeName).join(', ')));body.append(t)}
+ if(o.themes?.length&&!inTheme){const t=el('p','item-src');t.append(el('span','item-src-label','테마'),el('span','item-src-text',o.themes.map(themeName).join(', ')));body.append(t)}
  if(o.source){const src=el('p','item-src');src.append(el('span','item-src-label','획득처'),el('span','item-src-text',cleanTags(o.source)));body.append(src)}
  main.append(body);card.append(main);return card;
 }
+// v1.3 숙소: 테마로만. 작은 폴더(이름 · 개수) → 누르면 테마 페이지 (#dorm/<id>). 테마 없는 가구는 「그 외 가구」
+const DORM_ETC='etc';
+function dormThemes(){const d=furnData||{items:[],themes:[]};const byId=new Map(d.items.map(o=>[o.id,o]));
+ const out=d.themes.map(t=>({id:String(t.id),name:t.name,info:t.info,pics:t.pics||[],items:t.items.map(i=>byId.get(i)).filter(Boolean)}));
+ const etc=d.items.filter(o=>!o.themes?.length);if(etc.length)out.push({id:DORM_ETC,name:'그 외 가구',info:'',pics:[],items:etc});
+ return out}
 function drawDorm(list,count,q){
- const d=furnData||{items:[],categories:[],themes:[]};
- const cats=new Map(d.categories.map(c=>[c.id,c.name])),ths=new Map(d.themes.map(t=>[t.id,t])),byId=new Map(d.items.map(o=>[o.id,o]));
- const themeName=id=>ths.get(id)?.name||String(id);
- const hit=o=>!q||dnorm(o.name).includes(q)||dnorm(o.desc).includes(q);
- const bar=el('div','dorm-bar');
- const views=el('div','dorm-views');
- for(const [v,name] of [['cat','종류별'],['theme','테마별']]){const b=el('button','dorm-view'+(dormView===v?' selected':''),name);b.type='button';b.onclick=()=>{dormView=v;set('dormView',v);drawDorm(list,count,q)};views.append(b)}
- bar.append(views);list.replaceChildren(bar);
- if(dormView==='cat'){
-  const chips=el('div','dorm-cats');
-  for(const [id,name] of [[0,'전체'],...d.categories.map(c=>[c.id,c.name])]){const n=id?d.items.filter(o=>o.cat===id).length:d.items.length;const b=el('button','dorm-cat'+(dormCat===id?' selected':''));b.type='button';b.append(el('span','',name),el('span','wr-tab-n',String(n)));b.onclick=()=>{dormCat=id;drawDorm(list,count,q)};chips.append(b)}
-  bar.append(chips);
-  const rows=d.items.filter(o=>(!dormCat||o.cat===dormCat)&&hit(o));count.textContent=rows.length+'개';
+ const d=furnData||{items:[],categories:[]};const cats=new Map(d.categories.map(c=>[c.id,c.name]));
+ list.replaceChildren();
+ if(q){const rows=d.items.filter(o=>dnorm(o.name).includes(q)||dnorm(o.desc).includes(q));count.textContent=rows.length+'개';
   const grid=el('div','item-list');list.append(grid);
-  if(!rows.length){grid.append(el('p','loading-note',q?'「'+itemQuery.trim()+'」에 맞는 기록이 없어요.':'기록이 없어요.'));return}
-  for(const o of rows)grid.append(furnCard(o,cats.get(o.cat),themeName));
-  return;
- }
- const box=el('div','wr-long');list.append(box);let shown=0;
- for(const t of d.themes){
-  const its=t.items.map(id=>byId.get(id)).filter(Boolean);
-  if(q&&!dnorm(t.name).includes(q)&&!its.some(hit))continue;shown++;
-  const item=el('section','wr-long-item');const h=el('button','wr-long-btn');h.type='button';h.setAttribute('aria-expanded','false');
-  const nm=el('span','wr-long-title');nm.append(el('strong','',t.name));h.append(nm,el('span','wr-long-len',its.length+'개'),ic('right','tri'));
-  const panel=el('div','wr-long-panel');
-  const fill=()=>{if(panel.childNodes.length)return;const inner=el('div','dorm-theme');if(t.info)inner.append(el('p','dorm-theme-info',cleanTags(t.info)));const g=el('div','item-list');its.forEach(o=>g.append(furnCard(o,cats.get(o.cat),themeName)));inner.append(g);panel.append(inner)};
-  if(q){item.classList.add('open');h.setAttribute('aria-expanded','true');fill()}
-  h.onclick=()=>{const on=!item.classList.contains('open');item.classList.toggle('open',on);h.setAttribute('aria-expanded',String(on));if(on)fill()};
-  item.append(h,panel);box.append(item);
- }
- count.textContent=shown+'세트';
- if(!shown)box.append(el('p','loading-note','「'+itemQuery.trim()+'」에 맞는 기록이 없어요.'));
+  if(!rows.length){grid.append(el('p','loading-note','「'+itemQuery.trim()+'」에 맞는 기록이 없어요.'));return}
+  const tn=new Map(d.themes.map(t=>[t.id,t.name]));rows.forEach(o=>grid.append(furnCard(o,cats.get(o.cat),id=>tn.get(id)||String(id))));return}
+ const ths=dormThemes();count.textContent=ths.length+'세트';
+ const grid=el('div','dorm-tiles');list.append(grid);
+ for(const t of ths){const b=el('button','dorm-tile'+(t.id===DORM_ETC?' dorm-tile-etc':''));b.type='button';
+  const ics=el('span','dorm-tile-ics');t.items.slice(0,4).forEach(o=>ics.append(itemIcon(o.icon,'sm')));
+  const tx=el('span','dorm-tile-text');tx.append(el('strong','',t.name),el('small','',t.items.length+'개'));
+  b.append(ics,tx);b.onclick=()=>showDormTheme(t.id);grid.append(b)}
+}
+async function showDormTheme(id,{push=true}={}){
+ const tok=++routeToken;showOnly('dollView');bgmLeave();voiceStop();closeArchiveMenu();
+ const host=$('#dollView');host.replaceChildren(el('p','loading-note','아이템을 불러오는 중…'));window.scrollTo(0,0);
+ try{await Promise.all([loadItems(),loadFurniture()])}catch(e){if(tok===routeToken)host.replaceChildren(error('아이템을 불러오지 못했어요. ('+e.message+')'));return}
+ if(tok!==routeToken)return;
+ const t=dormThemes().find(x=>x.id===String(id));if(!t){itemCat=DORM;await showItems({push});return}
+ if(push)saveRoute({type:'dorm',id:t.id});
+ $('#crumb').textContent='숙소 · '+t.name;host.replaceChildren();
+ const d=furnData;const cats=new Map(d.categories.map(c=>[c.id,c.name])),tn=new Map(d.themes.map(x=>[x.id,x.name]));
+ const back=el('button','folder-back');back.type='button';back.append(ic('left'),document.createTextNode(' 숙소'));
+ back.onclick=()=>{if(navCount>0)history.back();else{itemCat=DORM;showItems()}};
+ const head=el('div','record-head');const h=el('div');h.append(el('div','eyebrow','DORM / THEME'),el('h2','',t.name));head.append(h,linkBtn('#dorm/'+t.id,t.name));
+ host.append(back,head);
+ if(t.info)host.append(el('p','dorm-theme-info dorm-page-info',cleanTags(t.info)));
+ // 3D 프리셋 뷰 자리: site_info.home.dormPicBase 가 있으면 테마 그림(pics)을 띄움 (그림은 나중에)
+ const base=siteInfo?.home?.dormPicBase;
+ if(base&&t.pics.length){const pv=el('div','dorm-preview');t.pics.forEach(n=>{const im=el('img');im.alt='';im.loading='lazy';im.src=base.replace(/\/?$/,'/')+encodeURIComponent(n)+'.webp';im.onerror=()=>im.remove();pv.append(im)});host.append(pv)}
+ const sub=el('span','section-sub',t.items.length+'개');host.append(sub);
+ const grid=el('div','item-list dorm-page-list');t.items.forEach(o=>grid.append(furnCard(o,cats.get(o.cat),x=>tn.get(x)||String(x),t.id!==DORM_ETC)));host.append(grid);
 }
 // v1.2 프로필 선물 칸 → 아이템 (누르면 아이템 칸으로). 연결 정보가 있으면 그 순서 · 이름으로 다시 그림
 function giftLinks(w,vk,kind){loadItems().then(d=>{
