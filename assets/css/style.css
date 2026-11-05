@@ -1161,3 +1161,12 @@ button.doll-chip:hover{border-color:var(--accent)}
 /* v1.3 공지: 이전 업데이트 기록 단추 */
 .home-notice .home-card-head{position:relative}
 .notice-history{margin-left:auto;display:inline-flex;align-items:center;gap:6px;padding:5px 11px;font-size:12px;font-weight:700;border-radius:20px}
+/* v1.4 인형 프로필 목차 (스토리 분류 버튼 모양) */
+.doll-toc{margin-top:28px}
+.doll-toc-bar{display:flex;flex-direction:column;gap:8px;margin-bottom:16px}
+.doll-toc-tabs{flex-wrap:wrap}
+.doll-toc-tab{display:inline-flex;align-items:center;gap:6px;min-width:96px;justify-content:center}
+.doll-toc-body{min-height:120px}
+.doll-aff{display:flex;flex-direction:column;gap:10px;margin-bottom:22px;padding:16px 18px;background:var(--panel);border:1px solid var(--line);border-radius:16px}
+.doll-aff .doll-chips{margin:0}
+@media(max-width:750px){.doll-toc-tab{min-width:0;flex:none}}

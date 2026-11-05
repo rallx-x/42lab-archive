@@ -1784,19 +1784,30 @@ function renderDoll(p){
  info.append(dl);
  if(p.quote)info.append(el('blockquote','doll-quote',cleanTags(p.quote)));
  if(p.oathTitle?.length){const o=el('div','doll-oath');const top=el('div','doll-oath-top');top.append(el('span','doll-oath-label','서약 칭호'));const t=el('span','doll-oath-title');p.oathTitle.forEach((x,i)=>{if(i)t.append(el('i','doll-oath-sep'));t.append(el('span','',x))});top.append(t);o.append(top);if(p.oathDesc){o.append(el('hr','doll-oath-line'),el('p','doll-oath-desc',p.oathDesc))}info.append(o)}
- const chips=(label,arr,kind)=>{if(!arr?.length)return;const w=el('div','doll-chips');w.append(el('span','doll-chips-label',label));arr.forEach(x=>{const c=el('span','doll-chip',x);c.dataset.item=x;w.append(c)});info.append(w);giftLinks(w,p.voiceKey,kind)};
+ // v1.4 좋아함 · 싫어함 · 관계는 목차 「친밀도」 칸으로
+ const affBox=el('div','doll-aff');
+ const chips=(label,arr,kind)=>{if(!arr?.length)return;const w=el('div','doll-chips');w.append(el('span','doll-chips-label',label));arr.forEach(x=>{const c=el('span','doll-chip',x);c.dataset.item=x;w.append(c)});affBox.append(w);giftLinks(w,p.voiceKey,kind)};
  chips('좋아함',p.likes,0);chips('싫어함',p.dislikes,1);
- if(p.relations?.length){const w=el('div','doll-chips');w.append(el('span','doll-chips-label','관계'));for(const r of p.relations){const key=(dollIndex?.dolls||[]).find(d=>d.heroId===r.heroId)?.voiceKey;const c=el(key?'button':'span','doll-chip rel'+(key?' link':''));if(key){c.type='button';c.title=r.name+' 프로필로 이동';c.onclick=()=>showDoll(key)}c.append(el('b','',r.name),document.createTextNode(' '+String(r.text||'').replace(/^"|"$/g,'')));w.append(c)}info.append(w)}
+ if(p.relations?.length){const w=el('div','doll-chips');w.append(el('span','doll-chips-label','관계'));for(const r of p.relations){const key=(dollIndex?.dolls||[]).find(d=>d.heroId===r.heroId)?.voiceKey;const c=el(key?'button':'span','doll-chip rel'+(key?' link':''));if(key){c.type='button';c.title=r.name+' 프로필로 이동';c.onclick=()=>showDoll(key)}c.append(el('b','',r.name),document.createTextNode(' '+String(r.text||'').replace(/^"|"$/g,'')));w.append(c)}affBox.append(w)}
  const car=el('div','doll-career');car.append(el('h4','',window.L?window.L('이력'):'이력'));car.append(p.career?sentenceBlock(p.career):el('p','doll-empty','한국어 번역 준비 중이에요.'));info.append(car);
  hero.append(info);host.append(hero);
- // 2) 인형 스토리
- host.append(foldSection('story','인형 스토리','',inner=>inner.append(storyPanel(p))));
- // 3) 보이스
+ // 2) v1.4 목차: 스킬 · 친밀도 · 보이스 · 스킨 — 누른 칸만 아래에 (마지막 선택 기억)
  const vc=(p.voices||[]).filter(v=>v.group!=='affinity').length+(p.skinVoices||[]).reduce((a,s)=>a+s.voices.length,0);
- if(vc)host.append(foldSection('voice','보이스',vc+'개',inner=>inner.append(voicePanel(p))));
- // 4) 스킨
  const skins=(p.skinList||[]).map(x=>({img:x.img,title:x.name,desc:x.desc,photo:x.photo,photoName:x.photoName}));
- if(skins.length)host.append(foldSection('skin','스킨',skins.length+'벌',inner=>{inner.append(el('p','load-note',LOAD_NOTE),gallery(p,skins,{label:'스킨',cls:'gal-skin'}))}));
+ const parts=[];
+ if(p.skills?.length&&typeof skillPanel==='function')parts.push(['skill','스킬',p.skills.length+'개',box=>box.append(skillPanel(p))]);
+ parts.push(['affinity','친밀도','',box=>{if(affBox.childNodes.length)box.append(affBox);box.append(storyPanel(p))}]);
+ if(vc)parts.push(['voice','보이스',vc+'개',box=>box.append(voicePanel(p))]);
+ if(skins.length)parts.push(['skin','스킨',skins.length+'벌',box=>{box.append(el('p','load-note',LOAD_NOTE),gallery(p,skins,{label:'스킨',cls:'gal-skin'}))}]);
+ const toc=el('section','doll-toc');const tb=el('div','tb-group doll-toc-bar');tb.append(el('div','tb-label','목차'));
+ const nav=el('nav','cat-tabs doll-toc-tabs');nav.setAttribute('aria-label','목차');tb.append(nav);
+ const body=el('div','doll-toc-body');toc.append(tb,body);host.append(toc);
+ let cur=get('dollTab','affinity');if(!parts.some(x=>x[0]===cur))cur=parts[0]?.[0];
+ const show=id=>{cur=id;set('dollTab',id);voiceStop();
+  nav.querySelectorAll('.cat-tab').forEach(b=>{const on=b.dataset.part===id;b.classList.toggle('selected',on);b.setAttribute('aria-pressed',String(on))});
+  body.replaceChildren();const part=parts.find(x=>x[0]===id);if(part)part[3](body)};
+ for(const [id,name,n] of parts){const b=el('button','cat-tab doll-toc-tab');b.type='button';b.dataset.part=id;b.append(el('span','',name));if(n)b.append(el('span','wr-tab-n',n));b.onclick=()=>show(id);nav.append(b)}
+ if(cur)show(cur);
  window.scrollTo(0,0);
 }
 // 숙소 대화 회차: 목록(분류)에는 없지만 인형 프로필에서 열림 → 앞뒤 · 돌아가기를 그 인형 안에서
