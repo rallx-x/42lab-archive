@@ -521,7 +521,13 @@ function renderLanding(host){
  wrap.append(notice,cal,side);host.append(wrap);
 }
 function sortedNotices(){return [...(siteInfo?.notices||[])].sort((a,b)=>(b.pinned===true)-(a.pinned===true)||String(b.date||'').localeCompare(String(a.date||'')))}
-function openNotice(n){openInfo({title:n.title,items:[{title:noticeDate(n),lines:n.lines||[]}]})}
+function openNotice(n){openInfo({title:n.title,items:[{title:noticeDate(n),lines:n.lines||[]}]});if(n.popup){const box=el('div','popup-links');box.append(...feedbackLinks());$('#infoBody').append(box)}}
+// v0.12.22 팝업 공지 (popup:true): 공지마다 한 번만, 첫 방문 창이 있으면 그 창을 닫은 뒤에
+function maybePopup(){
+ const n=(siteInfo?.notices||[]).find(x=>x.popup&&x.id&&!get('popupSeen.'+x.id,false));if(!n)return;
+ const show=()=>{if($('#infoDialog').open)return;openNotice(n);$('#infoDialog').addEventListener('close',()=>set('popupSeen.'+n.id,true),{once:true})};
+ const w=$('#welcome');if(w&&w.open)w.addEventListener('close',()=>setTimeout(show,250),{once:true});else show();
+}
 function feedbackLinks(){
  const fb=siteInfo?.home?.feedback||{};
  const form=el('a','home-link primary');form.href=feedbackURL()||fb.form||'#';form.target='_blank';form.rel='noopener';form.append(el('strong','','피드백 폼'),el('small','','오류 · 오탈자 · 기능 제안은 폼으로 먼저 보내 주세요.'));
@@ -970,7 +976,7 @@ function openInfo(pg){
  for(const item of pg.items||[]){const box=el('section','info-item');if(item.title)box.append(el('h3','',item.title));(item.lines||[]).forEach(t=>box.append(el('p','',t)));body.append(box)}
  $('#infoDialog').showModal();
 }
-fetchJSON(dataPath('site_info.json')).then(info=>{siteInfo=info;fillHeroTags();renderSettingsFeedback();maybeWelcome();initBgm();if(Array.isArray(info.languages)&&info.languages.length)readyLangs=info.languages;renderFooter(info);if(index&&category==null&&!openFolderId&&!$('#search').value.trim()&&!$('#library').classList.contains('hidden'))drawLibrary()}).catch(()=>{});
+fetchJSON(dataPath('site_info.json')).then(info=>{siteInfo=info;fillHeroTags();renderSettingsFeedback();maybeWelcome();maybePopup();initBgm();if(Array.isArray(info.languages)&&info.languages.length)readyLangs=info.languages;renderFooter(info);if(index&&category==null&&!openFolderId&&!$('#search').value.trim()&&!$('#library').classList.contains('hidden'))drawLibrary()}).catch(()=>{});
 
 // ---------- v0.9.3 소개 카드 태그 ----------
 function fillHeroTags(){

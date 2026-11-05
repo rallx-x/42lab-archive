@@ -13,6 +13,19 @@
  ],
  "notices": [
   {
+   "id": "2026-11-05-mail",
+   "date": "2026-11-05",
+   "popup": true,
+   "title": "Now Collecting In-Game Mail",
+   "lines": [
+    "We are preparing to back up the mail received in the game.",
+    "If you still have mail saved, please send screenshots showing the \"send date (including time)\" and the \"full text\" through the feedback form or by email.",
+    "Mail from every server will be recorded, and other languages will be added as \"fan translations.\"",
+    "Feel free to hide personal information such as your account name or UID.",
+    "We'd appreciate the help of all Professors. Thank you."
+   ]
+  },
+  {
    "id": "2026-10-30-welcome",
    "date": "2026-10-30",
    "pinned": true,
@@ -208,5 +221,5 @@
   ],
   "bgmBase": "https://42lab-bgm.pages.dev/"
  },
- "updated": "2026-10-30"
+ "updated": "2026-11-05"
 }
