@@ -323,7 +323,49 @@ function searchCard(g,badges=[]){
  b.onclick=()=>{showChapter(groupKey(g),g.category)};return b;
 }
 function searchSection(host,title,count){const sec=el('section','search-section');const h=el('div','search-head');h.append(el('h3','',title));if(count!=null)h.append(el('span','search-count',count+'건'));sec.append(h);host.append(sec);return sec}
+// v1.2 기록 찾기 필터: 스토리 · 인형 · 아이템 · 시계 기록 · 로딩 팁 (아이콘은 data-kind 로 나중에 CSS 에서)
+const SEARCH_KINDS=[['all','전체'],['story','스토리'],['doll','인형'],['item','아이템'],['record','시계 기록'],['tip','로딩 팁']];
+let searchKind=SEARCH_KINDS.some(([k])=>k===get('searchKind','all'))?get('searchKind','all'):'all',searchDataLoading=false;
+function ensureSearchData(){
+ if(searchDataLoading||(dollIndex&&itemData&&furnData&&wrData&&tipData))return;
+ searchDataLoading=true;
+ Promise.all([loadDollIndex(),loadItems(),loadFurniture(),loadRecords(),tipData?tipData:fetchJSON(dataPath('loading_tips.json')).then(d=>tipData=d)].map(x=>Promise.resolve(x).catch(()=>null)))
+  .then(()=>{searchDataLoading=false;if($('#search').value.trim()&&!$('#library').classList.contains('hidden'))drawLibrary()});
+}
+function searchExtra(nq){
+ const hit=(...v)=>v.some(x=>norm(cleanTags(x||'')).includes(nq));
+ const dolls=(dollIndex?.dolls||[]).filter(d=>dollMatches(d,dnorm(nq)));
+ const items=[...(itemData?.items||[]).map(o=>({...o,kind:'item'})),...(furnData?.items||[]).map(o=>({...o,kind:'furn'}))].filter(o=>hit(o.name)||(nq.length>=2&&hit(o.desc)));
+ const recs=(wrData?.records||[]).filter(r=>hit(r.name)||(nq.length>=2&&hit(r.description)));
+ const tips=(tipData?.tips||[]).filter(t=>hit(t.title)||(nq.length>=2&&hit(t.text)));
+ return {dolls,items,recs,tips};
+}
 function renderSearch(q,host){
+ const nq=norm(q);ensureSearchData();
+ const ex=searchExtra(nq);
+ const bar=el('div','search-filters');bar.setAttribute('role','tablist');bar.setAttribute('aria-label','기록 찾기 분류');
+ const counts={doll:ex.dolls.length,item:ex.items.length,record:ex.recs.length,tip:ex.tips.length};
+ for(const [k,name] of SEARCH_KINDS){
+  const b=el('button','search-filter'+(searchKind===k?' selected':''));b.type='button';b.dataset.kind=k;b.setAttribute('role','tab');b.setAttribute('aria-selected',String(searchKind===k));
+  b.append(el('span','search-filter-ic'),el('span','',name));if(counts[k]!=null)b.append(el('span','wr-tab-n',String(counts[k])));
+  b.onclick=()=>{searchKind=k;set('searchKind',k);drawLibrary()};bar.append(b);
+ }
+ host.append(bar);
+ const show=k=>searchKind==='all'||searchKind===k;
+ let any=false;
+ if(show('story'))any=renderStorySearch(q,host,searchKind==='story')||any;
+ if(show('doll')&&ex.dolls.length){any=true;const sec=searchSection(host,'인형',ex.dolls.length);const g=el('div','doll-grid');ex.dolls.slice(0,searchKind==='doll'?99:8).forEach(d=>g.append(dollCard(d)));sec.append(g)}
+ if(show('item')&&ex.items.length){any=true;const sec=searchSection(host,'아이템',ex.items.length);const list=el('div','search-episodes');
+  const lim=searchKind==='item'?200:12;
+  ex.items.slice(0,lim).forEach(o=>{const b=el('button','search-ep search-item');b.type='button';b.append(itemIcon(o.icon,'sm'));const t=el('span','search-item-text');t.append(el('small','',o.kind==='furn'?'숙소':(ITEM_PAGES.find(([pg])=>pg===o.page)||[,''])[1]),el('strong','',o.name));b.append(t);b.onclick=()=>showItem(o.id);list.append(b)});
+  if(ex.items.length>lim)list.append(el('p','search-hint','앞의 '+lim+'건만 보여 줍니다. 「아이템」 필터를 누르면 더 볼 수 있어요.'));sec.append(list)}
+ if(show('record')&&ex.recs.length){any=true;const sec=searchSection(host,'시계 기록',ex.recs.length);const list=el('div','search-episodes');const tn=new Map((wrData.types||[]).map(t=>[t.id,t.name]));
+  ex.recs.forEach(r=>{const b=el('button','search-ep');b.type='button';b.append(el('small','',tn.get(r.type)||''),el('strong','',r.name));b.onclick=()=>r.type===7?showRecord(r.id):openLore(r.name,r.description,r.id);list.append(b)});sec.append(list)}
+ if(show('tip')&&ex.tips.length){any=true;const sec=searchSection(host,'로딩 팁',ex.tips.length);const list=el('div','search-tips');
+  ex.tips.forEach(t=>{const c=el('div','search-tip');c.append(el('small','',t.title),el('p','',cleanTags(t.text)));list.append(c)});sec.append(list)}
+ if(!any&&cast&&!searchDataLoading)host.append(error('검색 결과가 없습니다.'));
+}
+function renderStorySearch(q,host,only){
  const nq=norm(q);let any=false;const byId=new Map(displayGroups.map(g=>[g.id,g]));
  // 0. 분류 바로가기 (v0.9.0): 「메인」 → 메인 스토리 목록, 「전체」 → 전체 기록
  const cats=storyCategories.filter(([id,name])=>{const full=norm(name),base=norm(name.replace(/\s*(스토리|기록)$/,''));return base===nq||full===nq||(nq.length>=2&&(base.includes(nq)||full.includes(nq)))||norm(id)===nq});
@@ -369,7 +411,8 @@ function renderSearch(q,host){
  if(eps.length){any=true;const sec=searchSection(host,'에피소드',eps.length);const list=el('div','search-episodes');
   eps.slice(0,60).forEach(({g,e})=>{const b=el('button','search-ep');b.type='button';b.append(el('small','',chapterDisplayTitle(g)+(episodeLabel(e)?' · '+episodeLabel(e):'')),el('strong','',episodeTitle(e)));b.onclick=()=>openEpisode(e.id);list.append(b)});
   if(eps.length>60)list.append(el('p','search-hint','앞의 60건만 보여 줍니다. 검색어를 더 자세히 입력해 보세요.'));sec.append(list)}
- if(!any&&cast)host.append(error('검색 결과가 없습니다.'));
+ if(only&&!any&&cast)host.append(error('검색 결과가 없습니다.'));
+ return any;
 }
 function drawLibrary(){
  showOnly('library');bgmLeave();voiceStop();$('#crumb').textContent='';

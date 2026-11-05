@@ -26,6 +26,19 @@
    ]
   },
   {
+   "id": "2026-11-05-v1.2",
+   "date": "2026-11-05",
+   "title": "Update v1.2 · Library · Search filters",
+   "lines": [
+    "The ☰ menu now has a \"Library\" group with Perception's Record, Loading Tips, and Items.",
+    "Search now has filters: All · Stories · Dolls · Items · Perception's Record · Loading Tips.",
+    "Long records in 《》 open on their own page. Going back returns you to where you were.",
+    "Each record and item now has its own link. Use the share button on a card to copy it.",
+    "Gift items show which Dolls like or dislike them, and gifts on Doll profiles link to the item.",
+    "Self-select boxes show \"Choose one,\" and random boxes show their \"Contents.\""
+   ]
+  },
+  {
    "id": "2026-11-05-v1.1",
    "date": "2026-11-05",
    "title": "Update v1.1 · Perception's Record · Loading Tips · Items",

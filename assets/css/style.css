@@ -1088,3 +1088,16 @@ button.doll-chip:hover{border-color:var(--accent)}
 .item-fans .item-src-text{line-height:1.8}
 .doll-chip-link{cursor:pointer;border:1px solid transparent;font:inherit}
 .doll-chip-link:hover{border-color:var(--accent)}
+/* v1.2 기록 찾기 필터 (아이콘: .search-filter[data-kind=…] .search-filter-ic 에 배경 그림) */
+.search-filters{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 18px}
+.search-filter{display:inline-flex;align-items:center;gap:6px;padding:7px 13px;font-size:13px;font-weight:700;border-radius:20px}
+.search-filter.selected{border-color:var(--accent);color:var(--accent-text,var(--accent));background:color-mix(in srgb,var(--accent) 10%,var(--panel))}
+.search-filter-ic{display:none;width:16px;height:16px;background:center/contain no-repeat}
+.search-ep.search-item{flex-direction:row;align-items:center;gap:10px}
+.search-item .item-ic.sm.empty{display:grid}
+.search-item-text{display:flex;flex-direction:column;min-width:0}
+.search-tips{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:10px}
+.search-tip{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+.search-tip small{color:var(--sub);font-weight:700;font-size:11px}
+.search-tip p{margin:4px 0 0;font-size:13px;line-height:1.7;white-space:pre-line}
+@media(max-width:750px){.search-filters{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}.search-filter{flex:none}}
