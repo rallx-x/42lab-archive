@@ -1324,7 +1324,7 @@ function renderTips(){
 }
 // ----- v0.12.22 아이템 (#items) — 게임 창고 분류 -----
 // 그림: site_info.home.itemIconBase (Cloudflare 별도 프로젝트) + <icon 이름>.webp. 주소가 없거나 그림이 없으면 글만
-const ITEM_PAGES=[[0,'전체'],[2,'기본 아이템'],[3,'소모 아이템'],[4,'마인드맵 파편'],[5,'육성재료'],[6,'공장재료'],[7,'기념품']];
+const ITEM_PAGES=[[0,'전체'],[2,'기본 아이템'],[3,'소모 아이템'],[5,'육성재료'],[6,'공장재료'],[7,'기념품']];
 let itemData=null,itemCat=+get('itemCat',0)||0,itemQuery='';
 const loadItems=()=>itemData?Promise.resolve(itemData):fetchJSON(dataPath('items.json')).then(d=>itemData=d);
 const itemIconBase=()=>siteInfo?.home?.itemIconBase||'';
@@ -1344,6 +1344,7 @@ async function showItems({push=true,cat=null}={}){
 function renderItems(){
  const host=$('#dollView');host.replaceChildren();
  const all=itemData.items||[],refs=itemData.refs||{},byId=new Map(all.map(o=>[o.id,o]));
+ if(!ITEM_PAGES.some(([pg])=>pg===itemCat))itemCat=0;
  const ref=id=>byId.get(id)||refs[String(id)]||{name:String(id)};
  const head=el('div','doll-list-head');const t=el('div');t.append(el('div','eyebrow','DATABASE / ITEMS'),el('h2','','아이템'));head.append(t);
  const count=el('span','section-sub');head.append(count);host.append(head);
