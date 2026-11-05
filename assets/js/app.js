@@ -68,6 +68,7 @@ const groupKey=g=>String(g.id||g.key);
 function routeHash(route){
  if(route.type==='episode')return '#ep/'+encodeURIComponent(route.id);
  if(route.type==='dolls')return '#dolls';
+ if(route.type==='archive')return '#archive';
  if(route.type==='record')return '#record/'+encodeURIComponent(route.id);
  if(route.type==='item')return '#item/'+encodeURIComponent(route.id);
  if(route.type==='dorm')return '#dorm/'+encodeURIComponent(route.id);
@@ -84,6 +85,7 @@ function parseRoute(){
  try{
   if(raw.startsWith('ep/'))return {type:'episode',id:decodeURIComponent(raw.slice(3))};
   if(raw==='dolls')return {type:'dolls'};
+  if(raw==='archive')return {type:'archive'};
   if(raw.startsWith('record/'))return {type:'record',id:decodeURIComponent(raw.slice(7))};
   if(raw.startsWith('item/'))return {type:'item',id:decodeURIComponent(raw.slice(5))};
   if(raw.startsWith('dorm/'))return {type:'dorm',id:decodeURIComponent(raw.slice(5))};
@@ -153,6 +155,7 @@ async function restoreRoute(){
   }
  }
  if(route.type==='dolls'){await showDolls({push:false});return}
+ if(route.type==='archive'){await showArchive({push:false});return}
  if(route.type==='record'){await showRecord(route.id,{push:false});return}
  if(route.type==='item'){await showItem(route.id,{push:false});return}
  if(route.type==='dorm'){await showDormTheme(route.id,{push:false});return}
@@ -539,11 +542,14 @@ function chapterDisplayTitle(group){
  return title.startsWith(n+' ')||title.startsWith(n+'.')?title:n+'. '+title;
 }
 
+// v1.5 퀵 바: 홈 · 전체 기록 · 인형 기록 · 자료실 (스토리 분류는 전체 기록 안에서)
+const QUICK=[['home','홈'],['all','전체 기록'],['dolls','인형 기록'],['archive','자료실']];
 function renderCatTabs(){
  const nav=$('#catTabs');if(!nav)return;
- const want=storyCategories.filter(([id])=>id!=='all').length+1;
- if(nav.childElementCount!==want){nav.replaceChildren();const h=el('button','cat-tab cat-home','홈');h.type='button';h.dataset.category='';h.onclick=()=>{$('#search').value='';showHome(null)};nav.append(h);for(const [id,name] of storyCategories.filter(([id])=>id!=='all')){const b=el('button','cat-tab',name.replace(/\s*스토리$/,''));b.type='button';b.dataset.category=id;b.onclick=()=>{$('#search').value='';showHome(id)};nav.append(b)}}
- nav.querySelectorAll('.cat-tab').forEach(b=>{const on=b.dataset.category===(category??'')&&!openFolderId||(b.dataset.category!==''&&b.dataset.category===category);b.classList.toggle('selected',on);b.setAttribute('aria-pressed',String(on))});
+ if(nav.childElementCount!==QUICK.length){nav.replaceChildren();for(const [id,name] of QUICK){const b=el('button','cat-tab'+(id==='home'?' cat-home':''),name);b.type='button';b.dataset.quick=id;
+  b.onclick=()=>{$('#search').value='';if(id==='home')showHome(null);else if(id==='all')showHome('all');else if(id==='dolls')showDolls();else showArchive()};nav.append(b)}}
+ const cur=category==null?'home':'all';
+ nav.querySelectorAll('.cat-tab').forEach(b=>{const on=b.dataset.quick===cur;b.classList.toggle('selected',on);b.setAttribute('aria-pressed',String(on))});
 }
 function initIndex(d){index=d;storyCategories=[...(d.categories||[]).map(c=>[c.id,c.name]),['all','전체 기록']];displayGroups=makeDisplayGroups(d.groups||[]);drawLibrary()}
 // ---------- v0.9.0 첫 화면: 공지 · 일러스트 · 피드백/다른 사이트 ----------
@@ -701,7 +707,7 @@ function renderArchiveMenu(){
  host.append(allRow);
  // v0.10.0 인형 기록
  const dollLink=el('button','archive-menu-link archive-menu-home archive-menu-dolls','인형 기록');dollLink.type='button';dollLink.onclick=()=>{closeArchiveMenu();$('#search').value='';showDolls()};host.append(dollLink);
- host.append(el('div','archive-menu-section','자료실'));
+ {const sec=el('button','archive-menu-section archive-menu-section-link','자료실');sec.type='button';sec.onclick=()=>{closeArchiveMenu();$('#search').value='';showArchive()};host.append(sec)}
  const recFill=box=>{const put=()=>{box.replaceChildren();for(const t of (wrData?.types||[]).filter(t=>t.id)){const n=(wrData.records||[]).filter(r=>r.type===t.id).length;if(!n)continue;const link=el('button','archive-menu-chapter',t.name);link.type='button';link.onclick=()=>{closeArchiveMenu();$('#search').value='';showRecords({cat:String(t.id)})};box.append(link)}};
   if(wrData)put();else loadRecords().then(put).catch(()=>{})};
  host.append(foldRow('시계 기록',()=>{closeArchiveMenu();$('#search').value='';showRecords({cat:'0'})},recFill,'archive-menu-top'));
@@ -1386,6 +1392,26 @@ async function showRecord(id,{push=true}={}){
 // ----- v0.12.22 로딩 팁 (#tips) — 글만 (배경 그림 없음) -----
 const TIP_GROUPS=[['all','전체'],['doll','인형'],['sector','섹터'],['etc','그 외']];
 let tipData=null,tipCat=get('tipCat','all'),tipQuery='';
+// v1.5 자료실: 메뉴 「자료실」 항목을 한 화면에 카드로 (누르면 바로 그 화면)
+async function showArchive({push=true}={}){
+ const tok=++routeToken;showOnly('dollView');bgmLeave();voiceStop();closeArchiveMenu();$('#crumb').textContent='자료실';
+ if(push)saveRoute({type:'archive'});
+ const host=$('#dollView');host.replaceChildren();window.scrollTo(0,0);
+ const head=el('div','doll-list-head');const t=el('div');t.append(el('div','eyebrow','DATABASE / ARCHIVE'),el('h2','','자료실'));head.append(t);host.append(head);
+ const grid=el('div','arc-grid');host.append(grid);
+ const card=(eyebrow,name,desc,go)=>{const c=el('section','arc-card');const b=el('button','arc-main');b.type='button';b.onclick=go;
+  const tx=el('span','arc-text');tx.append(el('span','eyebrow',eyebrow),el('strong','arc-name',name),el('span','arc-desc',desc));
+  const n=el('span','arc-n');b.append(tx,n,ic('right','tri'));c.append(b);grid.append(c);return {c,n}};
+ const rec=card('WORLD RECORDS','시계 기록','게임 속 세계 기록 · 장문 기록',()=>showRecords({cat:'0'}));
+ const tip=card('LOADING TIPS','로딩 팁','로딩 화면에 나오는 인형 · 섹터 팁',()=>showTips());
+ const itm=card('ITEMS','아이템','창고 · 숙소 가구 · 이벤트 보상',()=>showItems());
+ const cnt=(o,n)=>{if(tok===routeToken&&n)o.n.textContent=n.toLocaleString(window.UI_LOCALE||'ko-KR')+'개'};
+ loadRecords().then(()=>{if(tok!==routeToken)return;cnt(rec,(wrData.records||[]).length);
+  const sub=el('div','arc-sub');for(const ty of (wrData.types||[]).filter(x=>x.id)){const k=(wrData.records||[]).filter(r=>r.type===ty.id).length;if(!k)continue;const b=el('button','arc-chip',ty.name);b.type='button';b.onclick=()=>showRecords({cat:String(ty.id)});sub.append(b)}
+  if(sub.childNodes.length)rec.c.append(sub)}).catch(()=>{});
+ (tipData?Promise.resolve(tipData):fetchJSON(dataPath('loading_tips.json')).then(d=>tipData=d)).then(d=>cnt(tip,(d.tips||[]).length)).catch(()=>{});
+ loadItems().then(d=>cnt(itm,(d.items||[]).length)).catch(()=>{});
+}
 async function showTips({push=true,cat=null}={}){
  const tok=++routeToken;showOnly('dollView');bgmLeave();voiceStop();closeArchiveMenu();$('#crumb').textContent='로딩 팁';
  if(cat&&TIP_GROUPS.some(([g])=>g===cat))tipCat=cat;

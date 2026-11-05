@@ -1258,3 +1258,18 @@ button.doll-chip:hover{border-color:var(--accent)}
 .arma-skill .skill-detail{margin:4px 0 0}
 .arma-unlock{margin:0;font-size:12px;color:var(--sub)}
 @media(max-width:750px){.arma-stage{aspect-ratio:4/3}.arma-info{padding:14px}}
+
+/* ===== v1.5 퀵 바 자료실 화면 ===== */
+.arc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px}
+.arc-card{background:var(--panel);border:1px solid var(--line);border-radius:20px;overflow:hidden;display:flex;flex-direction:column}
+.arc-main{display:flex;align-items:center;gap:14px;width:100%;text-align:left;border:0;border-radius:0;background:none;padding:20px 22px}
+.arc-main:hover{background:color-mix(in srgb,var(--accent) 6%,transparent)}
+.arc-text{flex:1;display:grid;gap:4px;min-width:0}
+.arc-name{font-size:20px}
+.arc-desc{color:var(--sub);font-size:13px}
+.arc-n{color:var(--sub);font-size:13px;font-variant-numeric:tabular-nums;white-space:nowrap}
+.arc-main .tri{flex:none;color:var(--sub)}
+.arc-sub{display:flex;flex-wrap:wrap;gap:6px;padding:0 22px 18px}
+.arc-chip{padding:6px 12px;border-radius:999px;font-size:13px}
+.archive-menu-section-link{display:block;width:calc(100% - 20px);text-align:left;background:none;border:0;cursor:pointer}
+.archive-menu-section-link:hover{text-decoration:underline}
