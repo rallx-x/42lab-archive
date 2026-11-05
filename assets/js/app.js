@@ -1722,27 +1722,46 @@ let armaLv=+get('armaLv',30)||30;
 // 1920×1080 화면 가운데 기준 좌표 → 무대 안 % 위치
 const armaPos=(x,y)=>({left:(x+960)/19.2+'%',top:(540-y)/10.8+'%'});
 const ARMA_NODE=[[-429,0],[429,0],[0,432]]; // 게임 화면: Ⅰ 왼쪽 · Ⅱ 오른쪽 · Ⅲ 위
-const ARMA_LINK=[[-330,0,'l'],[330,0,'r'],[0,335,'t']]; // 단계 칸 ↔ 가운데 잇는 선
 function armaPanel(p){
  const a=p.arma,MAX=a.levels?.length||30,attrs=armaData?.attrs||{};
  const ri=ROLE_ORDER.map(l=>l.indexOf(p.role)).find(i=>i>=0);const tone=ROLE_TONE[ri]??ROLE_TONE[2];
  let lv=Math.min(Math.max(armaLv,1),MAX),sel='center';
  const wrap=el('div','arma');wrap.style.setProperty('--arma',tone);
  if(a.fan)wrap.append(fanNote());
- const stage=el('div','arma-stage');
- const pts=el('div','arma-pts');(armaData?.points||[]).forEach(([x,y])=>{const d=el('span','arma-pt');Object.assign(d.style,armaPos(x,y));pts.append(d)});
- const center=el('button','arma-center');center.type='button';Object.assign(center.style,armaPos(0,0));
- const logo=el('span','arma-logo');const base=itemIconBase();
- if(base){const im=el('img');im.alt='';im.decoding='async';im.src=base.replace(/\/?$/,'/')+'arma/'+p.heroId+'.webp';im.onerror=()=>im.remove();logo.append(im)}
- const cStep=el('span','arma-c-step'),cLv=el('span','arma-c-lv');
- center.append(el('span','arma-dia'),cStep,logo,cLv);
- const title=el('div','arma-title');Object.assign(title.style,armaPos(0,-330));title.append(el('strong','arma-name',[a.hero,a.name].filter(Boolean).join('·')),el('span','arma-en','- ARMA INSCRIPTA -'));
- const links=ARMA_LINK.map(([x,y,d])=>{const l=el('span','arma-link '+d);Object.assign(l.style,armaPos(x,y));return l});
- const nodes=a.steps.slice(0,3).map((st,i)=>{const b=el('button','arma-node');b.type='button';Object.assign(b.style,armaPos(...ARMA_NODE[i]));
-  b.append(el('span','arma-node-dia'),el('span','arma-node-n',ROMAN[i]),ic('lock','arma-lock'));b.setAttribute('aria-label','각인 돌파 '+ROMAN[i]);
-  b.onclick=()=>{sel=i;draw()};return b});
+ // 게임 화면 그대로: 1920×1080 판에 게임 조각(assets/img/arma, KR spriteatlas/ui_armainscripta)을 배치 위치대로 놓고 칸 너비에 맞춰 줄임
+ const R='r'+(ri??2),IMG='/assets/img/arma/';
+ const stage=el('div','arma-stage');const cv=el('div','arma-canvas');stage.append(cv);
+ const put=(src,x,y,w,h,rot,cls)=>{const im=el('img','arma-px'+(cls?' '+cls:''));im.alt='';im.decoding='async';im.src=src.includes('/')?src:IMG+src+'.webp';
+  Object.assign(im.style,{left:(960+x-w/2)+'px',top:(540-y-h/2)+'px',width:w+'px',height:h+'px'});if(rot)im.style.transform='rotate('+(-rot)+'deg)';cv.append(im);return im};
+ // 네 귀퉁이 장식
+ put('lt',172-960,540-218,202,164);put('lb',136-960,209-540,284,373);put('rt',873,240,242,330);put('rb',827,127-540,182,212);
+ // 레벨 마름모 30개 (레벨만큼 켜짐, 지금 레벨엔 선택 표시)
+ const pts=(armaData?.points||[]).map(([x,y])=>({x,y,off:put('pt_off_'+R,x,y,91,90,0,'pt-off'),on:put('pt_on_'+R,x,y,91,90,0,'pt-on')}));
+ const nowPt=put('sel_pt',0,0,102,102,45,'pt-now');
+ // 가운데
+ put('center_'+R,0,0,1472,1125);put('cpu_'+R,0,0,902,902);
+ [[-128,127,45],[-128,-126,0],[128,-126,225],[127,126,0]].forEach(([x,y,r])=>put('cpuline_'+R,x,y,108,154,r));
+ // 가운데 흰 마름모 테두리 (CenterFrame 389 · CenterFrame(1) 1080, 둘 다 45도)
+ [['f1',389],['f2',1080]].forEach(([k,w])=>{const d=el('span','arma-frame '+k);Object.assign(d.style,{left:(960-w/2)+'px',top:(540-w/2)+'px',width:w+'px',height:w+'px'});cv.append(d)});
+ put('cdeco_'+R,0,0,360,360,45);
+ put('arrow',0,318,19,38,90);put('arrow',-316,0,19,38,180);put('arrow',316,0,19,38,0);
+ const cStep=put('n1',0,204,51,39,0,'c-step');
+ const base=itemIconBase();if(base){const lg=put(base.replace(/\/?$/,'/')+'arma/'+p.heroId+'.webp',0,18,330,330,0,'c-logo');lg.onerror=()=>lg.remove()}
+ const txt=(cls,y,t)=>{const d=el('div','arma-tx '+cls);d.style.top=(540-y)+'px';if(t)d.textContent=t;cv.append(d);return d};
+ const cLv=txt('c-lv',-188),cLvL=txt('c-lvl',-222,'- 레벨 -');
+ txt('c-name arma-name',-318,[a.hero,a.name].filter(Boolean).join('·'));put('word',3,-351,197,9);
+ const center=el('button','arma-hit c');center.type='button';center.setAttribute('aria-label',a.name);Object.assign(center.style,{left:(960-200)+'px',top:(540-200)+'px'});cv.append(center);
+ // 각인 돌파 칸: 게임 화면 Ⅰ 왼쪽 · Ⅱ 오른쪽 · Ⅲ 위
+ const NUMS=[[43,33],[39,30],[51,39]];
+ const nodes=a.steps.slice(0,3).map((st,i)=>{const [x,y]=ARMA_NODE[i];
+  const g={fog:null};put('node_'+R,x,y,391,391,0,'node');put('node_deco',x,y,90,90);put('n'+(i+1),x,y,...NUMS[i]);
+  g.fog=put('lockfog',x,y,220,220,0,'node-fog');g.sel=put('sel',x,y,126,128,45,'node-sel');
+  const b=el('button','arma-hit n');b.type='button';b.setAttribute('aria-label','각인 돌파 '+ROMAN[i]);Object.assign(b.style,{left:(960+x-90)+'px',top:(540-y-90)+'px'});
+  b.onclick=()=>{sel=i;draw()};cv.append(b);g.b=b;return g});
  center.onclick=()=>{sel='center';draw()};
- stage.append(pts,...links,center,...nodes,title);
+ // 판 크기 맞추기
+ const fit=()=>{cv.style.transform='scale('+(stage.clientWidth/1920)+')'};
+ if(window.ResizeObserver)new ResizeObserver(fit).observe(stage);requestAnimationFrame(fit);
  // 레벨 조절
  const bar=el('div','arma-lvbar');
  const dn=el('button','arma-step','▼'),up=el('button','arma-step','▲');dn.type=up.type='button';dn.setAttribute('aria-label','레벨 -1');up.setAttribute('aria-label','레벨 +1');
@@ -1756,10 +1775,10 @@ function armaPanel(p){
  const open=i=>lv>=(a.steps[i]?.maxLv??(i+1)*10);
  const stepOf=()=>a.steps.findIndex(st=>lv<=st.maxLv)+1||a.steps.length;
  function draw(){
-  pts.querySelectorAll('.arma-pt').forEach((d,i)=>d.classList.toggle('on',i<lv));
-  nodes.forEach((b,i)=>{b.classList.toggle('open',open(i));b.classList.toggle('sel',sel===i)});
-  center.classList.toggle('sel',sel==='center');
-  cStep.textContent=ROMAN[Math.min(stepOf(),3)-1]||'';cLv.replaceChildren(el('b','',lv+'/'+MAX),el('small','','- 레벨 -'));
+  pts.forEach((q,i)=>{q.on.hidden=i>=lv;q.off.hidden=i<lv});
+  const cur=pts[lv-1];if(cur){nowPt.hidden=false;nowPt.style.left=(960+cur.x-51)+'px';nowPt.style.top=(540-cur.y-51)+'px'}else nowPt.hidden=true;
+  nodes.forEach((g,i)=>{g.fog.hidden=open(i);g.sel.hidden=sel!==i;g.b.classList.toggle('open',open(i))});
+  cStep.src=IMG+'n'+Math.min(stepOf(),3)+'.webp';cLv.textContent=lv+'/'+MAX;
   lvTxt.replaceChildren(el('b','',String(lv).padStart(2,'0')),document.createTextNode(' / '+MAX));
   info.replaceChildren();
   if(sel==='center'){

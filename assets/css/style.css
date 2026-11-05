@@ -1326,3 +1326,22 @@ button.doll-chip:hover{border-color:var(--accent)}
 .arma-link.l,.arma-link.r{width:4%;height:1.5px}
 .arma-link.t{width:1.5px;height:6%}
 @media(max-width:750px){.arma-node{width:10%}}
+
+/* ===== v1.5.5 무장각인: 게임 조각으로 1920×1080 판 (칸 너비에 맞춰 줄임) ===== */
+.arma-stage{aspect-ratio:16/9!important;background:radial-gradient(ellipse 55% 60% at 50% 50%,color-mix(in srgb,var(--arma) 30%,#120606) 0%,color-mix(in srgb,var(--arma) 10%,#0a0708) 60%,#060506 100%)}
+.arma-stage::before{z-index:0}
+.arma-canvas{position:absolute;left:0;top:0;width:1920px;height:1080px;transform-origin:0 0}
+.arma-px{position:absolute;max-width:none;pointer-events:none;user-select:none}
+.arma-px[hidden],.arma-tx[hidden]{display:none}
+.arma-px.c-logo{object-fit:contain;filter:drop-shadow(0 0 10px rgba(0,0,0,.4))}
+.arma-tx{position:absolute;left:0;width:1920px;transform:translateY(-50%);text-align:center;color:#fff;pointer-events:none;line-height:1}
+.arma-tx.c-lv{font-size:40px;font-weight:700;font-variant-numeric:tabular-nums}
+.arma-tx.c-lvl{font-size:20px;opacity:.8}
+.arma-tx.c-name{font-size:34px;font-weight:700;text-shadow:0 2px 10px #000}
+.arma-hit{position:absolute;border:0;background:none;padding:0;cursor:pointer;transform:rotate(45deg);border-radius:6px}
+.arma-hit.c{width:400px;height:400px;transform:rotate(45deg) scale(.72)}
+.arma-hit.n{width:180px;height:180px;transform:rotate(45deg) scale(.72)}
+.arma-hit:focus-visible{outline:4px solid #fff}
+.arma-frame{position:absolute;transform:rotate(45deg);pointer-events:none}
+.arma-frame.f1{border:4px solid #fff;box-shadow:0 0 0 10px color-mix(in srgb,#fff 8%,transparent),0 0 30px color-mix(in srgb,var(--arma) 60%,transparent)}
+.arma-frame.f2{border:2px solid color-mix(in srgb,#fff 14%,transparent)}
