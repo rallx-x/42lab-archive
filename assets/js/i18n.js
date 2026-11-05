@@ -401,7 +401,7 @@ function tr(s){
 window.L=s=>tr(s)??s;
 window.tr18n=tr;
 /* 이야기 본문은 건너뜀 */
-const SKIP='.item-name,.item-desc,.item-src-text,.wr-long-title,.dorm-theme-info,.item-chip-name,.wr-body,.tip-card,.wr-tab-name,.bubble,.center-item,.chat .name,.option,.choice-spoken,.voice-text,.doll-quote,.doll-career,.doll-story-body,.doll-chip,#stream .entry,#epTitle,#epDesc,#loreText,.notice-line,code,pre';
+const SKIP='.fan-link,.item-name,.item-desc,.item-src-text,.wr-long-title,.dorm-theme-info,.item-chip-name,.wr-body,.tip-card,.wr-tab-name,.bubble,.center-item,.chat .name,.option,.choice-spoken,.voice-text,.doll-quote,.doll-career,.doll-story-body,.doll-chip,#stream .entry,#epTitle,#epDesc,#loreText,.notice-line,code,pre';
 const ATTRS=['title','aria-label','placeholder','alt'];
 function skip(n){const e=n.nodeType===1?n:n.parentElement;return !e||!!e.closest(SKIP)}
 function doText(t){if(skip(t))return;const r=tr(t.nodeValue);if(r!=null&&r!==t.nodeValue)t.nodeValue=r}

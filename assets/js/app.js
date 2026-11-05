@@ -1389,7 +1389,7 @@ async function showItems({push=true,cat=null}={}){
  if(cat!=null&&/^\d+$/.test(cat))itemCat=+cat;
  if(push)saveRoute({type:'items',cat:itemCat?String(itemCat):null});
  const host=$('#dollView');host.replaceChildren(el('p','loading-note','아이템을 불러오는 중…'));window.scrollTo(0,0);
- try{await Promise.all([loadItems(),loadFurniture().catch(()=>null)])}catch(e){if(tok===routeToken)host.replaceChildren(error('아이템을 불러오지 못했어요. ('+e.message+')'));return}
+ try{await Promise.all([loadItems(),loadFurniture().catch(()=>null),loadDollIndex().catch(()=>null)])}catch(e){if(tok===routeToken)host.replaceChildren(error('아이템을 불러오지 못했어요. ('+e.message+')'));return}
  if(tok===routeToken)renderItems();
 }
 function renderItems(){
@@ -1426,6 +1426,9 @@ function renderItems(){
    const body=el('div','item-body');body.append(el('strong','item-name',o.name));
    if(o.desc)body.append(el('p','item-desc',cleanTags(o.desc)));
    if(o.source){const src=el('p','item-src');src.append(el('span','item-src-label','획득처'),el('span','item-src-text',cleanTags(o.source)));body.append(src)}
+   const fans=giftFans(o.id);
+   for(const [k,label] of [[0,'좋아함'],[1,'싫어함']]){if(!fans[k].length)continue;const row=el('p','item-src item-fans');row.append(el('span','item-src-label',label));const names=el('span','item-src-text');
+    fans[k].forEach((d,i)=>{if(i)names.append(document.createTextNode(', '));const a=el('button','fan-link',d.name);a.type='button';a.onclick=()=>showDoll(d.voiceKey);names.append(a)});row.append(names);body.append(row)}
    main.append(body);card.append(main);
    // 랜덤 · 고정 상자 = 구성품(아이콘 · 이름 · 개수) / 선택형 상자 = 선택지(아이콘 · 이름)
    const cont=o.contents||[],opts=o.options||[];
@@ -1444,6 +1447,14 @@ function renderItems(){
   }
  };
  sync();draw();focusItemCard();
+}
+// 선물 아이템을 좋아하는 · 싫어하는 인형 (items.json gifts.byDoll + doll_index)
+let fanCache=null;
+function giftFans(id){
+ if(!fanCache){fanCache=new Map();const by=itemData?.gifts?.byDoll||{},dolls=new Map((dollIndex?.dolls||[]).map(d=>[d.voiceKey,d]));
+  for(const [vk,[lk,dk]] of Object.entries(by)){const d=dolls.get(vk);if(!d)continue;[lk,dk].forEach((ids,k)=>ids.forEach(i=>{if(!fanCache.has(i))fanCache.set(i,[[],[]]);fanCache.get(i)[k].push(d)}))}
+  for(const v of fanCache.values())v.forEach(a=>a.sort((x,y)=>x.name.localeCompare(y.name,'ko')))}
+ return fanCache.get(id)||[[],[]];
 }
 // v1.2 아이템 한 항목 (#item/<id>): 그 칸으로 가서 잠깐 강조 (가구는 숙소 탭)
 let focusItem=null;
@@ -1508,6 +1519,14 @@ function drawDorm(list,count,q){
  count.textContent=shown+'세트';
  if(!shown)box.append(el('p','loading-note','「'+itemQuery.trim()+'」에 맞는 기록이 없어요.'));
 }
+// v1.2 프로필 선물 칸 → 아이템 (누르면 아이템 칸으로). 연결 정보가 있으면 그 순서 · 이름으로 다시 그림
+function giftLinks(w,vk,kind){loadItems().then(d=>{
+ const ids=d.gifts?.byDoll?.[vk]?.[kind];if(!ids?.length){giftIcons(w);return}
+ const byId=new Map((d.items||[]).map(o=>[o.id,o]));
+ w.querySelectorAll('.doll-chip').forEach(c=>c.remove());
+ for(const id of ids){const o=byId.get(id);if(!o)continue;const b=el('button','doll-chip doll-chip-link');b.type='button';b.dataset.item=o.name;b.title=o.name;
+  if(itemIconBase())b.append(itemIcon(o.icon,'chip'));b.append(document.createTextNode(o.name));b.onclick=()=>showItem(id);w.append(b)}
+}).catch(()=>giftIcons(w))}
 // 선물 칸 아이콘 (그림 주소가 있을 때만, 아이템 이름으로 연결)
 function giftIcons(w){if(!itemIconBase())return;loadItems().then(d=>{const m=new Map((d.items||[]).filter(o=>o.page===2).map(o=>[o.name,o.icon]));w.querySelectorAll('.doll-chip[data-item]').forEach(c=>{const icon=m.get(c.dataset.item);if(icon&&!c.querySelector('.item-ic'))c.prepend(itemIcon(icon,'chip'))})}).catch(()=>{})}
 // ----- 프로필 -----
@@ -1666,8 +1685,8 @@ function renderDoll(p){
  info.append(dl);
  if(p.quote)info.append(el('blockquote','doll-quote',cleanTags(p.quote)));
  if(p.oathTitle?.length){const o=el('div','doll-oath');const top=el('div','doll-oath-top');top.append(el('span','doll-oath-label','서약 칭호'));const t=el('span','doll-oath-title');p.oathTitle.forEach((x,i)=>{if(i)t.append(el('i','doll-oath-sep'));t.append(el('span','',x))});top.append(t);o.append(top);if(p.oathDesc){o.append(el('hr','doll-oath-line'),el('p','doll-oath-desc',p.oathDesc))}info.append(o)}
- const chips=(label,arr)=>{if(!arr?.length)return;const w=el('div','doll-chips');w.append(el('span','doll-chips-label',label));arr.forEach(x=>{const c=el('span','doll-chip',x);c.dataset.item=x;w.append(c)});info.append(w);giftIcons(w)};
- chips('좋아함',p.likes);chips('싫어함',p.dislikes);
+ const chips=(label,arr,kind)=>{if(!arr?.length)return;const w=el('div','doll-chips');w.append(el('span','doll-chips-label',label));arr.forEach(x=>{const c=el('span','doll-chip',x);c.dataset.item=x;w.append(c)});info.append(w);giftLinks(w,p.voiceKey,kind)};
+ chips('좋아함',p.likes,0);chips('싫어함',p.dislikes,1);
  if(p.relations?.length){const w=el('div','doll-chips');w.append(el('span','doll-chips-label','관계'));for(const r of p.relations){const key=(dollIndex?.dolls||[]).find(d=>d.heroId===r.heroId)?.voiceKey;const c=el(key?'button':'span','doll-chip rel'+(key?' link':''));if(key){c.type='button';c.title=r.name+' 프로필로 이동';c.onclick=()=>showDoll(key)}c.append(el('b','',r.name),document.createTextNode(' '+String(r.text||'').replace(/^"|"$/g,'')));w.append(c)}info.append(w)}
  const car=el('div','doll-career');car.append(el('h4','',window.L?window.L('이력'):'이력'));car.append(p.career?sentenceBlock(p.career):el('p','doll-empty','한국어 번역 준비 중이에요.'));info.append(car);
  hero.append(info);host.append(hero);
