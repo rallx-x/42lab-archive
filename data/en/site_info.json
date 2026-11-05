@@ -26,6 +26,21 @@
    ]
   },
   {
+   "id": "2026-11-05-v1.5",
+   "date": "2026-11-05",
+   "kind": "update",
+   "title": "Update v1.5 · Quick Access · Doll pages · Arma Inscripta",
+   "lines": [
+    "The quick bar on the home screen is now \"Quick Access\": Home · All Records · Doll Records · Library. Main, Exclusive, Event and Other are chosen inside All Records.",
+    "\"Library\" opens a page with direct links to Perception's Record · Loading Tips · Items.",
+    "Doll pages now switch one section at a time from the contents at the top: Profile · Skills · Arma Inscripta · Intimacy · Voice · Outfits. Back returns to the previous section.",
+    "Arma Inscripta: change the level on a screen with the in-game logo and class color to see stat bonuses and the Ⅰ · Ⅱ · Ⅲ breakthrough skills.",
+    "Skill icons now appear in the in-game hexagon frame. Furniture, profile frames and outfits inside boxes now have images too.",
+    "Doll stories can be expanded and collapsed one by one.",
+    "Undine's Arma Inscripta is a fan translation of the CN server text."
+   ]
+  },
+  {
    "id": "2026-11-05-v1.4",
    "date": "2026-11-05",
    "kind": "update",
