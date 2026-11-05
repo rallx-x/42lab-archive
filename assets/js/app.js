@@ -684,6 +684,8 @@ function renderArchiveMenu(){
   arrow.onclick=()=>{const ex=row.classList.toggle('expanded');arrow.setAttribute('aria-expanded',String(ex))};
   fill(inner);line.append(label,arrow);row.append(line,children);return row;
  };
+ // v1.3 메뉴: 홈 / 기록 열람(전체 기록 ▶ · 인형 기록) / 자료실(시계 기록 ▶ · 로딩 팁 · 아이템)
+ host.append(el('div','archive-menu-section','기록 열람'));
  const allRow=foldRow('전체 기록',()=>{closeArchiveMenu();$('#search').value='';showHome('all')},inner=>{
   for(const [id,name] of storyCategories.filter(([id])=>id!=='all')){
    inner.append(foldRow(name,()=>{closeArchiveMenu();showHome(id)},box=>{
@@ -694,9 +696,10 @@ function renderArchiveMenu(){
  host.append(allRow);
  // v0.10.0 인형 기록
  const dollLink=el('button','archive-menu-link archive-menu-home archive-menu-dolls','인형 기록');dollLink.type='button';dollLink.onclick=()=>{closeArchiveMenu();$('#search').value='';showDolls()};host.append(dollLink);
- // v1.2 자료실 묶음: 시계 기록 · 로딩 팁 · 아이템
  host.append(el('div','archive-menu-section','자료실'));
- const wrLink=el('button','archive-menu-link archive-menu-home archive-menu-dolls','시계 기록');wrLink.type='button';wrLink.onclick=()=>{closeArchiveMenu();$('#search').value='';showRecords()};host.append(wrLink);
+ const recFill=box=>{const put=()=>{box.replaceChildren();for(const t of (wrData?.types||[]).filter(t=>t.id)){const n=(wrData.records||[]).filter(r=>r.type===t.id).length;if(!n)continue;const link=el('button','archive-menu-chapter',t.name);link.type='button';link.onclick=()=>{closeArchiveMenu();$('#search').value='';showRecords({cat:String(t.id)})};box.append(link)}};
+  if(wrData)put();else loadRecords().then(put).catch(()=>{})};
+ host.append(foldRow('시계 기록',()=>{closeArchiveMenu();$('#search').value='';showRecords({cat:'0'})},recFill,'archive-menu-top'));
  const tipLink=el('button','archive-menu-link archive-menu-home archive-menu-dolls','로딩 팁');tipLink.type='button';tipLink.onclick=()=>{closeArchiveMenu();$('#search').value='';showTips()};host.append(tipLink);
  const itemLink=el('button','archive-menu-link archive-menu-home archive-menu-dolls','아이템');itemLink.type='button';itemLink.onclick=()=>{closeArchiveMenu();$('#search').value='';showItems()};host.append(itemLink);
 }

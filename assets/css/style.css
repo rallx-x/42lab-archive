@@ -1155,3 +1155,6 @@ button.doll-chip:hover{border-color:var(--accent)}
 .dorm-preview img{width:100%;border-radius:14px;border:1px solid var(--line);background:var(--mono)}
 .dorm-page-list{margin-top:12px}
 @media(max-width:750px){.dorm-tiles{grid-template-columns:1fr 1fr}}
+/* v1.3 메뉴 묶음 제목: 위 줄 겹침 없애고 여백으로만 나눔 */
+.archive-menu-section{margin:22px 10px 4px;padding:0;border-top:0}
+.archive-menu-home+.archive-menu-section{margin-top:16px}
