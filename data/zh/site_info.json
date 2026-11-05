@@ -219,7 +219,8 @@
     "url": "https://pnc-chess.pages.dev/"
    }
   ],
-  "bgmBase": "https://42lab-bgm.pages.dev/"
+  "bgmBase": "https://42lab-bgm.pages.dev/",
+  "itemIconBase": ""
  },
  "updated": "2026-11-05"
 }
