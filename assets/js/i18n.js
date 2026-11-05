@@ -208,6 +208,9 @@ const D=[
 ['확인','確認','OK','確定','确定'],
 ['고르지 않으면 무작위로 정해져요. 사용자 창에서 언제든 바꿀 수 있어요.','選ばない場合はランダムで決まります。ユーザー画面でいつでも変更できます。','If you skip, one is picked at random. You can change it anytime under User.','若不選擇將隨機決定，之後可隨時在使用者視窗更改。','若不选择将随机决定，之后可随时在用户窗口更改。'],
 // 시계 기록 목록 (v0.12.22) — 메뉴 이름 = 게임 표기 (한국 UI 「시계 기록」, 그 외는 분류 7 서버 원문)
+['링크 복사','リンクをコピー','Copy link','複製連結','复制链接'],
+['기록 찾기 분류','記録検索の分類','Search categories','搜尋分類','搜索分类'],
+['자료실','資料室','Library','資料室','资料室'],
 ['시계 기록','視界記録',"Perception's Record",'視界記錄','视界记录'],
 ['시계 기록 분류','視界記録の分類',"Perception's Record categories",'視界記錄分類','视界记录分类'],
 ['시계 기록을 불러오는 중…','視界記録を読み込み中…',"Loading Perception's Record…",'正在載入視界記錄…','正在加载视界记录…'],
@@ -357,7 +360,9 @@ const P=[
 [/^아이템을 불러오지 못했어요\. \((.+)\)$/,'アイテムを読み込めませんでした。（$1）','Could not load items. ($1)','無法載入道具。（$1）','无法加载道具。（$1）'],
 [/^쾌적도 \+(\d+)$/,'快適度 +$1','Comfort +$1','舒適度 +$1','舒适度 +$1'],
 [/^(\d+)세트$/,'$1セット','$1 sets','$1 套','$1 套'],
+[/^앞의 (\d+)건만 보여 줍니다\. 「아이템」 필터를 누르면 더 볼 수 있어요\.$/,'最初の $1 件のみ表示しています。「アイテム」で絞り込むと続きを見られます。','Showing the first $1. Choose the "Items" filter to see more.','僅顯示前 $1 筆。點選「道具」篩選可查看更多。','仅显示前 $1 条。点选「道具」筛选可查看更多。'],
 [/^로딩 팁을 불러오지 못했어요\. \((.+)\)$/,'ロード画面のTipsを読み込めませんでした。（$1）','Could not load loading tips. ($1)','無法載入載入提示。（$1）','无法加载加载提示。（$1）'],
+[/^시계 기록 · (.+)$/,'視界記録 · $1',"Perception's Record · $1",'視界記錄 · $1','视界记录 · $1'],
 [/^시계 기록을 불러오지 못했어요\. \((.+)\)$/,'視界記録を読み込めませんでした。（$1）',"Could not load Perception's Record. ($1)",'無法載入視界記錄。（$1）','无法加载视界记录。（$1）'],
 [/^([\d,]+)자$/,'$1字','$1 chars','$1字','$1字'],
 [/^「(.+)」에 맞는 기록이 없어요\.$/,'「$1」に合う記録はありません。','No records match "$1".','沒有符合「$1」的記錄。','没有符合「$1」的记录。'],
@@ -398,7 +403,7 @@ function tr(s){
 window.L=s=>tr(s)??s;
 window.tr18n=tr;
 /* 이야기 본문은 건너뜀 */
-const SKIP='.item-name,.item-desc,.item-src-text,.wr-long-title,.dorm-theme-info,.item-chip-name,.wr-body,.tip-card,.wr-tab-name,.bubble,.center-item,.chat .name,.option,.choice-spoken,.voice-text,.doll-quote,.doll-career,.doll-story-body,.doll-chip,#stream .entry,#epTitle,#epDesc,#loreText,.notice-line,code,pre';
+const SKIP='.search-tip p,.search-item-text strong,.fan-link,.item-name,.item-desc,.item-src-text,.wr-long-title,.dorm-theme-info,.item-chip-name,.wr-body,.tip-card,.wr-tab-name,.bubble,.center-item,.chat .name,.option,.choice-spoken,.voice-text,.doll-quote,.doll-career,.doll-story-body,.doll-chip,#stream .entry,#epTitle,#epDesc,#loreText,.notice-line,code,pre';
 const ATTRS=['title','aria-label','placeholder','alt'];
 function skip(n){const e=n.nodeType===1?n:n.parentElement;return !e||!!e.closest(SKIP)}
 function doText(t){if(skip(t))return;const r=tr(t.nodeValue);if(r!=null&&r!==t.nodeValue)t.nodeValue=r}
