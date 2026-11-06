@@ -1530,3 +1530,25 @@ body.entropics{--hex-sh:rgba(8,3,16,.8)}
 .attr-ic.none{display:none}
 .attr-lbl{display:inline-flex;align-items:center}
 .arma-stat>span:first-child{display:inline-flex;align-items:center}
+/* ===== v1.7 인형 능력치 · 친밀도 보너스 (PC: 두 칸) ===== */
+.stats-wrap{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:16px;align-items:start}
+@media(max-width:900px){.stats-wrap{grid-template-columns:1fr}}
+.stats-card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:16px 18px;display:grid;gap:12px}
+.stats-head{font-size:16px;font-weight:800}
+.stats-table th{vertical-align:bottom}
+.stats-star{display:block;color:var(--accent);font-size:13px}
+.stats-lv{display:block;font-size:12px;color:var(--sub)}
+.stats-fbar{margin:0}
+.stats-bonus{display:grid;gap:10px}
+.stats-brow{display:flex;gap:12px;align-items:flex-start;padding:12px;border-radius:12px;background:var(--mono)}
+.stats-brow.locked{opacity:.55}
+.stats-brow .item-ic.sm{width:40px;height:40px;border-radius:10px;display:grid}
+.stats-brow .item-ic.sm.empty{display:grid}
+.stats-bbody{flex:1;display:grid;gap:6px;min-width:0}
+.stats-btop{display:flex;align-items:baseline;gap:8px}
+.stats-bname{font-size:15px}
+.stats-bstep{font-size:12px;color:var(--sub);margin-left:auto}
+.stats-bline{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:14px}
+.stats-bval{color:var(--accent);font-variant-numeric:tabular-nums}
+.stats-breq{display:flex;gap:6px;flex-wrap:wrap}
+.stats-next{color:var(--sub)}
