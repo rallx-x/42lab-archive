@@ -50,3 +50,10 @@
 ## 그림 올리기 (pnc-item)
 - 압축은 `D:\42lab-resource\pnc-item` 을 대상 폴더로 지정해 풀기 (안의 폴더 `arma/` · `skill/` 유지)
 - 올리기: `npx wrangler pages deploy "D:\42lab-resource\pnc-item" --project-name pnc-item --branch production`
+
+## 그림 위치 메모 (CN png 내보내기, 2026-11-06 검토)
+- commonicon.ab_export: 가구 538개는 모두 사이트에 있음 (ICON_furniture_1097 은 쓰는 아이템 없음, 눈송이 721152 는 임시 그림 = 미공개)
+  - 나중에: ICON_spic_* (성령 · 보스) · ICON_Friendship_* (친밀도) · attri_* (능력치 아이콘) · reinforce_card_* · UserInfo_*
+- explorationicon.ab_export: 함수 작업용 — ICON_tag_buff_* (chip_tag 묶음) · Corner_* (chip_mark) · ICON_xy_* · ICON_LBuff_* · ICON_Room_*
+- ui_fairylist.ab_export: 성령 목록 UI 틀 (등급 S·A·B·C, 카드 테두리, 스킬 칸) · 얼굴은 fairysmallheadicon
+
