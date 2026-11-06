@@ -1430,6 +1430,9 @@ async function showArchive({push=true}={}){
  loadItems().then(d=>{if(tok!==routeToken)return;cnt(itm,(d.items||[]).filter(o=>!String(o.grp||'').startsWith('widget:')).length);
   chipRow(itm,ITEM_PAGES.filter(([pg])=>pg).map(([pg,n])=>[n,()=>showItems({cat:String(pg)})]))}).catch(()=>{});
 }
+// v1.6.6 능력치 아이콘 (게임 attri_*, assets/img/attri)
+const attrIc=name=>{const i=el('span','attr-ic');if(name)i.style.setProperty('--ai','url(/assets/img/attri/'+name+'.webp)');else i.classList.add('none');return i};
+const attrLbl=(name,text)=>{const w=el('span','attr-lbl');w.append(attrIc(name),document.createTextNode(text));return w};
 // ----- v1.6 알고리즘 도감 (#algorithms, data/<언어>/algorithms.json) -----
 let algoData=null,algoCat=get('algoCat','all'),algoQuery='';
 const loadAlgos=()=>algoData?Promise.resolve(algoData):fetchJSON(dataPath('algorithms.json')).then(d=>algoData=d);
@@ -1482,7 +1485,7 @@ async function showAlgos({push=true,cat=null}={}){
   basic.replaceChildren();if(q)return;
   const ak=Object.keys(areas).filter(k=>(d.main?.[k]||d.sub?.[k])&&(algoCat==='all'||k===algoCat));
   const table=(heads,rows)=>{const tb=el('table','algo-table');const th=el('tr');heads.forEach((h,i)=>th.append(el('th',i?'':'algo-th-stat',h)));tb.append(th);
-   for(const r of rows){const tr=el('tr');r.forEach((c,i)=>tr.append(el('td',i?'':'algo-td-stat',c)));tb.append(tr)}const w=el('div','algo-table-wrap');w.append(tb);return w};
+   for(const r of rows){const tr=el('tr');r.forEach((c,i)=>{const td=el('td',i?'':'algo-td-stat');if(c instanceof Node)td.append(c);else td.textContent=c;tr.append(td)});tb.append(tr)}const w=el('div','algo-table-wrap');w.append(tb);return w};
   const pctIn=list=>{const c={};list.forEach(x=>c[x.stat]=(c[x.stat]||0)+1);return x=>x.stat+(x.pct&&c[x.stat]>1?' %':'')};
   // 접기 · 펼치기 (처음엔 접힘, 상태 기억)
   const fold=(key,title,note,fill)=>{const sec=el('section','algo-fold'+(get(key,'closed')==='open'?' open':''));const hb=el('button','algo-fold-head');hb.type='button';
@@ -1490,9 +1493,9 @@ async function showAlgos({push=true,cat=null}={}){
    const bd=el('div','algo-fold-body');fill(bd);sec.append(hb,bd);basic.append(sec)};
   if(ak.length){
    fold('algoMain','주요 수치','등급 · 칸 수별 기본값이에요. 알고리즘 효율에 따라 더 올라가요.',bd=>{for(const k of ak){if(!d.main?.[k])continue;const box=el('div','algo-tbox');box.append(el('strong','algo-area a'+k,areas[k].name));
-    box.append(table(['','파랑 1칸','파랑 2칸','보라 1칸','보라 2칸','주황 1칸','주황 2칸'],d.main[k].map(x=>[pctIn(d.main[k])(x),...['b1','b2','p1','p2','o1','o2'].map(c=>x[c]||'-')])));bd.append(box)}});
+    box.append(table(['','파랑 1칸','파랑 2칸','보라 1칸','보라 2칸','주황 1칸','주황 2칸'],d.main[k].map(x=>[attrLbl(x.icon,pctIn(d.main[k])(x)),...['b1','b2','p1','p2','o1','o2'].map(c=>x[c]||'-')])));bd.append(box)}});
    fold('algoSub','부가 수치','품질별 값이에요. 알고리즘 효율의 영향을 받지 않아요.',bd=>{for(const k of ak){if(!d.sub?.[k])continue;const box=el('div','algo-tbox');box.append(el('strong','algo-area a'+k,areas[k].name));
-    box.append(table(['','회색','파랑','보라','주황'],d.sub[k].map(x=>[pctIn(d.sub[k])(x),...x.v])));bd.append(box)}})}
+    box.append(table(['','회색','파랑','보라','주황'],d.sub[k].map(x=>[attrLbl(x.icon,pctIn(d.sub[k])(x)),...x.v])));bd.append(box)}})}
  };
  sync();draw();
 }
@@ -1912,7 +1915,7 @@ function armaPanel(p){
    const tl=el('div','arma-traits');a.steps.forEach((st,i)=>{const t=el('button','arma-trait'+(open(i)?' open':''));t.type='button';t.append(el('span','arma-trait-n',ROMAN[i]),el('span','arma-trait-name',st.skill.name),el('span','arma-trait-lv',open(i)?'':'Lv.'+(st.maxLv??(i+1)*10)));t.onclick=()=>{sel=i;draw()};tl.append(t)});info.append(tl);
    info.append(el('div','arma-sub','능력치 상승'));
    const g=el('div','arma-stats');const row=a.levels[lv-1]||{};
-   for(const [k,v] of Object.entries(row)){if(!v)continue;const it=el('div','arma-stat');it.append(el('span','',attrs[k]||k),el('b','','+'+fmtNum(v)));g.append(it)}
+   for(const [k,v] of Object.entries(row)){if(!v)continue;const it=el('div','arma-stat');const lb=el('span','');lb.append(attrIc(armaData?.attrIcons?.[k]),document.createTextNode(attrs[k]||k));it.append(lb,el('b','','+'+fmtNum(v)));g.append(it)}
    if(!g.childNodes.length)g.append(el('span','arma-none','—'));info.append(g);
   }else{
    const st=a.steps[sel],i=sel;

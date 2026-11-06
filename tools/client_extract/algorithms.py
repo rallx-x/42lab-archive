@@ -96,6 +96,7 @@ def main():
         att, adef = root(cdir + '/LuaConfigs.attribute.lua')
         aname = lambda i: T(att[i]['name']) if isinstance(att.get(i), dict) else str(i)
         isp = lambda i: isinstance(att.get(i), dict) and {**adef, **att[i]}.get('num_type') == 2
+        aicon = lambda i: ({**adef, **att[i]}.get('icon') or '') if isinstance(att.get(i), dict) else ''
         fmt = lambda i, v: (('%g' % (v / 10)) + '%') if isp(i) else str(v)
         # 주요 수치: ath_attribute_pool 1~88 이 등급 → 구역 → 칸 순서로 놓여 있음
         pool, pdef = root(cdir + '/LuaConfigs.ath_attribute_pool.lua')
@@ -111,7 +112,7 @@ def main():
                 m = {**pdef, **pool.get(pid, {})}
                 aid, val = list(m['attrtibute_id'].values())[0], list(m['attrtibute_num'].values())[0]
                 key = aname(aid) + ('%' if isp(aid) else '')
-                row = main.setdefault(a, {}).setdefault(key, {'stat': aname(aid), 'pct': isp(aid)})
+                row = main.setdefault(a, {}).setdefault(key, {'stat': aname(aid), 'pct': isp(aid), 'icon': aicon(aid)})
                 row[q + size] = fmt(aid, val)
         # 부가 수치: ath_affix_pool pool 1 · 2 · 3 = 공격성 · 안정성 · 특이성 (값 1~4 = 회색 · 파랑 · 보라 · 주황)
         afx, xdef = root(cdir + '/LuaConfigs.ath_affix_pool.lua')
@@ -121,7 +122,7 @@ def main():
             if m['pool_id'] not in (1, 2, 3):
                 continue
             aid = m['affix_para']
-            sub.setdefault(str(m['pool_id']), []).append({'stat': aname(aid), 'pct': isp(aid), 'v': [fmt(aid, m['attribute_num'][g]) for g in (1, 2, 3, 4)]})
+            sub.setdefault(str(m['pool_id']), []).append({'stat': aname(aid), 'pct': isp(aid), 'icon': aicon(aid), 'v': [fmt(aid, m['attribute_num'][g]) for g in (1, 2, 3, 4)]})
         docs[lang] = {'schema': '42lab-algorithms/0.1', 'lang': lang, 'areas': areas, 'intro': INTRO[lang],
                       'main': {a: list(r.values()) for a, r in main.items()}, 'sub': sub,
                       'sets': [sets[k] for k in sorted(sets)], 'basics': basics}
