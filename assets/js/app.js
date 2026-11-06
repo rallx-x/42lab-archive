@@ -69,6 +69,7 @@ function routeHash(route){
  if(route.type==='episode')return '#ep/'+encodeURIComponent(route.id);
  if(route.type==='dolls')return '#dolls';
  if(route.type==='archive')return '#archive';
+ if(route.type==='algos')return '#algorithms'+(route.cat?'/'+encodeURIComponent(route.cat):'');
  if(route.type==='record')return '#record/'+encodeURIComponent(route.id);
  if(route.type==='item')return '#item/'+encodeURIComponent(route.id);
  if(route.type==='dorm')return '#dorm/'+encodeURIComponent(route.id);
@@ -86,6 +87,7 @@ function parseRoute(){
   if(raw.startsWith('ep/'))return {type:'episode',id:decodeURIComponent(raw.slice(3))};
   if(raw==='dolls')return {type:'dolls'};
   if(raw==='archive')return {type:'archive'};
+  if(raw==='algorithms'||raw.startsWith('algorithms/'))return {type:'algos',cat:raw.startsWith('algorithms/')?decodeURIComponent(raw.slice(11)):null};
   if(raw.startsWith('record/'))return {type:'record',id:decodeURIComponent(raw.slice(7))};
   if(raw.startsWith('item/'))return {type:'item',id:decodeURIComponent(raw.slice(5))};
   if(raw.startsWith('dorm/'))return {type:'dorm',id:decodeURIComponent(raw.slice(5))};
@@ -156,6 +158,7 @@ async function restoreRoute(){
  }
  if(route.type==='dolls'){await showDolls({push:false});return}
  if(route.type==='archive'){await showArchive({push:false});return}
+ if(route.type==='algos'){await showAlgos({push:false,cat:route.cat});return}
  if(route.type==='record'){await showRecord(route.id,{push:false});return}
  if(route.type==='item'){await showItem(route.id,{push:false});return}
  if(route.type==='dorm'){await showDormTheme(route.id,{push:false});return}
@@ -714,6 +717,7 @@ function renderArchiveMenu(){
  host.append(foldRow('시계 기록',()=>{closeArchiveMenu();$('#search').value='';showRecords({cat:'0'})},recFill,'archive-menu-top'));
  const tipLink=el('button','archive-menu-link archive-menu-home archive-menu-dolls','로딩 팁');tipLink.type='button';tipLink.onclick=()=>{closeArchiveMenu();$('#search').value='';showTips()};host.append(tipLink);
  const itemLink=el('button','archive-menu-link archive-menu-home archive-menu-dolls','아이템');itemLink.type='button';itemLink.onclick=()=>{closeArchiveMenu();$('#search').value='';showItems()};host.append(itemLink);
+ const algoLink=el('button','archive-menu-link archive-menu-home archive-menu-dolls','알고리즘');algoLink.type='button';algoLink.onclick=()=>{closeArchiveMenu();$('#search').value='';showAlgos()};host.append(algoLink);
 }
 $('#menuBtn').onclick=()=>{const menu=$('#archiveMenu');if(!menu.classList.contains('open')){renderArchiveMenu();menu.classList.add('open');menu.removeAttribute('aria-hidden');$('#menuBtn').setAttribute('aria-expanded','true');$('#menuBtn').classList.add('is-open')}else closeArchiveMenu()};
 $('#archiveMenuClose').onclick=closeArchiveMenu;
@@ -1414,6 +1418,7 @@ async function showArchive({push=true}={}){
  const rec=card('WORLD RECORDS','시계 기록','게임 속 세계 기록 · 장문 기록',()=>showRecords({cat:'0'}));
  const tip=card('LOADING TIPS','로딩 팁','로딩 화면에 나오는 백과사전 · 섹터 팁',()=>showTips());
  const itm=card('ITEMS','아이템','창고 · 숙소 가구 · 이벤트 보상',()=>showItems());
+ const alg=card('ALGORITHMS','알고리즘','세트 효과 · 구역 · 기본 능력치',()=>showAlgos());
  const cnt=(o,n)=>{if(tok===routeToken&&n)o.n.textContent=n.toLocaleString(window.UI_LOCALE||'ko-KR')+'개'};
  loadRecords().then(()=>{if(tok!==routeToken)return;cnt(rec,(wrData.records||[]).length);
   const sub=el('div','arc-sub');for(const ty of (wrData.types||[]).filter(x=>x.id)){const k=(wrData.records||[]).filter(r=>r.type===ty.id).length;if(!k)continue;const b=el('button','arc-chip rec',ty.name);b.type='button';b.onclick=()=>showRecords({cat:String(ty.id)});sub.append(b)}
@@ -1421,8 +1426,57 @@ async function showArchive({push=true}={}){
   const chipRow=(o,list)=>{const sub=el('div','arc-sub');for(const [name,go] of list){const b=el('button','arc-chip',name);b.type='button';b.onclick=go;sub.append(b)}if(sub.childNodes.length)o.c.append(sub)};
  (tipData?Promise.resolve(tipData):fetchJSON(dataPath('loading_tips.json')).then(d=>tipData=d)).then(d=>{if(tok!==routeToken)return;cnt(tip,(d.tips||[]).length);
   chipRow(tip,TIP_GROUPS.filter(([g])=>g!=='all'&&(d.tips||[]).some(x=>x.group===g)).map(([g,n])=>[n,()=>showTips({cat:g})]))}).catch(()=>{});
+ loadAlgos().then(d=>{if(tok!==routeToken)return;cnt(alg,(d.sets||[]).length);chipRow(alg,Object.entries(d.areas||{}).filter(([k])=>(d.sets||[]).some(x=>String(x.area)===k)).map(([k,a])=>[a.name,()=>showAlgos({cat:k})]))}).catch(()=>{});
  loadItems().then(d=>{if(tok!==routeToken)return;cnt(itm,(d.items||[]).filter(o=>!String(o.grp||'').startsWith('widget:')).length);
   chipRow(itm,ITEM_PAGES.filter(([pg])=>pg).map(([pg,n])=>[n,()=>showItems({cat:String(pg)})]))}).catch(()=>{});
+}
+// ----- v1.6 알고리즘 도감 (#algorithms, data/<언어>/algorithms.json) -----
+let algoData=null,algoCat=get('algoCat','all'),algoQuery='';
+const loadAlgos=()=>algoData?Promise.resolve(algoData):fetchJSON(dataPath('algorithms.json')).then(d=>algoData=d);
+async function showAlgos({push=true,cat=null}={}){
+ const tok=++routeToken;showOnly('dollView');bgmLeave();voiceStop();closeArchiveMenu();$('#crumb').textContent='알고리즘';
+ if(cat)algoCat=cat;
+ if(push)saveRoute({type:'algos',cat:algoCat==='all'?null:algoCat});
+ const host=$('#dollView');host.replaceChildren(el('p','loading-note','알고리즘을 불러오는 중…'));window.scrollTo(0,0);
+ try{await Promise.all([loadAlgos(),window.siteReady?.catch(()=>{})])}catch(e){if(tok===routeToken)host.replaceChildren(error('알고리즘을 불러오지 못했어요. ('+e.message+')'));return}
+ if(tok!==routeToken)return;
+ const d=algoData,areas=d.areas||{},all=d.sets||[];
+ if(algoCat!=='all'&&!areas[algoCat])algoCat='all';
+ host.replaceChildren();
+ const head=el('div','doll-list-head');const t=el('div');t.append(el('div','eyebrow','DATABASE / ALGORITHMS'),el('h2','','알고리즘'));head.append(t);
+ const count=el('span','section-sub');head.append(count);host.append(head);
+ const bar=el('div','doll-controls wr-controls');const tabs=el('div','wr-tabs');tabs.setAttribute('role','tablist');
+ const btns=[];
+ for(const [g,name] of [['all','전체'],...Object.entries(areas).map(([k,a])=>[k,a.name])]){
+  const n=g==='all'?all.length:all.filter(x=>String(x.area)===g).length;if(!n)continue;
+  const b=el('button','cat-tab wr-tab');b.type='button';b.setAttribute('role','tab');b.append(el('span',g==='all'?'':'algo-area-name',name),el('span','wr-tab-n',String(n)));
+  b.onclick=()=>{algoCat=g;set('algoCat',g);history.replaceState(history.state,'',location.pathname+location.search+routeHash({type:'algos',cat:g==='all'?null:g}));sync();draw()};
+  btns.push([g,b]);tabs.append(b)}
+ const sync=()=>btns.forEach(([g,b])=>{b.classList.toggle('selected',g===algoCat);b.setAttribute('aria-selected',String(g===algoCat))});
+ const sw=el('label','doll-ctl doll-search-wrap');sw.append(el('span','doll-ctl-label','기록 찾기'));
+ const sbox=el('span','doll-search');const si=el('input');si.type='search';si.placeholder='이름 · 효과';si.value=algoQuery;si.autocomplete='off';si.setAttribute('aria-label','알고리즘 찾기');
+ si.oninput=()=>{algoQuery=si.value;draw()};sbox.append(el('span','doll-search-prompt','//:_'),si);sw.append(sbox);
+ bar.append(tabs,sw);const list=el('div','wr-list algo-list');const basic=el('section','algo-basic');host.append(bar,list,basic);
+ const draw=()=>{
+  const q=dnorm(algoQuery);
+  const rows=all.filter(x=>(algoCat==='all'||String(x.area)===algoCat)&&(!q||[x.name,x.two,x.three].some(v=>dnorm(v||'').includes(q))));
+  count.textContent=rows.length+'개';list.replaceChildren();
+  if(!rows.length)list.append(el('p','loading-note','「'+algoQuery.trim()+'」에 맞는 알고리즘이 없어요.'));
+  for(const x of rows){
+   const c=el('div','wr-card algo-card');const top=el('div','algo-top');top.append(itemIcon(x.icon));
+   const tt=el('div','algo-head');tt.append(el('strong','algo-name',x.name),el('span','algo-area a'+x.area,areas[x.area]?.name||''));top.append(tt);c.append(top);
+   const ef=el('div','algo-effects');
+   if(x.two){const r=el('p','algo-eff');r.append(el('span','algo-n','2세트'),el('span','algo-text',x.two));ef.append(r)}
+   if(x.three){const r=el('p','algo-eff');r.append(el('span','algo-n','3세트'),el('span','algo-text',x.three));ef.append(r)}
+   c.append(ef);list.append(c)}
+  // 기본 알고리즘 (세트 없음): 구역별 · 칸 수별 능력치
+  basic.replaceChildren();const b=d.basics||{};const keys=Object.keys(b).filter(k=>algoCat==='all'||k===algoCat);
+  if(keys.length&&!q){basic.append(el('h3','tip-sub','기본 알고리즘 (세트 없음)'));const g=el('div','algo-basic-grid');
+   for(const k of keys){const c=el('div','wr-card algo-bcard');c.append(el('strong','algo-area a'+k,areas[k]?.name||k));
+    for(const [size,names] of Object.entries(b[k])){const r=el('p','algo-eff');r.append(el('span','algo-n',size+'칸'),el('span','algo-text',names.join(' · ')));c.append(r)}g.append(c)}
+   basic.append(g)}
+ };
+ sync();draw();
 }
 async function showTips({push=true,cat=null}={}){
  const tok=++routeToken;showOnly('dollView');bgmLeave();voiceStop();closeArchiveMenu();$('#crumb').textContent='로딩 팁';

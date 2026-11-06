@@ -1410,3 +1410,23 @@ button.doll-chip:hover{border-color:var(--accent)}
 .tip-card{display:flex;flex-direction:column}
 .tip-card>.wr-body{flex:1;display:flex;flex-direction:column}
 .tip-card .tip-dolls{margin-top:auto;padding-top:10px}
+
+/* ===== v1.6 알고리즘 도감 ===== */
+.algo-list{grid-template-columns:repeat(auto-fill,minmax(320px,1fr))}
+.algo-card{display:flex;flex-direction:column;gap:10px}
+.algo-top{display:flex;align-items:center;gap:12px}
+.algo-top .item-ic{width:52px;height:52px;border-radius:10px}
+.algo-head{display:grid;gap:4px;justify-items:start}
+.algo-name{font-size:16px}
+.algo-area{font-size:11px;font-weight:700;padding:2px 8px;border-radius:999px;background:var(--mono);color:var(--sub)}
+.algo-area.a1{background:color-mix(in srgb,#e0503c 16%,transparent);color:#c8452f}
+.algo-area.a2{background:color-mix(in srgb,#2f8fd0 16%,transparent);color:#2a7fbf}
+.algo-area.a3{background:color-mix(in srgb,#9a6bd6 18%,transparent);color:#8559c4}
+.algo-effects{display:grid;gap:6px}
+.algo-eff{margin:0;display:grid;grid-template-columns:48px 1fr;gap:8px;line-height:1.6;font-size:14px}
+.algo-n{font-size:12px;font-weight:700;color:var(--accent);padding-top:2px}
+.algo-basic{margin-top:26px}
+.algo-basic-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:10px}
+.algo-bcard{display:grid;gap:8px;align-content:start}
+.algo-bcard>.algo-area{justify-self:start}
+.algo-card,.algo-bcard{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:16px 18px}

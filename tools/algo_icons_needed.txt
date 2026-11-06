@@ -1,0 +1,13 @@
+ICON_suit_23_2
+ICON_suit_24_2
+ICON_suit_28_2
+ICON_suit_29_2
+ICON_suit_30_2
+ICON_suit_31_2
+ICON_suit_32_2
+ICON_suit_35_2
+ICON_suit_36_2
+ICON_suit_37_2
+ICON_suit_40_2
+ICON_suit_41_2
+ICON_suit_44_2
