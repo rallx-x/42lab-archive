@@ -213,6 +213,9 @@ const D=[
 ['자료실','資料室','Library','資料室','资料室'],
 ['바로가기','クイックアクセス','Quick Access','快速前往','快速前往'],
 ['필터','フィルター','Filter','篩選','筛选'],
+['마그라세아 백과사전','マグラシア知識ベース','Magrasea Knowledge Base','麥戈拉知識庫','麦戈拉知识库'],
+['기업','企業','Companies','企業','企业'],
+['세력','勢力','Factions','勢力','势力'],
 ['- 레벨 -','- レベル -','- LEVEL -','- 等級 -','- 等级 -'],
 ['모두 펼치기','すべて開く','Expand all','全部展開','全部展开'],
 ['프로필','プロフィール','Profile','檔案','档案'],
@@ -397,6 +400,10 @@ const P=[
 [/^해금됨 · 레벨 (\d+) 돌파$/,'解放済み · レベル$1で突破','Unlocked · breakthrough at Lv.$1','已解鎖 · 等級$1突破','已解锁 · 等级$1突破'],
 [/^레벨 (\d+)에서 돌파$/,'レベル$1で突破','Breakthrough at Lv.$1','等級$1突破','等级$1突破'],
 [/^강화: (.+)$/,'強化：$1','Enhances: $1','強化：$1','强化：$1'],
+[/^기업 · (\d+)$/,'企業 · $1','Companies · $1','企業 · $1','企业 · $1'],
+[/^세력 · (\d+)$/,'勢力 · $1','Factions · $1','勢力 · $1','势力 · $1'],
+[/^그 외 · (\d+)$/,'その他 · $1','Other · $1','其他 · $1','其他 · $1'],
+[/^번호는 게임 데이터의 공식 번호예요\. (.+)번은 게임에서 지워져 없어요\.$/,'番号はゲームデータの公式番号です。$1番はゲームから削除されています。','Numbers are the official IDs from the game data. No. $1 were removed from the game.','編號為遊戲資料的官方編號。第 $1 號已從遊戲中刪除。','编号为游戏数据的官方编号。第 $1 号已从游戏中删除。'],
 [/^예충전 ([\d.]+)초$/,'チャージ$1秒','Precharge $1s','預充能$1秒','预充能$1秒'],
 [/^⏳ ([\d.]+)초$/,'⏳ $1秒','⏳ $1s','⏳ $1秒','⏳ $1秒'],
 [/^숙소 · (.+)$/,'宿舎 · $1','Dorm · $1','宿舍 · $1','宿舍 · $1'],
@@ -441,7 +448,7 @@ function tr(s){
 window.L=s=>tr(s)??s;
 window.tr18n=tr;
 /* 이야기 본문은 건너뜀 */
-const SKIP='.doll-mini-name,.doll-story-peek,.arc-chip,.arma-name,.arma-nm,.arma-desc,.arma-trait-name,.arma-stat span,.skill-brief,.skill-detail,.skill-name,.item-folder-names,.item-variant,.search-tip p,.search-item-text strong,.fan-link,.item-name,.item-desc,.item-src-text,.wr-long-title,.dorm-theme-info,.item-chip-name,.wr-body,.tip-card,.wr-tab-name,.bubble,.center-item,.chat .name,.option,.choice-spoken,.voice-text,.doll-quote,.doll-career,.doll-story-body,.doll-chip,#stream .entry,#epTitle,#epDesc,#loreText,.notice-line,code,pre';
+const SKIP='.tip-doll,.doll-mini-name,.doll-story-peek,.arc-chip,.arma-name,.arma-nm,.arma-desc,.arma-trait-name,.arma-stat span,.skill-brief,.skill-detail,.skill-name,.item-folder-names,.item-variant,.search-tip p,.search-item-text strong,.fan-link,.item-name,.item-desc,.item-src-text,.wr-long-title,.dorm-theme-info,.item-chip-name,.wr-body,.tip-card,.wr-tab-name,.bubble,.center-item,.chat .name,.option,.choice-spoken,.voice-text,.doll-quote,.doll-career,.doll-story-body,.doll-chip,#stream .entry,#epTitle,#epDesc,#loreText,.notice-line,code,pre';
 const ATTRS=['title','aria-label','placeholder','alt'];
 function skip(n){const e=n.nodeType===1?n:n.parentElement;return !e||!!e.closest(SKIP)}
 function doText(t){if(skip(t))return;const r=tr(t.nodeValue);if(r!=null&&r!==t.nodeValue)t.nodeValue=r}

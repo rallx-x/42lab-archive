@@ -1391,7 +1391,8 @@ async function showRecord(id,{push=true}={}){
  host.append(back,head,meta,txt,foot);
 }
 // ----- v0.12.22 로딩 팁 (#tips) — 글만 (배경 그림 없음) -----
-const TIP_GROUPS=[['all','전체'],['doll','인형'],['sector','섹터'],['etc','그 외']];
+const TIP_GROUPS=[['all','전체'],['doll','인형'],['wiki','마그라세아 백과사전'],['sector','섹터'],['etc','그 외']];
+const TIP_SUBS=[['corp','기업'],['faction','세력'],['etc','그 외']]; // 「그 외」 안 세부 분류
 let tipData=null,tipCat=get('tipCat','all'),tipQuery='';
 // v1.5 자료실: 메뉴 「자료실」 항목을 한 화면에 카드로 (누르면 바로 그 화면)
 async function showArchive({push=true}={}){
@@ -1418,7 +1419,7 @@ async function showTips({push=true,cat=null}={}){
  if(cat&&TIP_GROUPS.some(([g])=>g===cat))tipCat=cat;
  if(push)saveRoute({type:'tips',cat:tipCat==='all'?null:tipCat});
  const host=$('#dollView');host.replaceChildren(el('p','loading-note','로딩 팁을 불러오는 중…'));window.scrollTo(0,0);
- try{if(!tipData)tipData=await fetchJSON(dataPath('loading_tips.json'))}catch(e){if(tok===routeToken)host.replaceChildren(error('로딩 팁을 불러오지 못했어요. ('+e.message+')'));return}
+ try{if(!tipData)tipData=await fetchJSON(dataPath('loading_tips.json'));await loadDollIndex().catch(()=>null)}catch(e){if(tok===routeToken)host.replaceChildren(error('로딩 팁을 불러오지 못했어요. ('+e.message+')'));return}
  if(tok===routeToken)renderTips();
 }
 function renderTips(){
@@ -1438,17 +1439,23 @@ function renderTips(){
  const sw=el('label','doll-ctl doll-search-wrap');sw.append(el('span','doll-ctl-label','기록 찾기'));
  const sbox=el('span','doll-search');const si=el('input');si.type='search';si.placeholder='이름 · 내용';si.value=tipQuery;si.setAttribute('aria-label','로딩 팁 찾기');si.autocomplete='off';
  si.oninput=()=>{tipQuery=si.value;draw()};sbox.append(el('span','doll-search-prompt','//:_'),si);sw.append(sbox);
- bar.append(tabs,sw);const list=el('div','wr-list tip-list');host.append(bar,list);
+ bar.append(tabs,sw);const list=el('div','wr-list tip-list');
+ const note=el('p','load-note tip-note','번호는 게임 데이터의 공식 번호예요. '+(tipData.missing||[1,2,40]).join(' · ')+'번은 게임에서 지워져 없어요.');
+ host.append(note,bar,list);
+ const dname=k=>(dollIndex?.dolls||[]).find(d=>d.voiceKey===k)?.name||k;
  const draw=()=>{
   const q=dnorm(tipQuery);
   const rows=all.filter(x=>(tipCat==='all'||x.group===tipCat)&&(!q||dnorm(x.title).includes(q)||dnorm(x.text).includes(q)));
   count.textContent=rows.length+'개';list.replaceChildren();
   if(!rows.length){list.append(el('p','loading-note',q?'「'+tipQuery.trim()+'」에 맞는 기록이 없어요.':'기록이 없어요.'));return}
-  for(const x of rows){
+  const card=x=>{
    const c=el('div','wr-card tip-card');const top=el('div','wr-card-top');top.append(el('span','wr-no',String(x.id).padStart(2,'0')));
    const body=el('div','wr-body');body.append(el('strong','wr-name tip-title',x.title));body.append(el('p','tip-text',cleanTags(x.text)));
-   c.append(top,body);list.append(c);
-  }
+   // 글에 나오는 인형 → 아래에 이름 바로가기
+   if(x.dolls?.length){const w=el('div','tip-dolls');for(const [k,alias] of x.dolls){const b=el('button','doll-chip link tip-doll');b.type='button';b.append(ic('user'),document.createTextNode(' '+(alias||dname(k))));b.onclick=()=>showDoll(k);w.append(b)}body.append(w)}
+   c.append(top,body);return c};
+  if(tipCat==='etc'&&!q){for(const [sg,sn] of TIP_SUBS){const part=rows.filter(x=>(x.sub||'etc')===sg);if(!part.length)continue;list.append(el('h3','tip-sub',sn+' · '+part.length));part.forEach(x=>list.append(card(x)))}}
+  else rows.forEach(x=>list.append(card(x)));
  };
  sync();draw();
 }
