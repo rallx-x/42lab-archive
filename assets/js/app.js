@@ -1864,7 +1864,7 @@ function statsPanel(p){
  const list=el('div','stats-bonus');right.append(list);
  const draw=()=>{lvTxt.replaceChildren(el('b','',String(friendLv)),document.createTextNode(' / 20'));list.replaceChildren();
   for(const b of st.bonus||[]){const got=b.steps.filter(x=>x.fl<=friendLv);const cur=got[got.length-1],next=b.steps[got.length];
-   const row=el('div','stats-brow'+(cur?'':' locked'));const ic=itemIcon(b.icon,'sm');row.append(ic);
+   const row=el('div','stats-brow'+(cur?'':' locked'));const ic=el('span','stats-fic');if(b.icon){const im=el('img');im.alt='';im.decoding='async';im.src='/assets/img/friend/'+b.icon+'.webp';im.onerror=()=>im.remove();ic.append(im)}row.append(ic);
    const body=el('div','stats-bbody');const t=el('div','stats-btop');t.append(el('strong','stats-bname',b.name),el('span','stats-bstep','LV'+got.length+' / '+b.steps.length));body.append(t);
    const line=el('div','stats-bline');line.append(attrLbl(icons[b.attr],names[b.attr]||''),el('b','stats-bval',cur?'+'+(typeof cur.v==='number'?cur.v.toLocaleString(window.UI_LOCALE||'ko-KR'):cur.v):'-'));body.append(line);
    const req=el('div','stats-breq');
