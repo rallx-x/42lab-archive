@@ -1558,3 +1558,5 @@ body.entropics{--hex-sh:rgba(8,3,16,.8)}
 .algo-emblem::after{inset:8px}
 .algo-top .item-ic.algo-item{width:44px;height:44px;padding:3px;background:var(--mono)}
 .algo-top .item-ic.algo-item img{width:100%;height:100%;object-fit:contain}
+/* v1.7.1 인형 목록 무장각인 필터 */
+.doll-arma-filter{height:38px}
