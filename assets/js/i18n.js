@@ -217,6 +217,18 @@ const D=[
 ['기업','企業','Companies','企業','企业'],
 ['자세히','詳細','Details','詳細','详细'],
 ['선물','プレゼント','Gifts','禮物','礼物'],
+['세트 효과 · 구역 · 기본 능력치','セット効果 · エリア · 基本ステータス','Set effects · areas · base stats','套裝效果 · 區域 · 基礎屬性','套装效果 · 区域 · 基础属性'],
+['기본 알고리즘 (세트 없음)','基本アルゴリズム（セットなし）','Basic algorithms (no set)','基礎演算法（無套裝）','基础算法（无套装）'],
+['2세트','2セット','2-piece','2件套','2件套'],
+['주요 수치','メインステータス','Main stats','主要屬性','主要属性'],
+['부가 수치','サブステータス','Sub stats','附加屬性','附加属性'],
+['등급 · 칸 수별 기본값이에요. 알고리즘 효율에 따라 더 올라가요.','レア度 · マス数ごとの基本値です。アルゴリズム効率でさらに上がります。','Base values by rarity and slots. They rise further with algorithm efficiency.','依稀有度 · 格數的基礎值，會隨演算法效率提升。','按稀有度 · 格数的基础值，会随算法效率提升。'],
+['품질별 값이에요. 알고리즘 효율의 영향을 받지 않아요.','品質ごとの値です。アルゴリズム効率の影響は受けません。','Values by grade. Not affected by algorithm efficiency.','依品質的數值，不受演算法效率影響。','按品质的数值，不受算法效率影响。'],
+['회색','灰','Gray','灰','灰'],['파랑','青','Blue','藍','蓝'],['보라','紫','Purple','紫','紫'],['주황','橙','Orange','橙','橙'],
+['알고리즘이란?','アルゴリズムとは？','What are algorithms?','什麼是演算法？','什么是算法？'],
+['3세트','3セット','3-piece','3件套','3件套'],
+['이름 · 효과','名前 · 効果','Name · effect','名稱 · 效果','名称 · 效果'],
+['알고리즘을 불러오는 중…','アルゴリズムを読み込み中…','Loading algorithms…','正在載入演算法…','正在加载算法…'],
 ['로딩 화면에 나오는 백과사전 · 섹터 팁','ロード画面の知識ベース · セクターTips','Knowledge base and sector tips from loading screens','載入畫面的知識庫 · 區域提示','加载画面的知识库 · 区域提示'],
 ['공격','アタック','Attack','攻擊','攻击'],
 ['암살','アサシン','Assassin','刺殺','刺杀'],
@@ -413,6 +425,10 @@ const P=[
 [/^세력 · (\d+)$/,'勢力 · $1','Factions · $1','勢力 · $1','势力 · $1'],
 [/^그 외 · (\d+)$/,'その他 · $1','Other · $1','其他 · $1','其他 · $1'],
 [/^번호는 게임 데이터의 공식 번호예요\. (.+)번은 게임에서 지워져 없어요\.$/,'番号はゲームデータの公式番号です。$1番はゲームから削除されています。','Numbers are the official IDs from the game data. No. $1 were removed from the game.','編號為遊戲資料的官方編號。第 $1 號已從遊戲中刪除。','编号为游戏数据的官方编号。第 $1 号已从游戏中删除。'],
+[/^파랑 (\d)칸$/,'青 $1マス','Blue $1-slot','藍 $1格','蓝 $1格'],
+[/^보라 (\d)칸$/,'紫 $1マス','Purple $1-slot','紫 $1格','紫 $1格'],
+[/^주황 (\d)칸$/,'橙 $1マス','Orange $1-slot','橙 $1格','橙 $1格'],
+[/^(\d)칸$/,'$1マス','$1 slot','$1格','$1格'],
 [/^예충전 ([\d.]+)초$/,'チャージ$1秒','Precharge $1s','預充能$1秒','预充能$1秒'],
 [/^⏳ ([\d.]+)초$/,'⏳ $1秒','⏳ $1s','⏳ $1秒','⏳ $1秒'],
 [/^숙소 · (.+)$/,'宿舎 · $1','Dorm · $1','宿舍 · $1','宿舍 · $1'],
@@ -457,7 +473,7 @@ function tr(s){
 window.L=s=>tr(s)??s;
 window.tr18n=tr;
 /* 이야기 본문은 건너뜀 */
-const SKIP='.dc-career .dc-name,.tip-doll,.doll-mini-name,.doll-story-peek,.arc-chip.rec,.arma-name,.arma-nm,.arma-desc,.arma-trait-name,.arma-stat span,.skill-brief,.skill-detail,.skill-name,.item-folder-names,.item-variant,.search-tip p,.search-item-text strong,.fan-link,.item-name,.item-desc,.item-src-text,.wr-long-title,.dorm-theme-info,.item-chip-name,.wr-body,.tip-card,.wr-tab-name,.bubble,.center-item,.chat .name,.option,.choice-spoken,.voice-text,.doll-quote,.doll-career,.doll-story-body,.doll-chip,#stream .entry,#epTitle,#epDesc,#loreText,.notice-line,code,pre';
+const SKIP='.algo-td-stat,.algo-intro-h,.algo-intro-t,.algo-area,.algo-area-name,.algo-name,.algo-text,.dc-career .dc-name,.tip-doll,.doll-mini-name,.doll-story-peek,.arc-chip.rec,.arma-name,.arma-nm,.arma-desc,.arma-trait-name,.arma-stat span,.skill-brief,.skill-detail,.skill-name,.item-folder-names,.item-variant,.search-tip p,.search-item-text strong,.fan-link,.item-name,.item-desc,.item-src-text,.wr-long-title,.dorm-theme-info,.item-chip-name,.wr-body,.tip-card,.wr-tab-name,.bubble,.center-item,.chat .name,.option,.choice-spoken,.voice-text,.doll-quote,.doll-career,.doll-story-body,.doll-chip,#stream .entry,#epTitle,#epDesc,#loreText,.notice-line,code,pre';
 const ATTRS=['title','aria-label','placeholder','alt'];
 function skip(n){const e=n.nodeType===1?n:n.parentElement;return !e||!!e.closest(SKIP)}
 function doText(t){if(skip(t))return;const r=tr(t.nodeValue);if(r!=null&&r!==t.nodeValue)t.nodeValue=r}

@@ -1410,3 +1410,59 @@ button.doll-chip:hover{border-color:var(--accent)}
 .tip-card{display:flex;flex-direction:column}
 .tip-card>.wr-body{flex:1;display:flex;flex-direction:column}
 .tip-card .tip-dolls{margin-top:auto;padding-top:10px}
+
+/* ===== v1.6 알고리즘 도감 ===== */
+.algo-list{grid-template-columns:repeat(auto-fill,minmax(320px,1fr))}
+.algo-card{display:flex;flex-direction:column;gap:10px}
+.algo-top{display:flex;align-items:center;gap:12px}
+.algo-top .item-ic{width:52px;height:52px;border-radius:10px}
+.algo-head{display:grid;gap:4px;justify-items:start}
+.algo-name{font-size:16px}
+.algo-area{font-size:11px;font-weight:700;padding:2px 8px;border-radius:999px;background:var(--mono);color:var(--sub)}
+.algo-area.a1{background:color-mix(in srgb,#e0503c 16%,transparent);color:#c8452f}
+.algo-area.a2{background:color-mix(in srgb,#2f8fd0 16%,transparent);color:#2a7fbf}
+.algo-area.a3{background:color-mix(in srgb,#9a6bd6 18%,transparent);color:#8559c4}
+.algo-effects{display:grid;gap:6px}
+.algo-eff{margin:0;display:grid;grid-template-columns:48px 1fr;gap:8px;line-height:1.6;font-size:14px}
+.algo-n{font-size:12px;font-weight:700;color:var(--accent);padding-top:2px}
+.algo-basic{margin-top:26px}
+.algo-basic-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:10px}
+.algo-bcard{display:grid;gap:8px;align-content:start}
+.algo-bcard>.algo-area{justify-self:start}
+.algo-card,.algo-bcard{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:16px 18px}
+
+/* v1.6.0 알고리즘 세트 기호 (게임 suit_NN) */
+.algo-emblem{flex:none;width:52px;height:52px;border-radius:12px;position:relative;background:#5a5a62}
+.algo-emblem.a1{background:linear-gradient(160deg,#d9533f,#9b2c1f)}
+.algo-emblem.a2{background:linear-gradient(160deg,#3b97d6,#1f5f94)}
+.algo-emblem.a3{background:linear-gradient(160deg,#9a6bd6,#5f3b98)}
+.algo-emblem::after{content:"";position:absolute;inset:9px;background:#fff;-webkit-mask:var(--em) center/contain no-repeat;mask:var(--em) center/contain no-repeat}
+.algo-emblem.none{display:none}
+.algo-top .item-ic.algo-item{width:40px;height:40px;border-radius:8px;order:3;margin-left:auto}
+.algo-intro{background:var(--panel);border:1px solid var(--line);border-radius:16px;margin:0 0 16px;overflow:hidden}
+.algo-intro-head{width:100%;display:flex;align-items:center;gap:10px;text-align:left;border:0;border-radius:0;background:none;padding:14px 18px}
+.algo-intro-head strong{font-size:16px;flex:1}
+.algo-intro-head .tri{color:var(--sub);transition:transform .2s}
+.algo-intro.open .algo-intro-head .tri{transform:rotate(90deg)}
+.algo-intro-body{display:none;padding:0 18px 16px;gap:8px}
+.algo-intro.open .algo-intro-body{display:grid}
+.algo-intro-row{margin:0;display:grid;grid-template-columns:96px 1fr;gap:10px;line-height:1.65;font-size:14px}
+.algo-intro-h{color:var(--accent);font-size:13px}
+@media(max-width:750px){.algo-intro-row{grid-template-columns:1fr;gap:2px}}
+.algo-tbox{display:grid;gap:8px;margin:0 0 14px}
+.algo-tbox>.algo-area{justify-self:start}
+.algo-table-wrap{overflow-x:auto;background:var(--panel);border:1px solid var(--line);border-radius:14px}
+.algo-table{width:100%;border-collapse:collapse;font-size:13px;font-variant-numeric:tabular-nums}
+.algo-table th,.algo-table td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:center;white-space:nowrap}
+.algo-table tr:last-child td{border-bottom:0}
+.algo-table th{font-size:12px;color:var(--sub);font-weight:700}
+.algo-th-stat,.algo-td-stat{text-align:left!important;font-weight:700}
+.algo-fold{background:var(--panel);border:1px solid var(--line);border-radius:16px;margin:0 0 12px;overflow:hidden}
+.algo-fold-head{width:100%;display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;text-align:left;border:0;border-radius:0;background:none;padding:14px 18px}
+.algo-fold-head strong{font-size:16px}
+.algo-fold-note{flex:1;color:var(--sub);font-size:12px}
+.algo-fold-head .tri{color:var(--sub);transition:transform .2s;align-self:center}
+.algo-fold.open .algo-fold-head .tri{transform:rotate(90deg)}
+.algo-fold-body{display:none;padding:0 14px 14px}
+.algo-fold.open .algo-fold-body{display:block}
+.algo-basic{margin-top:22px}
