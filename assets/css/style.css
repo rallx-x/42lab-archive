@@ -1525,3 +1525,8 @@ body.entropics{--hex-sh:rgba(8,3,16,.8)}
 .skill-arma-tag{font-size:11px;font-weight:700;color:#fff;background:#ff9a1f;border-radius:6px;padding:1px 7px;white-space:nowrap;margin-top:2px}
 /* 주황 무장각인 테두리는 회색 육각 안쪽 (흰 테두리와 겹치지 않게) */
 .skill-hex .hex-arma{left:10%;top:8%;width:80%;height:84%}
+/* v1.6.6 능력치 아이콘 (게임 attri_*, 글자색으로 칠함) */
+.attr-ic{display:inline-block;width:1.15em;height:1.15em;flex:none;vertical-align:-.2em;margin-right:6px;background:currentColor;-webkit-mask:var(--ai) center/contain no-repeat;mask:var(--ai) center/contain no-repeat;opacity:.85}
+.attr-ic.none{display:none}
+.attr-lbl{display:inline-flex;align-items:center}
+.arma-stat>span:first-child{display:inline-flex;align-items:center}
