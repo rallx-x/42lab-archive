@@ -1589,3 +1589,43 @@ body.dark .item-ic.empty::before,body.dim .item-ic.empty::before,body.entropics 
 .ic-record{--ic:url(../icons/record.png)}
 .folder-tile-symbol .ic{font-size:.6em;vertical-align:middle}
 .folder-art-symbol .ic{font-size:.6em}
+/* v1.7.5 생일 칸: 오늘 생일 · 다음 생일 + 달력 팝업 */
+.home-birthday .bday-list{max-height:none}
+.bday-next{display:flex;align-items:center;gap:8px;font:700 13px ui-monospace,Consolas,"Noto Sans KR",monospace;color:var(--sub);margin-top:2px}
+.bday-next-date{color:var(--accent-text,var(--accent))}
+.bday-next-d{margin-left:auto;font-size:11px;border:1px solid var(--line);border-radius:999px;padding:2px 8px}
+.bday-open{margin-top:12px;width:100%;height:38px;display:flex;align-items:center;justify-content:center;gap:7px;border:1px solid var(--line);border-radius:12px;background:var(--panel2,transparent);color:var(--text);font-weight:700;cursor:pointer}
+.bday-open:hover{border-color:var(--accent)}
+.bday-open .ic{font-size:14px}
+.bday-pop{min-width:min(360px,80vw)}
+.bday-pop .bday-list{max-height:260px}
+/* v1.7.5 픽업 일정 (첫 화면 생일 칸 아래 · 전체 일정 팝업) */
+.gacha-sec{margin-top:16px;padding-top:14px;border-top:1px solid var(--line)}
+.gacha-head{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.gacha-head-title{font:700 13px ui-monospace,Consolas,"Noto Sans KR",monospace;color:var(--accent-text,var(--accent))}
+.gacha-head .bday-next-d,.gacha-slot-head .bday-next-d{margin-left:auto}
+.gacha-list{display:flex;flex-direction:column;gap:8px}
+.gacha-pick{border:1px solid var(--line);border-radius:14px;padding:10px 12px;background:var(--bg)}
+.gacha-title{font-weight:700;font-size:13px;margin-bottom:8px}
+.gacha-main{display:flex;align-items:center;gap:10px}
+.gacha-main-text{display:flex;flex-direction:column;line-height:1.3}
+.gacha-label{font-size:10px;color:var(--sub);letter-spacing:.04em}
+.gacha-face{position:relative;padding:0;border:0;background:none;cursor:pointer;flex:none;color:inherit}
+.gacha-face .avatar{width:30px;height:30px}
+.gacha-face.main .avatar{width:42px;height:42px}
+.gacha-career{position:absolute;right:-3px;bottom:-3px;width:15px;height:15px;border-radius:50%;background:var(--panel,#222);box-shadow:0 0 0 1px var(--line);color:var(--text)}
+.gacha-career::after{content:"";position:absolute;inset:2px;background:currentColor;-webkit-mask:var(--ci) center/contain no-repeat;mask:var(--ci) center/contain no-repeat}
+.gacha-server{font-size:10px;color:var(--sub);border:1px solid var(--line);border-radius:999px;padding:1px 7px}
+.gacha-face.main .gacha-career{width:18px;height:18px}
+.gacha-subs{display:flex;flex-wrap:wrap;gap:6px;margin-top:9px}
+.gacha-pop{min-width:min(560px,86vw);display:flex;flex-direction:column;gap:12px}
+.gacha-pop-note{text-align:left;margin:0}
+.gacha-slot{border:1px solid var(--line);border-radius:16px;padding:10px 12px}
+.gacha-slot.now{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 7%,transparent)}
+.gacha-slot-head{display:flex;align-items:center;gap:8px;margin-bottom:8px;font:700 13px ui-monospace,Consolas,"Noto Sans KR",monospace}
+.gacha-slot-in{margin-left:auto;font-size:11px;color:var(--sub)}
+.gacha-slot-body{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+@media(max-width:640px){.gacha-slot-body{grid-template-columns:1fr}}
+.gacha-pick.full .gacha-subs{gap:8px 4px}
+.gacha-sub{display:flex;flex-direction:column;align-items:center;gap:3px;width:52px}
+.gacha-sub-name{font-size:10px;color:var(--sub);text-align:center;line-height:1.2;word-break:keep-all}

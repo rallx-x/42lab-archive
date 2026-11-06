@@ -655,7 +655,90 @@ function pagedCard(cls,pages){
 function gameToday(){const t=new Date(Date.now()+(9-5)*3600e3);return {y:t.getUTCFullYear(),m:t.getUTCMonth()+1,d:t.getUTCDate()}}
 let dolls=null;
 let calShift=0; // 0 = 이번 달, -1 = 지난달, +1 = 다음 달
+// v1.7.5 첫 화면 생일 칸은 오늘 생일인 인형(없으면 다음 생일)만, 달력은 「달력 펼치기」 팝업에서
+const bdayCard=(x,isToday)=>{
+ const c=el('div','bday-card'+(isToday?' today':''));
+ const face=el('div','avatar bday-face');const url=(x.portrait&&imageMap[x.portrait])||imageMap[x.nameKo]||imageMap[x.name];
+ if(url){const im=document.createElement('img');im.src=url.startsWith('./')?url:'./'+url;im.alt='';im.onerror=()=>{im.remove();face.classList.add('fallback')};face.append(im)}else face.classList.add('fallback');
+ const t=el('div','bday-text');t.append(el('strong','',x.birthday+'. Happy Birthday!'),el('span','',x.name));
+ c.append(face,t);return c};
+function nextBirthday(T){
+ const list=(dolls?.dolls||[]).filter(x=>/^\d{4}$/.test(x.birthday||''));if(!list.length)return null;
+ const base=Date.UTC(T.y,T.m-1,T.d);let best=null;
+ for(const x of list){const m=+x.birthday.slice(0,2),d=+x.birthday.slice(2);let t=Date.UTC(T.y,m-1,d);if(t<=base)t=Date.UTC(T.y+1,m-1,d);const n=Math.round((t-base)/864e5);if(!best||n<best.n)best={n,key:x.birthday,who:[]};}
+ best.who=list.filter(x=>x.birthday===best.key);return best}
 function renderBirthday(card){
+ const T=gameToday(),todayKey=String(T.m).padStart(2,'0')+String(T.d).padStart(2,'0');
+ const cards=el('div','bday-list');
+ if(!dolls)cards.append(el('p','bm-empty','생일 정보를 불러오는 중…'));
+ else{
+  const who=(dolls.dolls||[]).filter(x=>x.birthday===todayKey);
+  who.forEach(x=>cards.append(bdayCard(x,true)));
+  if(!who.length){cards.append(el('p','bm-empty','오늘 생일인 인형이 없어요.'));
+   const nx=nextBirthday(T);
+   if(nx){const r=el('div','bday-next');r.append(el('span','bday-next-label','다음 생일'),el('span','bday-next-date',nx.key.slice(0,2)+'.'+nx.key.slice(2)),el('span','bday-next-d','D-'+nx.n));cards.append(r);nx.who.forEach(x=>cards.append(bdayCard(x,false)))}}
+ }
+ const btn=el('button','bday-open');btn.type='button';btn.append(ic('expand'),el('span','','달력 펼치기'));btn.onclick=openBirthdayCalendar;
+ card.append(cards,btn);renderGacha(card);card.append(el('p','cal-note','매일 오전 5시(KST)에 갱신됩니다.'));
+}
+// v1.7.5 픽업(지정검색) 로테이션 — data/gacha.json (tools/client_extract/gacha.py). 기준일부터 days 일마다 다음 칸, 끝나면 처음으로
+let gachaData=null,gachaLoading=false;
+const redrawLanding=()=>{if(index&&category==null&&!openFolderId&&!$('#search').value.trim()&&!$('#library').classList.contains('hidden'))drawLibrary()};
+function gachaNow(){
+ const g=gachaData;if(!g?.slots?.length)return null;
+ const T=gameToday(),[ay,am,ad]=g.anchor.split('-').map(Number);
+ const since=Math.floor((Date.UTC(T.y,T.m-1,T.d)-Date.UTC(ay,am-1,ad))/864e5),n=g.slots.length;
+ const k=Math.floor(since/g.days),at=((k%n)+n)%n,left=g.days-(since-k*g.days);
+ const start=new Date(Date.UTC(ay,am-1,ad)+k*g.days*864e5);
+ return {at,left,start,slot:g.slots[at],next:g.slots[(at+1)%n]};
+}
+const gTitle=p=>p.title?.[window.UI_LANG||'ko']||p.title?.ko||'';
+function gachaDoll(id){
+ const x=(dolls?.dolls||[]).find(d=>+d.heroId===+id),di=(dollIndex?.dolls||[]).find(d=>+d.heroId===+id);
+ return {name:x?.name||di?.name||String(id),ko:x?.nameKo||x?.name||di?.name,career:di?.career,key:di?.voiceKey}}
+function gachaFace(id,cls){
+ const d=gachaDoll(id),b=el('button','gacha-face'+(cls?' '+cls:''));b.type='button';b.title=d.name;b.setAttribute('aria-label',d.name);
+ const face=el('span','avatar');const url=imageMap[d.ko]||imageMap[d.name];
+ if(url){const im=document.createElement('img');im.src=url.startsWith('./')?url:'./'+url;im.alt='';im.loading='lazy';im.onerror=()=>{im.remove();face.classList.add('fallback')};face.append(im)}else face.classList.add('fallback');
+ b.append(face);
+ if(d.career){const ci=el('span','dc-ic career gacha-career');ci.style.setProperty('--ci','url(/assets/img/class/career_'+d.career+'.png)');b.append(ci)}
+ if(d.key)b.onclick=()=>showDoll(d.key);
+ return b}
+function gachaBlock(p,full){
+ const box=el('div','gacha-pick'+(full?' full':''));
+ box.append(el('div','gacha-title',gTitle(p)));
+ const row=el('div','gacha-main');const m=gachaDoll(p.main);row.append(gachaFace(p.main,'main'));
+ const t=el('div','gacha-main-text');t.append(el('span','gacha-label','메인 픽업'),el('strong','',m.name));row.append(t);box.append(row);
+ const subs=el('div','gacha-subs');
+ for(const id of p.subs){if(full){const c=el('div','gacha-sub');c.append(gachaFace(id),el('span','gacha-sub-name',gachaDoll(id).name));subs.append(c)}else subs.append(gachaFace(id))}
+ box.append(subs);return box}
+const mmdd=d=>String(d.getUTCMonth()+1).padStart(2,'0')+'.'+String(d.getUTCDate()).padStart(2,'0');
+function renderGacha(card){
+ const sec=el('div','gacha-sec');card.append(sec);
+ if(!gachaData||!dollIndex){
+  sec.append(el('p','bm-empty','픽업 일정을 불러오는 중…'));
+  if(!gachaLoading){gachaLoading=true;Promise.all([gachaData||fetchJSON(new URL('/data/gacha.json',location.origin).href).then(d=>gachaData=d),loadDollIndex()]).then(redrawLanding).catch(()=>{gachaData=gachaData||{slots:[]};gachaLoading=false})}
+  return}
+ const now=gachaNow();if(!now){sec.remove();return}
+ const head=el('div','gacha-head');head.append(el('span','gacha-head-title','픽업 일정'),el('span','gacha-server','글로벌 서버'),el('span','bday-next-d','D-'+now.left));head.title='글로벌 서버 기준이에요. 중국 본섭과는 일정이 달라요.';sec.append(head);
+ const list=el('div','gacha-list');now.slot.forEach(p=>list.append(gachaBlock(p,false)));sec.append(list);
+ const btn=el('button','bday-open');btn.type='button';btn.append(ic('expand'),el('span','','전체 픽업 일정'));btn.onclick=openGachaSchedule;sec.append(btn);
+}
+function openGachaSchedule(){
+ openInfo({title:'픽업 일정',items:[]});
+ const host=el('div','gacha-pop');$('#infoBody').append(host);
+ const now=gachaNow();if(!now)return;const n=gachaData.slots.length,D=gachaData.days;
+ host.append(el('p','cal-note gacha-pop-note','글로벌 서버 기준이에요. 중국 본섭과는 일정이 달라요.'),el('p','cal-note gacha-pop-note','2주마다 픽업 2개가 같이 열리고, 같은 순서로 돌아요. 매일 오전 5시(KST) 기준.'));
+ for(let i=0;i<n;i++){
+  const at=(now.at+i)%n,st=new Date(now.start.getTime()+i*D*864e5),en=new Date(st.getTime()+D*864e5);
+  const sec=el('section','gacha-slot'+(i===0?' now':''));
+  const h=el('div','gacha-slot-head');h.append(el('span','gacha-slot-date',mmdd(st)+' ~ '+mmdd(en)));if(i===0)h.append(el('span','bday-next-d','지금 · D-'+now.left));else h.append(el('span','gacha-slot-in',(i===1?now.left:now.left+(i-1)*D)+'일 뒤'));
+  const body=el('div','gacha-slot-body');gachaData.slots[at].forEach(p=>body.append(gachaBlock(p,true)));
+  sec.append(h,body);host.append(sec)}
+}
+function openBirthdayCalendar(){
+ openInfo({title:'생일 달력',items:[]});
+ const host=el('div','bday-pop');$('#infoBody').append(host);
  const T=gameToday(),todayKey=String(T.m).padStart(2,'0')+String(T.d).padStart(2,'0');
  const box=el('div','cal-box');const cards=el('div','bday-list');
  let picked=null; // 달력에서 누른 날 (MMDD). 없으면 오늘
@@ -665,13 +748,7 @@ function renderBirthday(card){
   if(!dolls){cards.append(el('p','bm-empty','생일 정보를 불러오는 중…'));return}
   if(!isToday){const h=el('div','bday-pick-head');const back=el('button','bday-back','오늘로');back.type='button';back.onclick=()=>{picked=null;draw();showCards()};h.append(el('span','',key.slice(0,2)+'.'+key.slice(2)+' 생일'),back);cards.append(h)}
   if(!who.length)cards.append(el('p','bm-empty',isToday?'오늘 생일인 인형이 없어요.':'이날 생일인 인형이 없어요.'));
-  for(const x of who){
-   const c=el('div','bday-card'+(isToday?' today':''));
-   const face=el('div','avatar bday-face');const url=(x.portrait&&imageMap[x.portrait])||imageMap[x.nameKo]||imageMap[x.name];
-   if(url){const im=document.createElement('img');im.src=url.startsWith('./')?url:'./'+url;im.alt='';im.onerror=()=>{im.remove();face.classList.add('fallback')};face.append(im)}else face.classList.add('fallback');
-   const t=el('div','bday-text');t.append(el('strong','',x.birthday+'. Happy Birthday!'),el('span','',x.name));
-   c.append(face,t);cards.append(c);
-  }
+  for(const x of who)cards.append(bdayCard(x,isToday));
  };
  const draw=()=>{
   const v=new Date(Date.UTC(T.y,T.m-1+calShift,1)),Y=v.getUTCFullYear(),M=v.getUTCMonth()+1,mm=String(M).padStart(2,'0');
@@ -687,7 +764,6 @@ function renderBirthday(card){
   for(let i=0;i<first;i++)grid.append(el('span','cal-d blank',''));
   for(let d=1;d<=last;d++){
    const key=mm+String(d).padStart(2,'0'),cls='cal-d'+(days.has(d)?' bday':'')+(calShift===0&&d===T.d?' today':'')+(picked===key?' picked':'');
-   // v0.9.12 생일 동그라미는 눌러서 그날 생일인 인형을 아래에 보여줌
    const c=days.has(d)?el('button',cls,String(d)):el('span',cls,String(d));
    if(days.has(d)){const names=list.filter(x=>+x.birthday.slice(2)===d).map(x=>x.name).join(', ');c.type='button';c.title=names;c.setAttribute('aria-label',M+'월 '+d+'일 생일: '+names);c.setAttribute('aria-pressed',String(picked===key));
     c.onclick=()=>{picked=(picked===key||key===todayKey)?null:key;draw();showCards()}}
@@ -695,8 +771,8 @@ function renderBirthday(card){
   }
   box.replaceChildren(head,grid);
  };
- draw();card.append(box);showCards();
- card.append(cards,el('p','cal-note','동그라미를 누르면 그날 생일인 인형을 볼 수 있어요. 매일 오전 5시(KST)에 갱신됩니다.'));
+ draw();showCards();
+ host.append(box,cards,el('p','cal-note','동그라미를 누르면 그날 생일인 인형을 볼 수 있어요.'));
 }
 // Hierarchical navigation: category label navigates, chevron expands chapter links.
 function closeArchiveMenu(){const menu=$('#archiveMenu');menu.classList.remove('open');menu.setAttribute('aria-hidden','true');$('#menuBtn').setAttribute('aria-expanded','false');$('#menuBtn').classList.remove('is-open')}
