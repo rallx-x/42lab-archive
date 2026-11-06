@@ -1463,7 +1463,11 @@ async function showAlgos({push=true,cat=null}={}){
   count.textContent=rows.length+'개';list.replaceChildren();
   if(!rows.length)list.append(el('p','loading-note','「'+algoQuery.trim()+'」에 맞는 알고리즘이 없어요.'));
   for(const x of rows){
-   const c=el('div','wr-card algo-card');const top=el('div','algo-top');top.append(itemIcon(x.icon));
+   const c=el('div','wr-card algo-card');const top=el('div','algo-top');
+   // 게임 세트 기호(assets/img/algo/suit_NN, 흰 그림 → 구역 색 바탕) + 아이템 그림 작게
+   const em=el('span','algo-emblem a'+x.area);const nn=String(x.id).padStart(2,'0');em.style.setProperty('--em','url(/assets/img/algo/suit_'+nn+'.webp)');
+   const probe=new Image();probe.onerror=()=>em.classList.add('none');probe.src='/assets/img/algo/suit_'+nn+'.webp';
+   top.append(em);const ii=itemIcon(x.icon);ii.classList.add('algo-item');top.append(ii);
    const tt=el('div','algo-head');tt.append(el('strong','algo-name',x.name),el('span','algo-area a'+x.area,areas[x.area]?.name||''));top.append(tt);c.append(top);
    const ef=el('div','algo-effects');
    if(x.two){const r=el('p','algo-eff');r.append(el('span','algo-n','2세트'),el('span','algo-text',x.two));ef.append(r)}

@@ -1430,3 +1430,12 @@ button.doll-chip:hover{border-color:var(--accent)}
 .algo-bcard{display:grid;gap:8px;align-content:start}
 .algo-bcard>.algo-area{justify-self:start}
 .algo-card,.algo-bcard{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:16px 18px}
+
+/* v1.6.0 알고리즘 세트 기호 (게임 suit_NN) */
+.algo-emblem{flex:none;width:52px;height:52px;border-radius:12px;position:relative;background:#5a5a62}
+.algo-emblem.a1{background:linear-gradient(160deg,#d9533f,#9b2c1f)}
+.algo-emblem.a2{background:linear-gradient(160deg,#3b97d6,#1f5f94)}
+.algo-emblem.a3{background:linear-gradient(160deg,#9a6bd6,#5f3b98)}
+.algo-emblem::after{content:"";position:absolute;inset:9px;background:#fff;-webkit-mask:var(--em) center/contain no-repeat;mask:var(--em) center/contain no-repeat}
+.algo-emblem.none{display:none}
+.algo-top .item-ic.algo-item{width:40px;height:40px;border-radius:8px;order:3;margin-left:auto}
