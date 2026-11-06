@@ -217,6 +217,7 @@ const D=[
 ['기업','企業','Companies','企業','企业'],
 ['자세히','詳細','Details','詳細','详细'],
 ['선물','プレゼント','Gifts','禮物','礼物'],
+['무장각인 적용','武装刻印を適用','Apply Arma Inscripta','套用武裝刻印','套用武装刻印'],
 ['세트 효과 · 구역 · 기본 능력치','セット効果 · エリア · 基本ステータス','Set effects · areas · base stats','套裝效果 · 區域 · 基礎屬性','套装效果 · 区域 · 基础属性'],
 ['기본 알고리즘 (세트 없음)','基本アルゴリズム（セットなし）','Basic algorithms (no set)','基礎演算法（無套裝）','基础算法（无套装）'],
 ['2세트','2セット','2-piece','2件套','2件套'],
@@ -429,6 +430,7 @@ const P=[
 [/^보라 (\d)칸$/,'紫 $1マス','Purple $1-slot','紫 $1格','紫 $1格'],
 [/^주황 (\d)칸$/,'橙 $1マス','Orange $1-slot','橙 $1格','橙 $1格'],
 [/^(\d)칸$/,'$1マス','$1 slot','$1格','$1格'],
+[/^무장각인 ([ⅠⅡⅢ])$/,'武装刻印 $1','Arma $1','武裝刻印 $1','武装刻印 $1'],
 [/^예충전 ([\d.]+)초$/,'チャージ$1秒','Precharge $1s','預充能$1秒','预充能$1秒'],
 [/^⏳ ([\d.]+)초$/,'⏳ $1秒','⏳ $1s','⏳ $1秒','⏳ $1秒'],
 [/^숙소 · (.+)$/,'宿舎 · $1','Dorm · $1','宿舍 · $1','宿舍 · $1'],
@@ -473,7 +475,7 @@ function tr(s){
 window.L=s=>tr(s)??s;
 window.tr18n=tr;
 /* 이야기 본문은 건너뜀 */
-const SKIP='.algo-td-stat,.algo-intro-h,.algo-intro-t,.algo-area,.algo-area-name,.algo-name,.algo-text,.dc-career .dc-name,.tip-doll,.doll-mini-name,.doll-story-peek,.arc-chip.rec,.arma-name,.arma-nm,.arma-desc,.arma-trait-name,.arma-stat span,.skill-brief,.skill-detail,.skill-name,.item-folder-names,.item-variant,.search-tip p,.search-item-text strong,.fan-link,.item-name,.item-desc,.item-src-text,.wr-long-title,.dorm-theme-info,.item-chip-name,.wr-body,.tip-card,.wr-tab-name,.bubble,.center-item,.chat .name,.option,.choice-spoken,.voice-text,.doll-quote,.doll-career,.doll-story-body,.doll-chip,#stream .entry,#epTitle,#epDesc,#loreText,.notice-line,code,pre';
+const SKIP='.skill-arma-text,.skill-arma-name,.algo-td-stat,.algo-intro-h,.algo-intro-t,.algo-area,.algo-area-name,.algo-name,.algo-text,.dc-career .dc-name,.tip-doll,.doll-mini-name,.doll-story-peek,.arc-chip.rec,.arma-name,.arma-nm,.arma-desc,.arma-trait-name,.arma-stat span,.skill-brief,.skill-detail,.skill-name,.item-folder-names,.item-variant,.search-tip p,.search-item-text strong,.fan-link,.item-name,.item-desc,.item-src-text,.wr-long-title,.dorm-theme-info,.item-chip-name,.wr-body,.tip-card,.wr-tab-name,.bubble,.center-item,.chat .name,.option,.choice-spoken,.voice-text,.doll-quote,.doll-career,.doll-story-body,.doll-chip,#stream .entry,#epTitle,#epDesc,#loreText,.notice-line,code,pre';
 const ATTRS=['title','aria-label','placeholder','alt'];
 function skip(n){const e=n.nodeType===1?n:n.parentElement;return !e||!!e.closest(SKIP)}
 function doText(t){if(skip(t))return;const r=tr(t.nodeValue);if(r!=null&&r!==t.nodeValue)t.nodeValue=r}

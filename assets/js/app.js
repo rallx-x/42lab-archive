@@ -1785,19 +1785,31 @@ function skillPanel(p){
  const box=el('div','skill-list');
  const list=[...(p.skills||[])].sort((a,b)=>(SKILL_ORDER[a.type]??9)-(SKILL_ORDER[b.type]??9));
  if(list.some(x=>x.fan))box.append(fanNote());
+ // v1.6.5 무장각인 적용: 단계 Ⅰ · Ⅱ · Ⅲ 강화가 붙는 스킬에 주황 안쪽 테두리 · 강화 이름 · 추가 효과
+ const steps=(p.arma?.steps||[]).slice(0,3);
+ if(steps.length){
+  const on=get('armaOn','off')==='on';
+  const bar=el('div','skill-arma-bar');const tg=el('button','skill-arma-toggle'+(on?' on':''));tg.type='button';tg.setAttribute('aria-pressed',String(on));
+  tg.append(el('span','skill-arma-dot'),el('span','','무장각인 적용'),el('span','skill-arma-state',on?'ON':'OFF'));
+  tg.onclick=()=>{set('armaOn',on?'off':'on');box.replaceWith(skillPanel(p))};
+  bar.append(tg,el('span','skill-arma-name',[p.arma.name,'Ⅰ · Ⅱ · Ⅲ'].join(' · ')));box.append(bar);
+ }
+ const armaOn=steps.length&&get('armaOn','off')==='on';
  for(const sk of list){
+  const ups=armaOn?steps.map((st,i)=>({st,i})).filter(x=>x.st.skill?.base===sk.id):[];
   const max=sk.maxLv||1;let lv=skillLv==='max'?max:Math.min(+skillLv||max,max);
   const row=el('section','skill-row');
   const head=el('button','skill-head');head.type='button';head.setAttribute('aria-expanded','false');
-  const icw=skillHex(sk.icon,{type:sk.type,cat:sk.cat});
+  const icw=skillHex(sk.icon,{type:sk.type,cat:sk.cat,enh:ups.length>0});
   const mid=el('span','skill-mid');const top=el('span','skill-top');
-  top.append(el('span','skill-type t'+sk.type,SKILL_TYPE[sk.type]||''),el('strong','skill-name',sk.name));
+  top.append(el('span','skill-type t'+sk.type,SKILL_TYPE[sk.type]||''),el('strong','skill-name',ups.length?ups[ups.length-1].st.skill.name:sk.name));
   const meta=el('span','skill-meta');
   const preAt=l=>{if(!sk.pre)return null;let v=sk.pre[0];(sk.preLv||[]).forEach((L,i)=>{if(l>=L)v=sk.pre[i]});return v};
   const drawMeta=()=>{meta.replaceChildren();const pv=preAt(lv);if(pv!=null)meta.append(el('span','skill-chip','예충전 '+fmtNum(pv)+'초'));if(sk.cd)meta.append(el('span','skill-chip','⏳ '+fmtNum(sk.cd)+'초'))};
   drawMeta();top.append(meta);
   const brief=el('span','skill-brief');skillText(brief,sk.brief);
-  mid.append(top,brief);head.append(icw,mid,ic('right','tri'));
+  mid.append(top,brief);
+  for(const {st,i} of ups){const r=el('span','skill-arma-add');r.append(el('span','skill-arma-tag','무장각인 '+ROMAN[i]));const t=el('span','skill-arma-text');skillText(t,st.skill.desc||'');r.append(t);mid.append(r)}head.append(icw,mid,ic('right','tri'));
   const panel=el('div','skill-panel');
   const fill=()=>{panel.replaceChildren();
    const lvbar=el('div','skill-lv');lvbar.append(el('span','skill-lv-label','레벨'));
@@ -1824,7 +1836,7 @@ function hexFilters(){if(document.getElementById('skHexDefs'))return;
 function skillHex(icon,o={}){hexFilters();
  const w=el('span','skill-ic skill-hex t'+(o.type||1)+' c'+(o.cat||1)+(o.enh?' enh':''));
  const tn=HEX_TONE[o.cat||1]||HEX_TONE[1];w.style.setProperty('--hx','rgb('+tn.map(v=>Math.round(v*255)).join(',')+')');
- w.append(el('span','hex-fill'),el('span','hex-base'));const ii=itemIcon(icon?'skill/'+icon:'');w.append(ii,el('span','hex-fr'));return w}
+ w.append(el('span','hex-fill'),el('span','hex-base'));const ii=itemIcon(icon?'skill/'+icon:'');w.append(ii);if(o.enh)w.append(el('span','hex-arma'));w.append(el('span','hex-fr'));return w}
 
 // ----- v1.4 무장각인 (data/<언어>/arma.json · 로고 = pnc-item arma/<heroId>.webp) -----
 let armaData=null;

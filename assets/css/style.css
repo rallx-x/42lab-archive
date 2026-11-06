@@ -1507,3 +1507,21 @@ body.persica{--hex-sh:rgba(122,45,80,.55)}
 body.entropics{--hex-sh:rgba(8,3,16,.8)}
 .skill-hex .hex-fr{filter:drop-shadow(0 0 1.2px var(--hex-sh)) drop-shadow(0 1.5px 2px var(--hex-sh))}
 .skill-hex.enh .hex-fr{filter:drop-shadow(0 0 3px #ff9a1f) drop-shadow(0 0 1.2px var(--hex-sh)) drop-shadow(0 1.5px 2px var(--hex-sh))}
+
+/* ===== v1.6.5 스킬 탭 무장각인 적용 ===== */
+.skill-hex.enh .hex-fr{background:#fff;filter:drop-shadow(0 0 1.2px var(--hex-sh)) drop-shadow(0 1.5px 2px var(--hex-sh))}
+.skill-hex.enh::before{content:none}
+/* 게임 Img_SpecWeaponLine(专武_技能框 102×118, 칸 116×116 가운데): 회색 육각 안쪽 주황 테두리 */
+.skill-hex .hex-arma{position:absolute;left:6%;top:-1%;width:88%;height:102%;background:#ff9a1f;-webkit-mask:url(../img/skill/fr_arma.png) center/contain no-repeat;mask:url(../img/skill/fr_arma.png) center/contain no-repeat;filter:drop-shadow(0 0 2px rgba(255,154,31,.7));pointer-events:none}
+.skill-arma-bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:0 0 10px}
+.skill-arma-toggle{display:inline-flex;align-items:center;gap:8px;padding:7px 14px;border-radius:999px;font-size:13px;font-weight:700}
+.skill-arma-dot{width:10px;height:10px;border-radius:50%;background:var(--line);box-shadow:inset 0 0 0 1px var(--sub)}
+.skill-arma-toggle.on{border-color:#ff9a1f;color:#c86a00;background:color-mix(in srgb,#ff9a1f 12%,var(--panel))}
+.skill-arma-toggle.on .skill-arma-dot{background:#ff9a1f;box-shadow:0 0 6px #ff9a1f}
+.skill-arma-state{font-size:11px;letter-spacing:.08em;color:var(--sub)}
+.skill-arma-toggle.on .skill-arma-state{color:#ff9a1f}
+.skill-arma-name{font-size:12px;color:var(--sub)}
+.skill-arma-add{display:grid;grid-template-columns:auto 1fr;gap:8px;align-items:start;margin-top:6px;font-size:13px;line-height:1.6}
+.skill-arma-tag{font-size:11px;font-weight:700;color:#fff;background:#ff9a1f;border-radius:6px;padding:1px 7px;white-space:nowrap;margin-top:2px}
+/* 주황 무장각인 테두리는 회색 육각 안쪽 (흰 테두리와 겹치지 않게) */
+.skill-hex .hex-arma{left:10%;top:8%;width:80%;height:84%}
