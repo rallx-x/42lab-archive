@@ -1406,3 +1406,7 @@ button.doll-chip:hover{border-color:var(--accent)}
 .doll-class .dc-ic.tag{padding:0}
 /* v1.5.13 분류 아이콘: 둥근 판 없이 기호만 (글자색) */
 .doll-class .dc-ic.tag{border-radius:0;padding:0;background:currentColor;-webkit-mask:var(--ci) center/contain no-repeat;mask:var(--ci) center/contain no-repeat}
+/* v1.5.14 로딩 팁: 인형 바로가기를 카드 맨 아래에 맞춤 */
+.tip-card{display:flex;flex-direction:column}
+.tip-card>.wr-body{flex:1;display:flex;flex-direction:column}
+.tip-card .tip-dolls{margin-top:auto;padding-top:10px}
