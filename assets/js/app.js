@@ -2141,7 +2141,9 @@ function renderDoll(p,startPart){
  if(proj.length){artCol.append(el('p','load-note',LOAD_NOTE),gallery(p,proj,{label:'투영',tabs:true,cls:'gal-projection'}))}
  hero.append(artCol);
  const info=el('div','doll-info');
- info.append(el('div','eyebrow',[p.company,p.role].filter(Boolean).join(' / ').toUpperCase()||'DOLL RECORD'));
+ // v1.7.4 게임 인형 번호 (#0410 = 고유 번호를 16진수 4자리로, 게임 UIGetHero 의 HeroIdTo4Hex 와 같음)
+ {const hx=/^\d+$/.test(String(p.heroId??''))?'#'+(+p.heroId).toString(16).toUpperCase().padStart(4,'0'):'';
+  info.append(el('div','eyebrow',[p.company,p.role,hx].filter(Boolean).join(' / ').toUpperCase()||'DOLL RECORD'))}
  const nameRow=el('div','doll-name-row');nameRow.append(el('h1','doll-name',p.name));
  if(p.alt?.key){const a=el('button','doll-alt');a.type='button';a.append(el('span','doll-alt-label','이격'),el('b','',p.alt.name||p.alt.key),ic('right'));a.setAttribute('aria-label',(p.alt.name||'')+' 프로필로 이동');a.onclick=()=>showDoll(p.alt.key);nameRow.append(a)}
  info.append(nameRow);
