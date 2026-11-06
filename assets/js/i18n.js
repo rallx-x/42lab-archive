@@ -217,6 +217,12 @@ const D=[
 ['기업','企業','Companies','企業','企业'],
 ['자세히','詳細','Details','詳細','详细'],
 ['선물','プレゼント','Gifts','禮物','礼物'],
+['공격','アタック','Attack','攻擊','攻击'],
+['암살','アサシン','Assassin','刺殺','刺杀'],
+['제어','コントロール','Control','控制','控制'],
+['방어','防御','Defense','防禦','防御'],
+['보조','サポート','Support','輔助','辅助'],
+['치료','回復','Healing','治療','治疗'],
 ['세력','勢力','Factions','勢力','势力'],
 ['- 레벨 -','- レベル -','- LEVEL -','- 等級 -','- 等级 -'],
 ['모두 펼치기','すべて開く','Expand all','全部展開','全部展开'],
@@ -450,7 +456,7 @@ function tr(s){
 window.L=s=>tr(s)??s;
 window.tr18n=tr;
 /* 이야기 본문은 건너뜀 */
-const SKIP='.tip-doll,.doll-mini-name,.doll-story-peek,.arc-chip,.arma-name,.arma-nm,.arma-desc,.arma-trait-name,.arma-stat span,.skill-brief,.skill-detail,.skill-name,.item-folder-names,.item-variant,.search-tip p,.search-item-text strong,.fan-link,.item-name,.item-desc,.item-src-text,.wr-long-title,.dorm-theme-info,.item-chip-name,.wr-body,.tip-card,.wr-tab-name,.bubble,.center-item,.chat .name,.option,.choice-spoken,.voice-text,.doll-quote,.doll-career,.doll-story-body,.doll-chip,#stream .entry,#epTitle,#epDesc,#loreText,.notice-line,code,pre';
+const SKIP='.dc-career .dc-name,.tip-doll,.doll-mini-name,.doll-story-peek,.arc-chip,.arma-name,.arma-nm,.arma-desc,.arma-trait-name,.arma-stat span,.skill-brief,.skill-detail,.skill-name,.item-folder-names,.item-variant,.search-tip p,.search-item-text strong,.fan-link,.item-name,.item-desc,.item-src-text,.wr-long-title,.dorm-theme-info,.item-chip-name,.wr-body,.tip-card,.wr-tab-name,.bubble,.center-item,.chat .name,.option,.choice-spoken,.voice-text,.doll-quote,.doll-career,.doll-story-body,.doll-chip,#stream .entry,#epTitle,#epDesc,#loreText,.notice-line,code,pre';
 const ATTRS=['title','aria-label','placeholder','alt'];
 function skip(n){const e=n.nodeType===1?n:n.parentElement;return !e||!!e.closest(SKIP)}
 function doText(t){if(skip(t))return;const r=tr(t.nodeValue);if(r!=null&&r!==t.nodeValue)t.nodeValue=r}

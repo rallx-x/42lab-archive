@@ -1285,12 +1285,19 @@ function renderDollList(){
  si.oninput=()=>{dollQuery=si.value;drawGrid()};sbox.append(el('span','doll-search-prompt','//:_'),si);sw.append(sbox);
  bar.append(left,sw);host.append(bar,grid);drawGrid();
 }
+// v1.5.10 직군(career 1 수위 · 2 사수 · 3 전사 · 4 해결사 · 5 치료사) · 분류(tag) 아이콘 — 게임 그림 assets/img/class
+const TAG_NAME={1:'공격',2:'암살',3:'치료',4:'제어',5:'방어',6:'보조'};
+function classLine(d,small){if(!d?.career)return null;
+ const w=el('span','doll-class'+(small?' sm':''));const cn=dollIndex?.careers?.[d.career]||'';
+ const ci=el('span','dc-ic career');ci.style.setProperty('--ci','url(/assets/img/class/career_'+d.career+'.png)');const c=el('span','dc-career');c.append(ci);if(!small)c.append(el('span','dc-name',cn));c.title=cn;w.append(c);
+ for(const t of d.tags||[]){if(!small)w.append(el('span','dc-sep','|'));const ti=el('img','dc-ic tag');ti.alt='';ti.src='/assets/img/class/tag_'+t+'.png';const g=el('span','dc-tag');g.title=TAG_NAME[t]||'';g.append(ti);if(!small)g.append(el('span','dc-name',TAG_NAME[t]||''));w.append(g)}
+ return w}
 function dollCard(d){
  const b=el('button','doll-card');b.type='button';b.dataset.key=d.voiceKey;
  const face=el('div','doll-face');const url=dollFace(d);if(url){const im=el('img');im.src=url;im.alt='';im.loading='lazy';face.append(im)}else face.classList.add('unknown');
  const info=el('div','doll-card-info');info.append(el('strong','',d.name));
  info.append(el('span','doll-card-meta',[d.company,d.role].filter(Boolean).join(' · ')));
- const foot=el('span','doll-card-foot');foot.append(el('span','doll-stars',starText(d.stars)));info.append(foot);
+ const foot=el('span','doll-card-foot');foot.append(el('span','doll-stars',starText(d.stars)));{const cl=classLine(d,true);if(cl)foot.append(cl)}info.append(foot);
  b.append(face,info);b.onclick=()=>showDoll(d.voiceKey);return b;
 }
 // 게임 글의 <color=#..>…</color> 를 색 글자로 (나머지 꼬리표는 지움, innerHTML 쓰지 않음)
@@ -1730,8 +1737,8 @@ function skillPanel(p){
  return box;
 }
 // 스킬 아이콘 = 게임처럼 3층: 회색 육각 바탕 + 아이콘(검은 부분을 분류 색으로 칠함, 흰 부분은 그대로) + 흰 테두리(종류별 틀)
-// 분류 cat: 1 공격 빨강 · 2 치료 초록 · 3 보호 파랑 · 4 보조 노랑 / 궁극기 그림은 색이 들어 있어 그대로 / 무장각인 강화(enh)는 주황 테두리
-const HEX_TONE={1:[.86,.15,.12],2:[.47,.78,.16],3:[.2,.6,.86],4:[.9,.66,.15]};
+// 분류 cat: 1 공격 빨강 · 2 회복 연두 · 3 방어 파랑 · 4 특수 회청 / 궁극기 그림은 색이 들어 있어 그대로 / 무장각인 강화(enh)는 주황 테두리
+const HEX_TONE={1:[.82,.14,.14],2:[.57,.82,.16],3:[.11,.63,.85],4:[.49,.54,.63]}; // 게임 Consts.HeroConsts eBattleSkillTypeColor: Attack · Recovery · Defense · Special
 function hexFilters(){if(document.getElementById('skHexDefs'))return;
  const ns='http://www.w3.org/2000/svg',svg=document.createElementNS(ns,'svg');svg.id='skHexDefs';svg.setAttribute('width','0');svg.setAttribute('height','0');svg.style.position='absolute';
  // 검정 → 분류 색, 흰색 → 흰색 (out = c + (1 - c) × 밝기)
@@ -1837,7 +1844,7 @@ async function showDoll(key,{push=true,part=null}={}){
  if(push)saveRoute({type:'doll',id:key,part});
  const host=$('#dollView');host.replaceChildren(el('p','loading-note','프로필을 불러오는 중…'));window.scrollTo(0,0);
  try{loadDollIndex().catch(()=>{});let p=dollCache.get(key);if(!p){p=await fetchJSON(dataPath('profiles/'+encodeURIComponent(key)+'.json'));dollCache.set(key,p)}
-  const [sk,am]=await Promise.all([loadSkills().catch(()=>null),loadArma().catch(()=>null),window.siteReady?.catch(()=>{})]);if(sk&&!p.skills)p.skills=sk.heroes?.[String(p.heroId)]||null;if(am&&!p.arma)p.arma=am.heroes?.[String(p.heroId)]||null;
+  const [sk,am]=await Promise.all([loadSkills().catch(()=>null),loadArma().catch(()=>null),window.siteReady?.catch(()=>{}),loadDollIndex().catch(()=>null)]);if(sk&&!p.skills)p.skills=sk.heroes?.[String(p.heroId)]||null;if(am&&!p.arma)p.arma=am.heroes?.[String(p.heroId)]||null;
   if(tok!==routeToken)return;renderDoll(p,part)}
  catch(e){if(tok===routeToken){host.replaceChildren(error('프로필을 불러오지 못했어요. ('+e.message+')'))}}
 }
@@ -1994,6 +2001,7 @@ function renderDoll(p,startPart){
  {const EXH={'exclusive:24winter':1080};const exs=(typeof displayGroups!=='undefined'?displayGroups:[]).filter(g=>g.category==='exclusive'&&String(g.doll?.heroId??EXH[g.id]??'')===String(p.heroId));
   if(exs.length){const row=el('div','doll-links');for(const g of exs){const b=el('button','doll-alt doll-ex');b.type='button';b.append(el('span','doll-alt-label','전속 스토리'),el('b','',chapterDisplayTitle(g)),ic('right'));b.onclick=()=>showChapter(groupKey(g),'exclusive');row.append(b)}info.append(row)}}
  if(p.fanTL)info.append(fanNote());
+ {const di=(dollIndex?.dolls||[]).find(x=>x.heroId===p.heroId);const cl=classLine(di);if(cl)info.append(cl)}
  const sub=el('p','doll-sub');sub.append(el('span','doll-stars',starText(p.stars)));if(p.nameEn)sub.append(el('span','',p.nameEn));info.append(sub);
  const dl=el('dl','doll-facts');
  for(const [k,v] of [['클래스',p.role],['기업',p.company],['모델명',p.model],['직업',p.job],['생일',bdayText(p.birthday)],['성우',p.cv]]){if(!v)continue;dl.append(el('dt','',k),el('dd','',v))}

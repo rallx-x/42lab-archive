@@ -1380,3 +1380,13 @@ button.doll-chip:hover{border-color:var(--accent)}
 .skill-hex.c4 .item-ic img,.skill-hex.c4:not(.max):not(.t3) .item-ic img{filter:url(#skc4)}
 .skill-hex.t3 .item-ic img{filter:none!important}
 .skill-hex .item-ic{clip-path:polygon(50% 0,100% 25%,100% 75%,50% 100%,0 75%,0 25%)}
+
+/* v1.5.10 직군 · 분류 아이콘 (게임 career_N · tag_*_N) */
+.doll-class{display:inline-flex;align-items:center;gap:8px;flex-wrap:wrap;margin:6px 0 2px;font-size:14px;font-weight:700}
+.doll-class .dc-career,.doll-class .dc-tag{display:inline-flex;align-items:center;gap:6px}
+.doll-class .dc-ic{width:22px;height:22px;flex:none}
+.doll-class .dc-ic.career{background:currentColor;-webkit-mask:var(--ci) center/contain no-repeat;mask:var(--ci) center/contain no-repeat}
+.doll-class .dc-ic.tag{border-radius:50%;background:#2a2a30;padding:1px}
+.doll-class .dc-sep{color:var(--sub);font-weight:400}
+.doll-class.sm{gap:4px;margin:0 0 0 auto}
+.doll-class.sm .dc-ic{width:16px;height:16px}
