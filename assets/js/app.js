@@ -446,7 +446,7 @@ function drawLibrary(){
    const nav=el('div','folder-nav');nav.append(back);
    const mk=(g,dir)=>{const b=el('button','folder-step '+dir);b.type='button';const lab=el('span','folder-step-label');if(dir==='prev')lab.append(ic('left'),el('span','','이전'));else lab.append(el('span','','다음'),ic('right'));b.append(lab);if(g){b.append(el('small','folder-step-name',chapterDisplayTitle(g)));b.onclick=()=>showChapter(groupKey(g),category)}else b.disabled=true;return b};
    const steps=el('div','folder-steps');steps.append(mk(at>0?sib[at-1]:null,'prev'),mk(at>=0&&at<sib.length-1?sib[at+1]:null,'next'));nav.append(steps);host.append(nav)}
-  const panel=el('section','folder-detail');const art=el('div','folder-art');art.dataset.gid=selected.g.id;art.append(el('div','folder-art-kicker','42LAB / CHAPTER RECORD'),el('div','folder-art-symbol','◇'),el('h2','',chapterDisplayTitle(selected.g)),el('p','folder-art-pending','CHAPTER IMAGE PENDING'));applyFolderArt(art);
+  const panel=el('section','folder-detail');const art=el('div','folder-art');art.dataset.gid=selected.g.id;art.append(el('div','folder-art-kicker','42LAB / CHAPTER RECORD'),(()=>{const d=el('div','folder-art-symbol');d.append(ic('record'));return d})(),el('h2','',chapterDisplayTitle(selected.g)),el('p','folder-art-pending','CHAPTER IMAGE PENDING'));applyFolderArt(art);
   const side=el('div','folder-episodes');
   const episodeScroll=el('div','folder-episode-scroll');
   const header=el('div','folder-episodes-header');
@@ -486,7 +486,7 @@ function drawLibrary(){
    const title=chapterDisplayTitle(g);
    if(viewMode==='file'){
     const visual=el('div','folder-tile-visual');visual.dataset.gid=g.id;
-    visual.append(el('span','folder-tile-code','42LAB / '+String(i+1).padStart(2,'0')),el('span','folder-tile-symbol','◇'));
+    visual.append(el('span','folder-tile-code','42LAB / '+String(i+1).padStart(2,'0')),(()=>{const d=el('span','folder-tile-symbol');d.append(ic('record'));return d})());
     const info=el('div','folder-tile-info');info.append(el('strong','',title));if(g.subtitle)info.append(el('span','chapter-card-subtitle',g.subtitle));info.append(el('small','',episodes.length+'개 기록'));
     b.append(visual,info);
    }else if(viewMode==='folder'){

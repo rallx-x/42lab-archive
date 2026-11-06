@@ -1585,3 +1585,7 @@ body.entropics{--hex-sh:rgba(8,3,16,.8)}
 @keyframes spin8{to{transform:rotate(360deg)}}
 body.dark .item-ic.empty::before,body.dim .item-ic.empty::before,body.entropics .item-ic.empty::before,body.dark .item-ic.loading::after,body.dim .item-ic.loading::after,body.entropics .item-ic.loading::after,body.dark .avatar.fallback::after,body.dim .avatar.fallback::after,body.entropics .avatar.fallback::after{filter:invert(1)}
 @media (prefers-reduced-motion:reduce){.item-ic.loading::after{animation:none}}
+/* v1.7.3 스토리 폴더 표지 장식: ◇ 대신 문서 그림 */
+.ic-record{--ic:url(../icons/record.png)}
+.folder-tile-symbol .ic{font-size:.6em;vertical-align:middle}
+.folder-art-symbol .ic{font-size:.6em}
