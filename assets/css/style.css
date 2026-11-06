@@ -1560,3 +1560,7 @@ body.entropics{--hex-sh:rgba(8,3,16,.8)}
 .algo-top .item-ic.algo-item img{width:100%;height:100%;object-fit:contain}
 /* v1.7.1 인형 목록 무장각인 필터 */
 .doll-arma-filter{height:38px}
+/* v1.7.2 쿨타임 모래시계 (이모지 대신 그림) */
+.ic-hourglass{--ic:url(../icons/hourglass.png)}
+.skill-cd{display:inline-flex;align-items:center;gap:4px}
+.skill-cd .ic{font-size:13px}
