@@ -1361,3 +1361,12 @@ button.doll-chip:hover{border-color:var(--accent)}
 .tip-dolls{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
 .tip-doll{font-size:12px;padding:4px 10px}
 .tip-doll .ic{font-size:11px}
+
+/* v1.5.8 아이템 카드: 이름 · 설명만, 「자세히」 펼치기 · 같은 줄 카드 높이 맞춤 */
+.item-list{align-items:start}
+.item-list>.item-card{min-height:150px}
+.item-list .item-card>.item-toggle{margin-top:auto}
+.item-panel .item-src{margin:6px 0 0}
+.item-sub-label{margin:10px 0 6px;font-size:12px;font-weight:700;color:var(--sub)}
+.item-panel>.item-sub-label:first-child{margin-top:4px}
+.item-panel .item-contents{display:flex}

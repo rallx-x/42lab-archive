@@ -1484,7 +1484,9 @@ async function showItems({push=true,cat=null}={}){
 const openGroups=new Set();
 function renderItems(){
  const host=$('#dollView');host.replaceChildren();
- const all=itemData.items||[],refs=itemData.refs||{},groups=itemData.groups||{},byId=new Map(all.map(o=>[o.id,o]));
+ const every=itemData.items||[],refs=itemData.refs||{},groups=itemData.groups||{},byId=new Map(every.map(o=>[o.id,o]));
+ // v1.5.8 돌파 위젯 6종(widget:*)은 목록에 안 보이고, 위젯 선택박스의 「선택 가능」 안에만
+ const all=every.filter(o=>!String(o.grp||'').startsWith('widget:'));
  if(!ITEM_PAGES.some(([pg])=>pg===itemCat)||(itemCat===DORM&&!furnData))itemCat=0;
  const ref=id=>byId.get(id)||refs[String(id)]||{name:String(id)};
  const head=el('div','doll-list-head');const t=el('div');t.append(el('div','eyebrow','DATABASE / ITEMS'),el('h2','','아이템'));head.append(t);
@@ -1506,7 +1508,7 @@ function renderItems(){
  // 펼치기 단추 (구성품 · 선택 가능 · 폴더 · 이벤트별 설명 공용)
  const toggle=(card,key,label,n,fill,set_=opened)=>{
   const tg=el('button','item-toggle');tg.type='button';tg.setAttribute('aria-expanded',String(set_.has(key)));
-  tg.append(el('span','',label),el('span','wr-tab-n',String(n)),ic('right','tri'));
+  tg.append(el('span','',label));if(n!=null)tg.append(el('span','wr-tab-n',String(n)));tg.append(ic('right','tri'));
   const panel=el('div','item-panel');
   const go=on=>{card.classList.toggle('open',on);tg.setAttribute('aria-expanded',String(on));if(on&&!panel.childNodes.length)fill(panel)};
   tg.onclick=()=>{const on=!card.classList.contains('open');go(on);if(on)set_.add(key);else set_.delete(key)};
@@ -1522,17 +1524,27 @@ function renderItems(){
   else if(opts.length)toggle(card,o.id,'선택 가능',opts.length,p=>chips(p,opts.map(id=>[id,0])))};
  const shell=(o,ids,cls)=>{const card=el('div','item-card'+(cls?' '+cls:'')+(o.quality?' q'+o.quality:''));card.dataset.ids=ids.join(' ');card.append(linkBtn('#item/'+o.id,o.name));
   const main=el('div','item-main');main.append(itemIcon(o.icon));const body=el('div','item-body');main.append(body);card.append(main);return [card,body]};
+ // v1.5.8 카드엔 이름 · 설명만, 나머지는 「자세히」 안에 (카드 크기 맞추기)
+ const detail=(card,key,parts)=>{const n=parts.filter(Boolean).length;if(!n)return;toggle(card,'x'+key,'자세히',null,p=>parts.forEach(f=>f&&f(p)))};
+ const boxPart=o=>{const cont=o.contents||[],opts=o.options||[];
+  if(cont.length)return p=>{p.append(el('div','item-sub-label','구성품 · '+cont.length));chips(p,cont)};
+  if(opts.length)return p=>{p.append(el('div','item-sub-label','선택 가능 · '+opts.length));chips(p,opts.map(id=>[id,0]))};
+  return null};
+ const fanPart=id=>{const f=giftFans(id);return f[0].length||f[1].length?p=>fanLines(p,id):null};
  const itemCard=o=>{const [card,body]=shell(o,[o.id]);body.append(el('strong','item-name',o.name));
-  if(o.desc)body.append(el('p','item-desc',cleanTags(o.desc)));if(o.source)srcLine(body,o.source);fanLines(body,o.id);boxToggle(card,o);return card};
+  if(o.desc)body.append(el('p','item-desc',cleanTags(o.desc)));
+  detail(card,o.id,[o.source?p=>srcLine(p,o.source):null,fanPart(o.id),boxPart(o)]);return card};
  // 이름 · 아이콘이 같은 아이템: 카드 하나, 획득처 모으기, 설명이 다르면 이벤트별로
  const mergedCard=ms=>{const o=ms[0];const [card,body]=shell(o,ms.map(m=>m.id),'item-merged');
   const nm=el('strong','item-name',o.name);body.append(nm,el('span','item-badge','×'+ms.length));
   const descs=[...new Set(ms.map(m=>m.desc||''))];
   if(descs.length===1&&descs[0])body.append(el('p','item-desc',cleanTags(descs[0])));
+  else if(descs.length>1)body.append(el('p','item-desc',cleanTags(ms.find(m=>m.desc)?.desc||'')));
   const srcs=[...new Set(ms.map(m=>m.source).filter(Boolean))];
-  if(srcs.length){const src=el('div','item-src item-src-list');src.append(el('span','item-src-label','획득처'));const ul=el('ul','item-src-text');srcs.forEach(x=>ul.append(el('li','',cleanTags(x))));src.append(ul);body.append(src)}
-  if(descs.length>1)toggle(card,'d'+o.id,'이벤트별 설명',ms.length,p=>{for(const m of ms){const b=el('div','item-variant');b.append(el('small','',cleanTags(m.source||'')),el('p','item-desc',cleanTags(m.desc||'')));p.append(b)}});
-  else boxToggle(card,o);
+  detail(card,o.id,[
+   srcs.length?p=>{const src=el('div','item-src item-src-list');src.append(el('span','item-src-label','획득처'));const ul=el('ul','item-src-text');srcs.forEach(x=>ul.append(el('li','',cleanTags(x))));src.append(ul);p.append(src)}:null,
+   descs.length>1?p=>{p.append(el('div','item-sub-label','이벤트별 설명 · '+ms.length));for(const m of ms){const b=el('div','item-variant');b.append(el('small','',cleanTags(m.source||'')),el('p','item-desc',cleanTags(m.desc||'')));p.append(b)}}:null,
+   fanPart(o.id),descs.length>1?null:boxPart(o)]);
   return card};
  // 폴더: 같은 종류(위젯 등급 · 인증키 · 검색 지령 …) 를 카드 하나에
  const folderCard=(g,ms)=>{const o=ms[0];const [card,body]=shell({...o,name:groups[g]?.title||o.name},ms.map(m=>m.id),'item-folder');
