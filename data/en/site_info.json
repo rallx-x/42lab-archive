@@ -26,6 +26,23 @@
    ]
   },
   {
+   "id": "2026-11-06-v1.7",
+   "date": "2026-11-06",
+   "kind": "update",
+   "title": "Update v1.7 · Algorithms · Stats · All Records tabs",
+   "lines": [
+    "The Library now has an \"Algorithms\" compendium: 40 sets in tabs by area, with 2-set · 3-set effects and expandable main · sub stat tables. There is also a \"What are Algorithms?\" guide.",
+    "Doll pages have a new \"Stats\" section: stats at initial rarity Lv.1 · 5★ Lv.60 · 5★ Lv.70, plus intimacy bonuses you can check by intimacy level.",
+    "Skills: turn on \"Apply Arma Inscripta\" to see enhanced skill names, an orange border and the added Ⅰ · Ⅱ · Ⅲ effects. Skill icon sizes now match the in-game screen.",
+    "The Doll list has a new \"Arma Inscripta\" filter.",
+    "All Records is now split into Main · Exclusive · Event · Other tabs. The last tab you viewed is remembered.",
+    "Doll profiles now show the same Doll number as the game (#0410 etc.).",
+    "Stat icons were added, and symbols such as stars, arrows and the hourglass are now image icons, so they look the same on every device.",
+    "A spinning indicator appears while images load.",
+    "Event items were moved into folders named after their event."
+   ]
+  },
+  {
    "id": "2026-11-05-v1.5",
    "date": "2026-11-05",
    "kind": "update",
