@@ -1498,3 +1498,12 @@ button.doll-chip:hover{border-color:var(--accent)}
 .skill-hex .hex-fill,.skill-hex.max .hex-fill{inset:6% 7%}
 .skill-hex .hex-base{left:13%;top:12.1%;width:74%;height:75.8%}
 .skill-hex .item-ic{left:4.5%;top:3.45%;width:91%;height:93.1%}
+/* v1.6.4 테두리 그림자 (테두리 모양을 따라 바깥으로) — 테마별 색 */
+body{--hex-sh:rgba(0,0,0,.5)}
+body.light{--hex-sh:rgba(40,44,52,.55)}
+body.dim{--hex-sh:rgba(0,0,0,.6)}
+body.dark{--hex-sh:rgba(0,0,0,.75)}
+body.persica{--hex-sh:rgba(122,45,80,.55)}
+body.entropics{--hex-sh:rgba(8,3,16,.8)}
+.skill-hex .hex-fr{filter:drop-shadow(0 0 1.2px var(--hex-sh)) drop-shadow(0 1.5px 2px var(--hex-sh))}
+.skill-hex.enh .hex-fr{filter:drop-shadow(0 0 3px #ff9a1f) drop-shadow(0 0 1.2px var(--hex-sh)) drop-shadow(0 1.5px 2px var(--hex-sh))}
