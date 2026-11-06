@@ -1370,3 +1370,13 @@ button.doll-chip:hover{border-color:var(--accent)}
 .item-sub-label{margin:10px 0 6px;font-size:12px;font-weight:700;color:var(--sub)}
 .item-panel>.item-sub-label:first-child{margin-top:4px}
 .item-panel .item-contents{display:flex}
+
+/* v1.5.10 스킬 육각 (게임 3층): 회색 바탕 · 아이콘(검정=분류 색) · 테두리가 육각을 감쌈, 아이콘은 안을 꽉 채움 */
+.skill-hex .hex-fill,.skill-hex.max .hex-fill{inset:5% 6%;background:linear-gradient(180deg,#9a9a9e,#55555b)}
+.skill-hex .item-ic{left:7%;top:6.5%;width:86%;height:87%}
+.skill-hex .item-ic img,.skill-hex:not(.max):not(.t3) .item-ic img,.skill-hex.c2:not(.max):not(.t3) .item-ic img,.skill-hex.c3:not(.max):not(.t3) .item-ic img,.skill-hex.c4:not(.max):not(.t3) .item-ic img{filter:url(#skc1)}
+.skill-hex.c2 .item-ic img,.skill-hex.c2:not(.max):not(.t3) .item-ic img{filter:url(#skc2)}
+.skill-hex.c3 .item-ic img,.skill-hex.c3:not(.max):not(.t3) .item-ic img{filter:url(#skc3)}
+.skill-hex.c4 .item-ic img,.skill-hex.c4:not(.max):not(.t3) .item-ic img{filter:url(#skc4)}
+.skill-hex.t3 .item-ic img{filter:none!important}
+.skill-hex .item-ic{clip-path:polygon(50% 0,100% 25%,100% 75%,50% 100%,0 75%,0 25%)}
