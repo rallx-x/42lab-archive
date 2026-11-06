@@ -1494,3 +1494,7 @@ button.doll-chip:hover{border-color:var(--accent)}
 .skill-hex .hex-base{left:17.3%;top:16.5%;width:65.4%;height:67%}
 .skill-hex .hex-fr{filter:drop-shadow(0 0 1.5px color-mix(in srgb,var(--sub) 75%,transparent)) drop-shadow(0 1px 1px color-mix(in srgb,var(--sub) 55%,transparent))}
 .skill-hex.enh .hex-fr{filter:drop-shadow(0 0 3px #ff9a1f) drop-shadow(0 0 1.5px color-mix(in srgb,var(--sub) 70%,transparent))}
+/* v1.6.4 회색 육각을 테두리 바로 안까지 키우고, 빨간 밑그림 · 흰 그림도 같은 비율로 (테두리는 그대로) */
+.skill-hex .hex-fill,.skill-hex.max .hex-fill{inset:6% 7%}
+.skill-hex .hex-base{left:13%;top:12.1%;width:74%;height:75.8%}
+.skill-hex .item-ic{left:4.5%;top:3.45%;width:91%;height:93.1%}
