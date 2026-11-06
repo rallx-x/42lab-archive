@@ -1568,7 +1568,7 @@ const loadItems=()=>itemData?Promise.resolve(itemData):fetchJSON(dataPath('items
 const itemIconBase=()=>siteInfo?.home?.itemIconBase||'';
 function itemIcon(icon,cls){
  const box=el('span','item-ic'+(cls?' '+cls:''));const base=itemIconBase();
- if(base&&icon){const im=el('img');im.alt='';im.loading='lazy';im.decoding='async';im.src=base.replace(/\/?$/,'/')+String(icon).split('/').map(encodeURIComponent).join('/')+'.webp';im.onerror=()=>{im.remove();box.classList.add('empty')};box.append(im)}else box.classList.add('empty');
+ if(base&&icon){const im=el('img');im.alt='';im.loading='lazy';im.decoding='async';box.classList.add('loading');im.onload=()=>box.classList.remove('loading');im.onerror=()=>{im.remove();box.classList.remove('loading');box.classList.add('empty')};im.src=base.replace(/\/?$/,'/')+String(icon).split('/').map(encodeURIComponent).join('/')+'.webp';box.append(im)}else box.classList.add('empty');
  return box;
 }
 async function showItems({push=true,cat=null}={}){

@@ -8,7 +8,7 @@
 .chat.right .bubble{text-align:left}
 .avatar{width:48px;height:48px;border-radius:0;clip-path:polygon(50% 0%,93.3% 25%,93.3% 75%,50% 100%,6.7% 75%,6.7% 25%);overflow:hidden;background:var(--mono);position:relative}
 .avatar img{width:100%;height:100%;object-fit:cover;display:block}
-.avatar.fallback::after{content:'◇';color:var(--accent);font-size:23px}
+.avatar.fallback::after{content:'';width:46%;height:46%;background:url(../icons/spinner.png) center/contain no-repeat;opacity:.5}
 .avatar-spacer{width:48px;flex:none}
 .choice-output .entry:has(> .chat.right){justify-content:flex-end}
 .nested-choice{display:flex;flex-direction:column;gap:8px;margin:12px 0;padding:12px;border:1px solid var(--line);border-radius:12px}
@@ -1027,7 +1027,7 @@ button.doll-chip:hover{border-color:var(--accent)}
 .item-main{display:flex;gap:14px;align-items:flex-start}
 .item-ic{flex:none;width:56px;height:56px;border-radius:10px;background:var(--mono);display:grid;place-items:center;overflow:hidden}
 .item-ic img{width:100%;height:100%;object-fit:contain}
-.item-ic.empty::before{content:"◇";color:var(--sub);font-size:18px}
+.item-ic.empty::before{content:"";width:46%;height:46%;background:url(../icons/spinner.png) center/contain no-repeat;opacity:.45}
 .item-ic.sm{width:32px;height:32px;border-radius:7px}
 .item-ic.sm.empty{display:none}
 .item-ic.chip{width:22px;height:22px;border-radius:5px;background:none;margin-right:4px;vertical-align:middle;display:inline-grid}
@@ -1576,3 +1576,12 @@ body.entropics{--hex-sh:rgba(8,3,16,.8)}
 .folder-step-label .ic{font-size:.85em}
 .drive-folder-icon .ic{font-size:22px}
 .setting-hint .ic{font-size:.95em;vertical-align:-.12em;margin-right:2px}
+
+/* v1.7.3 그림 자리: 불러오는 중 = 돌아가는 스피너, 그림 없음 = 멈춘 흐린 스피너 */
+.item-ic.loading{position:relative}
+.item-ic.loading::after{content:"";position:absolute;left:27%;top:27%;width:46%;height:46%;background:url(../icons/spinner.png) center/contain no-repeat;animation:spin8 .9s steps(8) infinite;pointer-events:none}
+.item-ic.loading img{opacity:0}
+.skill-hex .item-ic.loading::after{display:none}
+@keyframes spin8{to{transform:rotate(360deg)}}
+body.dark .item-ic.empty::before,body.dim .item-ic.empty::before,body.entropics .item-ic.empty::before,body.dark .item-ic.loading::after,body.dim .item-ic.loading::after,body.entropics .item-ic.loading::after,body.dark .avatar.fallback::after,body.dim .avatar.fallback::after,body.entropics .avatar.fallback::after{filter:invert(1)}
+@media (prefers-reduced-motion:reduce){.item-ic.loading::after{animation:none}}
