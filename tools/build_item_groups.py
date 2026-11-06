@@ -14,6 +14,9 @@
   - key / search / retrain  인증키 · 검색 지령 · 재훈련 허가증
   - same:<번호>  이름 · 아이콘이 같은 아이템 (카드 하나로 합침)
   - ev:<번호>   이벤트 보상 탭의 이벤트별 폴더 (제목 = 그 언어 획득처의 첫 「」/[] 안)
+이벤트 폴더 나누기 (v1.7.4, 스토리 목록 data/ko/index.json 분류 기준)
+  - 전속 스토리 이벤트 → 7 기념품 · 메인 스토리 이벤트 · 콜라보 → 12 대형 이벤트 · 나머지 → 10 이벤트 보상
+  - 폴더 순서 = 스토리 목록 순서 (이벤트 순서), 스토리 목록에 없는 이벤트는 뒤에 (번호 순)
 
 사용: python3 tools/build_item_groups.py   (items.py · build_gift_links.py 다음에)
 """
@@ -25,6 +28,11 @@ TITLES = {  # 직접 정한 묶음 제목 (게임 표기 기준으로 짧게)
     'search':  ['검색 지령', '検索指令', 'Search Commands', '檢索指令', '检索指令'],
     'retrain': ['재훈련 허가증', '再訓練許可証', 'Retraining Permits', '重訓許可證', '重训许可证'],
 }
+EV_ALIAS = {  # 아이템 획득처 이벤트 이름 → 스토리 목록 제목 (이름이 다른 것만)
+    '함께 바라보는 여명': '함께 보는 새벽빛',
+    '철무덤과 수풀': '강철 무덤과 무성한 가지',
+}
+BIG_SHELVES = {'콜라보'}
 GRADES = ['간이', '표준', '고급', '특급', '첨단', '극한']
 
 
@@ -87,10 +95,24 @@ def main():
         if tab[o['id']] == 10 and o['id'] not in grp:
             e = ev_name(o.get('source'))
             evs.setdefault(e, []).append(o['id'])
+    ix = load(os.path.join(ROOT, 'data', 'ko', 'index.json'))
+    norm = lambda t: re.sub(r'\s+', '', t or '')
+    story = {norm(g.get('title')): (k, g) for k, g in enumerate(ix.get('groups', []))}
+    evord = {}
     for e, ids in evs.items():
+        key = 'ev:' + str(min(ids))
+        hit = story.get(norm(EV_ALIAS.get(e, e)))
+        if hit:
+            k, sg = hit
+            cat = sg.get('category')
+            t = 7 if cat == 'exclusive' else 12 if cat == 'main' or sg.get('shelf') in BIG_SHELVES else 10
+            evord[key] = k
+        else:
+            t, evord[key] = 10, 1000 + min(ids)
         for i in ids:
-            grp[i] = 'ev:' + str(min(ids))
+            grp[i] = key
             evkey[i] = True
+            tab[i] = t
     stats = {}
     for li, lang in enumerate(LANGS):
         path = os.path.join(ROOT, 'data', lang, 'items.json')
@@ -123,11 +145,13 @@ def main():
             else:  # ev
                 title = ev_name(ms[0].get('source')) or ms[0].get('source') or ''
             groups[g] = {'title': title, 'kind': 'merge' if kind == 'same' else 'event' if kind == 'ev' else 'folder'}
+            if g in evord:
+                groups[g]['ord'] = evord[g]
         d['groups'] = groups
-        d['tabs'] = [2, 3, 8, 9, 5, 6, 7, 10]
+        d['tabs'] = [2, 3, 8, 9, 5, 6, 7, 12, 10]
         with open(path, 'w', encoding='utf-8') as f:
             json.dump(d, f, ensure_ascii=False, separators=(',', ':'))
-        stats[lang] = (len(groups), sum(1 for o in d['items'] if o['tab'] == 10))
+        stats[lang] = (len(groups), {t: sum(1 for o in d['items'] if o['tab'] == t) for t in (7, 12, 10)})
     print(stats)
 
 

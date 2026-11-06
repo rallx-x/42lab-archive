@@ -1570,7 +1570,7 @@ function renderTips(){
 }
 // ----- v0.12.22 아이템 (#items) — 게임 창고 분류 -----
 // 그림: site_info.home.itemIconBase (Cloudflare 별도 프로젝트) + <icon 이름>.webp. 주소가 없거나 그림이 없으면 글만
-const ITEM_PAGES=[[0,'전체'],[2,'기본 아이템'],[11,'선물'],[3,'소모 아이템'],[8,'알고리즘'],[9,'돌파 위젯'],[5,'육성재료'],[6,'공장재료'],[7,'기념품'],[10,'이벤트 보상'],[100,'숙소']];
+const ITEM_PAGES=[[0,'전체'],[2,'기본 아이템'],[11,'선물'],[3,'소모 아이템'],[8,'알고리즘'],[9,'돌파 위젯'],[5,'육성재료'],[6,'공장재료'],[7,'기념품'],[12,'대형 이벤트'],[10,'이벤트 보상'],[100,'숙소']];
 // v1.5.9 선물(인형 좋아함 · 싫어함 선물, items.json gifts.byDoll)은 「선물」 탭(11)으로 따로
 let giftIds=null;const GIFT_TAB=11;
 const isGift=o=>{if(!giftIds){if(!itemData)return false;giftIds=new Set(Object.values(itemData.gifts?.byDoll||{}).flat(2))}return giftIds.has(o.id)};
@@ -1674,6 +1674,8 @@ function renderItems(){
    else grid.append(ms.length>1?folderCard(g,ms):itemCard(ms[0]));
   }
   if(grid.childNodes.length)box.append(grid);
+  // v1.7.4 이벤트 폴더는 이벤트 순서(스토리 목록 순서, groups[g].ord)대로
+  evs.sort((a,b)=>(groups[a[0]]?.ord??1e9)-(groups[b[0]]?.ord??1e9));
   if(evs.length){const acc=el('div','wr-long ev-list');
    for(const [g,ms] of evs){const item=el('section','wr-long-item');const h=el('button','wr-long-btn');h.type='button';
     const nm=el('span','wr-long-title');nm.append(el('strong','',groups[g]?.title||''));h.append(nm,el('span','wr-long-len',ms.length+'개'),ic('right','tri'));
