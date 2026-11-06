@@ -1478,3 +1478,7 @@ button.doll-chip:hover{border-color:var(--accent)}
 .skill-hex .item-ic{left:15%;top:14.5%;width:70%;height:71%}
 /* v1.6.3 흰 스킬 그림은 회색 육각 크기에 딱 맞춤 (빨간 밑그림만 86%) */
 .skill-hex .item-ic{left:12%;top:11%;width:76%;height:78%}
+/* v1.6.4 테두리는 회색 육각에 바짝, 흰 스킬 그림은 육각 거의 끝까지 (게임 화면 비율) */
+.skill-hex .hex-fill,.skill-hex.max .hex-fill{inset:6% 7%}
+.skill-hex .hex-base{left:13%;top:12.5%;width:74%;height:75%}
+.skill-hex .item-ic{left:3%;top:2.5%;width:94%;height:95%}
