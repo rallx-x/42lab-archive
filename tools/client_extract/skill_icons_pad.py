@@ -1,6 +1,7 @@
 """스킬 아이콘을 게임 원래 칸(m_Rect, 보통 128×128)에 원래 위치(textureRectOffset)로 다시 놓기 (2026-11-06)
 아틀라스의 스킬 그림은 빈 여백이 잘려 있어서, 그대로 쓰면 아이콘마다 크기 · 위치가 달라짐
 사용: atlas2/skillicon.ab 가 있는 곳에서 python skill_icons_pad.py → pnc-item-skill2/skill/*.webp (pnc-item 의 skill/ 에 덮어쓰기)
+"""
 import UnityPy, os
 from PIL import Image
 OUT = 'pnc-item-skill2/skill'
