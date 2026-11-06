@@ -1290,14 +1290,14 @@ const TAG_NAME={1:'공격',2:'암살',3:'치료',4:'제어',5:'방어',6:'보조
 function classLine(d,small){if(!d?.career)return null;
  const w=el('span','doll-class'+(small?' sm':''));const cn=dollIndex?.careers?.[d.career]||'';
  const ci=el('span','dc-ic career');ci.style.setProperty('--ci','url(/assets/img/class/career_'+d.career+'.png)');const c=el('span','dc-career');c.append(ci);if(!small)c.append(el('span','dc-name',cn));c.title=cn;w.append(c);
- for(const t of d.tags||[]){if(!small)w.append(el('span','dc-sep','|'));const ti=el('img','dc-ic tag');ti.alt='';ti.src='/assets/img/class/tag_'+t+'.png';const g=el('span','dc-tag');g.title=TAG_NAME[t]||'';g.append(ti);if(!small)g.append(el('span','dc-name',TAG_NAME[t]||''));w.append(g)}
+ for(const t of d.tags||[]){if(!small)w.append(el('span','dc-sep','|'));const ti=el('span','dc-ic tag');ti.style.setProperty('--ci','url(/assets/img/class/tag_'+t+'.png)');const g=el('span','dc-tag');g.title=TAG_NAME[t]||'';g.append(ti);if(!small)g.append(el('span','dc-name',TAG_NAME[t]||''));w.append(g)}
  return w}
 function dollCard(d){
  const b=el('button','doll-card');b.type='button';b.dataset.key=d.voiceKey;
  const face=el('div','doll-face');const url=dollFace(d);if(url){const im=el('img');im.src=url;im.alt='';im.loading='lazy';face.append(im)}else face.classList.add('unknown');
  const info=el('div','doll-card-info');info.append(el('strong','',d.name));
  info.append(el('span','doll-card-meta',[d.company,d.role].filter(Boolean).join(' · ')));
- const foot=el('span','doll-card-foot');foot.append(el('span','doll-stars',starText(d.stars)));{const cl=classLine(d,true);if(cl)foot.append(cl)}info.append(foot);
+ const foot=el('span','doll-card-foot');foot.append(el('span','doll-stars',starText(d.stars)));info.append(foot);
  b.append(face,info);b.onclick=()=>showDoll(d.voiceKey);return b;
 }
 // 게임 글의 <color=#..>…</color> 를 색 글자로 (나머지 꼬리표는 지움, innerHTML 쓰지 않음)
