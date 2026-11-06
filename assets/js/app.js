@@ -444,7 +444,7 @@ function drawLibrary(){
   // v0.12.4 (58번) 이전 · 다음 폴더: 같은 분류 목록 순서대로, 튜토리얼처럼 선반 폴더면 그 선반 안에서만. 처음 · 끝은 흐리게
   {const sib=visible.map(x=>x.g).filter(g=>selected.g.shelfFolder?(g.shelfFolder&&shelfFor(g)===shelfFor(selected.g)):!g.shelfFolder);const at=sib.findIndex(g=>g===selected.g);
    const nav=el('div','folder-nav');nav.append(back);
-   const mk=(g,dir)=>{const b=el('button','folder-step '+dir);b.type='button';const lab=el('span','folder-step-label',dir==='prev'?'‹ 이전':'다음 ›');b.append(lab);if(g){b.append(el('small','folder-step-name',chapterDisplayTitle(g)));b.onclick=()=>showChapter(groupKey(g),category)}else b.disabled=true;return b};
+   const mk=(g,dir)=>{const b=el('button','folder-step '+dir);b.type='button';const lab=el('span','folder-step-label');if(dir==='prev')lab.append(ic('left'),el('span','','이전'));else lab.append(el('span','','다음'),ic('right'));b.append(lab);if(g){b.append(el('small','folder-step-name',chapterDisplayTitle(g)));b.onclick=()=>showChapter(groupKey(g),category)}else b.disabled=true;return b};
    const steps=el('div','folder-steps');steps.append(mk(at>0?sib[at-1]:null,'prev'),mk(at>=0&&at<sib.length-1?sib[at+1]:null,'next'));nav.append(steps);host.append(nav)}
   const panel=el('section','folder-detail');const art=el('div','folder-art');art.dataset.gid=selected.g.id;art.append(el('div','folder-art-kicker','42LAB / CHAPTER RECORD'),el('div','folder-art-symbol','◇'),el('h2','',chapterDisplayTitle(selected.g)),el('p','folder-art-pending','CHAPTER IMAGE PENDING'));applyFolderArt(art);
   const side=el('div','folder-episodes');
@@ -490,7 +490,7 @@ function drawLibrary(){
     const info=el('div','folder-tile-info');info.append(el('strong','',title));if(g.subtitle)info.append(el('span','chapter-card-subtitle',g.subtitle));info.append(el('small','',episodes.length+'개 기록'));
     b.append(visual,info);
    }else if(viewMode==='folder'){
-    b.append(el('span','drive-folder-icon','▰'));
+    {const fi=el('span','drive-folder-icon');fi.append(ic('folder-stack'));b.append(fi)}
     const info=el('span','drive-folder-info');info.append(el('strong','',title));if(g.subtitle)info.append(el('span','chapter-card-subtitle',g.subtitle));info.append(el('small','',episodes.length+'개 기록'));b.append(info);
    }else{
     b.append(el('span','chapter-list-icon','≡'));
@@ -1203,6 +1203,9 @@ function showOnly(id){for(const x of ['library','reader','dollView'])$('#'+x).cl
 const loadDollIndex=()=>dollIndex?Promise.resolve(dollIndex):fetchJSON(dataPath('doll_index.json')).then(d=>dollIndex=d);
 const dollFace=d=>imageMap[d.nameKo]||imageMap[d.name]||imageMap[(d.voiceKey||'')+'_avg']||imageMap[d.voiceKey]||null;
 const starText=n=>'★'.repeat(Math.max(0,+n||0));
+// v1.7.3 별 · 화살표 · 폴더는 이모지 · 기호 글자 대신 그림 아이콘 (기기마다 같게)
+const starEl=(n,cls)=>{const w=el('span',cls||'doll-stars');w.setAttribute('aria-label','★'.repeat(Math.max(0,+n||0)));for(let i=0;i<Math.max(0,+n||0);i++)w.append(ic('star'));return w};
+const icBtn=(name,cls)=>{const b=el('button',cls);b.type='button';b.append(ic(name));return b};
 const bdayText=b=>b&&/^\d{4}$/.test(b)?(+b.slice(0,2))+'월 '+(+b.slice(2))+'일':'';
 const dnorm=s=>String(s||'').toLowerCase().replace(/[\s·・.\-_()]/g,'');
 // 긴 글은 문장 단위로 (덩어리로 묶지 않기)
@@ -1308,7 +1311,7 @@ function dollCard(d){
  const face=el('div','doll-face');const url=dollFace(d);if(url){const im=el('img');im.src=url;im.alt='';im.loading='lazy';face.append(im)}else face.classList.add('unknown');
  const info=el('div','doll-card-info');info.append(el('strong','',d.name));
  info.append(el('span','doll-card-meta',[d.company,d.role].filter(Boolean).join(' · ')));
- const foot=el('span','doll-card-foot');foot.append(el('span','doll-stars',starText(d.stars)));info.append(foot);
+ const foot=el('span','doll-card-foot');foot.append(starEl(d.stars));info.append(foot);
  b.append(face,info);b.onclick=()=>showDoll(d.voiceKey);return b;
 }
 // 게임 글의 <color=#..>…</color> 를 색 글자로 (나머지 꼬리표는 지움, innerHTML 쓰지 않음)
@@ -1859,13 +1862,13 @@ function statsPanel(p){
  // 왼쪽: 성급 · 레벨별 능력치
  const left=el('section','stats-card');left.append(el('div','stats-head','능력치'));
  const tb=el('table','algo-table stats-table');const th=el('tr');th.append(el('th','algo-th-stat',''));
- for(const c of st.cols){const h=el('th','');h.append(el('span','stats-star',starLabel(c.star)),el('span','stats-lv','Lv.'+c.lv));th.append(h)}tb.append(th);
+ for(const c of st.cols){const h=el('th','');{const ss=el('span','stats-star');ss.append(document.createTextNode(c.star%1?Math.floor(c.star)+'.5':String(c.star)),ic('star'));h.append(ss)}h.append(el('span','stats-lv','Lv.'+c.lv));th.append(h)}tb.append(th);
  for(const a of order){if(!st.cols.some(c=>c.v[a]!=null))continue;const tr=el('tr');const td=el('td','algo-td-stat');td.append(attrLbl(icons[a],names[a]||a));tr.append(td);
   for(const c of st.cols){const v=c.v[a];tr.append(el('td','',v==null?'-':typeof v==='number'?v.toLocaleString(window.UI_LOCALE||'ko-KR'):v))}tb.append(tr)}
  const tw=el('div','algo-table-wrap');tw.append(tb);left.append(tw,el('p','load-note','Lv.60 · Lv.70 은 그 레벨에 필요한 마인드 확장을 포함한 값이에요. 알고리즘 · 무장각인 · 친밀도는 빼고 계산했어요.'));
  // 오른쪽: 친밀도 보너스
  const right=el('section','stats-card');const rh=el('div','stats-head');rh.append(document.createTextNode('친밀도 보너스'));right.append(rh);
- const bar=el('div','arma-lvbar stats-fbar');const dn=el('button','arma-step','▼'),up=el('button','arma-step','▲');dn.type=up.type='button';
+ const bar=el('div','arma-lvbar stats-fbar');const dn=icBtn('down','arma-step'),up=icBtn('up','arma-step');
  const range=el('input','arma-range');range.type='range';range.min=1;range.max=20;range.value=friendLv;range.setAttribute('aria-label','친밀도');
  const lvTxt=el('span','arma-lvtxt');bar.append(el('span','arma-lvlabel','친밀도'),dn,range,up,lvTxt);right.append(bar);
  const list=el('div','stats-bonus');right.append(list);
@@ -1931,7 +1934,7 @@ function armaPanel(p){
  if(window.ResizeObserver)new ResizeObserver(fit).observe(stage);requestAnimationFrame(fit);
  // 레벨 조절
  const bar=el('div','arma-lvbar');
- const dn=el('button','arma-step','▼'),up=el('button','arma-step','▲');dn.type=up.type='button';dn.setAttribute('aria-label','레벨 -1');up.setAttribute('aria-label','레벨 +1');
+ const dn=icBtn('down','arma-step'),up=icBtn('up','arma-step');dn.setAttribute('aria-label','레벨 -1');up.setAttribute('aria-label','레벨 +1');
  const range=el('input','arma-range');range.type='range';range.min=0;range.max=MAX;range.value=lv;range.setAttribute('aria-label','레벨');
  const lvTxt=el('span','arma-lvtxt');
  const setLv=v=>{lv=Math.min(Math.max(v,0),MAX);armaLv=lv;set('armaLv',lv);range.value=lv;draw()};
@@ -2133,7 +2136,7 @@ function renderDoll(p,startPart){
   if(exs.length){const row=el('div','doll-links');for(const g of exs){const b=el('button','doll-alt doll-ex');b.type='button';b.append(el('span','doll-alt-label','전속 스토리'),el('b','',chapterDisplayTitle(g)),ic('right'));b.onclick=()=>showChapter(groupKey(g),'exclusive');row.append(b)}info.append(row)}}
  if(p.fanTL)info.append(fanNote());
  {const di=(dollIndex?.dolls||[]).find(x=>x.heroId===p.heroId);const cl=classLine(di);if(cl)info.append(cl)}
- const sub=el('p','doll-sub');sub.append(el('span','doll-stars',starText(p.stars)));if(p.nameEn)sub.append(el('span','',p.nameEn));info.append(sub);
+ const sub=el('p','doll-sub');sub.append(starEl(p.stars));if(p.nameEn)sub.append(el('span','',p.nameEn));info.append(sub);
  const dl=el('dl','doll-facts');
  for(const [k,v] of [['클래스',p.role],['기업',p.company],['모델명',p.model],['직업',p.job],['생일',bdayText(p.birthday)],['성우',p.cv]]){if(!v)continue;dl.append(el('dt','',k),el('dd','',v))}
  info.append(dl);

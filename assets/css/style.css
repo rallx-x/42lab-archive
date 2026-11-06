@@ -447,7 +447,7 @@ html,body{overflow-x:hidden}
 .shelf-wrap>.story-shelf.shelf-half{grid-column:auto}
 .shelf-half .folder-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
 .shelf-half .drive-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
-.shelf-folder-card .folder-tile-symbol::before{content:"▤ ";font-size:.5em;vertical-align:middle}
+.shelf-folder-card .folder-tile-symbol::before{content:"";display:inline-block;width:.5em;height:.5em;margin-right:.2em;vertical-align:middle;background:currentColor;-webkit-mask:url(../icons/layers.png) center/contain no-repeat;mask:url(../icons/layers.png) center/contain no-repeat}
 @media(max-width:900px){.cat-tab{padding:0 12px}}
 @media(max-width:750px){
  .toolbar{flex-direction:column;align-items:stretch;gap:10px}
@@ -1564,3 +1564,15 @@ body.entropics{--hex-sh:rgba(8,3,16,.8)}
 .ic-hourglass{--ic:url(../icons/hourglass.png)}
 .skill-cd{display:inline-flex;align-items:center;gap:4px}
 .skill-cd .ic{font-size:13px}
+
+/* v1.7.3 이모지 · 기호 글자 → 그림 아이콘 */
+.ic-layers{--ic:url(../icons/layers.png)}.ic-folder-stack{--ic:url(../icons/folder-stack.png)}
+.doll-stars{display:inline-flex;gap:1px;align-items:center}
+.doll-stars .ic{font-size:.95em}
+.stats-star{display:inline-flex!important;align-items:center;gap:2px;justify-content:center}
+.stats-star .ic{font-size:.9em}
+.arma-step .ic{font-size:13px}
+.folder-step-label{display:inline-flex;align-items:center;gap:4px}
+.folder-step-label .ic{font-size:.85em}
+.drive-folder-icon .ic{font-size:22px}
+.setting-hint .ic{font-size:.95em;vertical-align:-.12em;margin-right:2px}
