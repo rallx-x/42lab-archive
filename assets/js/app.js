@@ -1475,7 +1475,7 @@ async function showAlgos({push=true,cat=null}={}){
    // 게임 세트 기호(assets/img/algo/suit_NN, 흰 그림 → 구역 색 바탕) + 아이템 그림 작게
    const em=el('span','algo-emblem a'+x.area);const nn=String(x.id).padStart(2,'0');em.style.setProperty('--em','url(/assets/img/algo/suit_'+nn+'.webp)');
    const probe=new Image();probe.onerror=()=>em.classList.add('none');probe.src='/assets/img/algo/suit_'+nn+'.webp';
-   top.append(em);const ii=itemIcon(x.icon);ii.classList.add('algo-item');top.append(ii);
+   top.append(em);const ii=el('span','item-ic algo-item');const im=el('img');im.alt='';im.decoding='async';im.src='/assets/img/algo/item_'+nn+'.webp';im.onerror=()=>ii.remove();ii.append(im);top.append(ii);
    const tt=el('div','algo-head');tt.append(el('strong','algo-name',x.name),el('span','algo-area a'+x.area,areas[x.area]?.name||''));top.append(tt);c.append(top);
    const ef=el('div','algo-effects');
    if(x.two){const r=el('p','algo-eff');r.append(el('span','algo-n','2세트'),el('span','algo-text',x.two));ef.append(r)}
