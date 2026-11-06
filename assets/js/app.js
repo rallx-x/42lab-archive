@@ -137,13 +137,17 @@ function showChapter(id,cat=category,{push=true}={}){
  document.querySelector('#groups')?.scrollIntoView({block:'start'});
  return true;
 }
+// v1.7.4 전체 기록 = 메인 · 전속 · 이벤트 · 그 외 탭 화면. 'all' 로 들어오면 마지막에 본 탭(처음엔 메인)
+const storyTabIds=()=>storyCategories.filter(([id])=>id!=='all').map(([id])=>id);
 function showHome(cat=null,{push=true,shelf=null}={}){
  routeToken++;
- selectCategory(cat);
+ if(cat==='all'){const t=get('storyCat','main');const ids=storyTabIds();cat=ids.includes(t)?t:(ids[0]||'all')}
+ selectCategory(cat);if(category&&category!=='all')set('storyCat',category);
  openFolderId=null;openShelf=shelf||null;
  $('#reader').classList.add('hidden');bgmLeave();
  $('#library').classList.remove('hidden');
  if(push)saveRoute({type:'home',category,shelf:openShelf});
+ else if(location.hash==='#home/all'&&category!=='all')history.replaceState(history.state,'',location.pathname+location.search+routeHash({type:'home',category,shelf:null}));
  drawLibrary();
  window.scrollTo(0,0);
 }
@@ -433,12 +437,22 @@ function drawLibrary(){
  if(!index){host.append(el('p','loading-note','기록을 불러오는 중…'));return}
  if(!openFolderId){
   const name=(storyCategories.find(([id])=>id===category)||[,'전체 기록'])[1];
-  $('#listTitle').textContent=openShelf?name+' › '+openShelf:name;$('#listCount').textContent=displayGroups.filter(g=>categoryMatches(g,category)&&(!openShelf||shelfFor(g)===openShelf)).length+'개 챕터';
+  $('#listTitle').textContent=openShelf?name+' › '+openShelf:'전체 기록';$('#listCount').textContent=displayGroups.filter(g=>categoryMatches(g,category)&&(!openShelf||shelfFor(g)===openShelf)).length+'개 챕터';
   $('#listHead').classList.remove('hidden');
  }
  const visible=displayGroups.filter(g=>categoryMatches(g,category)).map(g=>({g,episodes:sortedEpisodes(g).filter(e=>!q||[e.title,e.description,e.id,g.title,chapterDisplayTitle(g)].some(v=>(v||'').toLowerCase().includes(q)))})).filter(x=>x.episodes.length);
  if(!visible.length){host.append(error('검색 결과가 없습니다.'));return}
  const selected=visible.find(x=>x.g.id===openFolderId||x.g.key===openFolderId);
+ if(!openFolderId&&!openShelf&&category!=='all'){
+  const bar=el('div','doll-controls wr-controls story-tabs');const tabs=el('div','wr-tabs');tabs.setAttribute('role','tablist');tabs.setAttribute('aria-label','스토리 분류');
+  for(const [id,name] of storyCategories.filter(([id])=>id!=='all')){
+   const n=displayGroups.filter(g=>categoryMatches(g,id)).length;if(!n)continue;
+   const on=id===category;const b=el('button','cat-tab wr-tab'+(on?' selected':''));b.type='button';b.setAttribute('role','tab');b.setAttribute('aria-selected',String(on));
+   b.append(el('span','',name),el('span','wr-tab-n',String(n)));
+   b.onclick=()=>{if(on)return;showHome(id,{push:false});history.replaceState(history.state,'',location.pathname+location.search+routeHash({type:'home',category:id,shelf:null}))};
+   tabs.append(b)}
+  bar.append(tabs);host.append(bar);
+ }
  if(selected){
   const back=el('button','folder-back');back.append(ic('menu'),document.createTextNode(' '+(selected.g.shelfFolder?shelfFor(selected.g):'폴더 목록')));back.onclick=()=>showHome(category,{shelf:selected.g.shelfFolder?shelfFor(selected.g):null});
   // v0.12.4 (58번) 이전 · 다음 폴더: 같은 분류 목록 순서대로, 튜토리얼처럼 선반 폴더면 그 선반 안에서만. 처음 · 끝은 흐리게
