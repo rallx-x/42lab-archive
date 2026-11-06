@@ -679,7 +679,62 @@ function renderBirthday(card){
    if(nx){const r=el('div','bday-next');r.append(el('span','bday-next-label','다음 생일'),el('span','bday-next-date',nx.key.slice(0,2)+'.'+nx.key.slice(2)),el('span','bday-next-d','D-'+nx.n));cards.append(r);nx.who.forEach(x=>cards.append(bdayCard(x,false)))}}
  }
  const btn=el('button','bday-open');btn.type='button';btn.append(ic('expand'),el('span','','달력 펼치기'));btn.onclick=openBirthdayCalendar;
- card.append(cards,btn,el('p','cal-note','매일 오전 5시(KST)에 갱신됩니다.'));
+ card.append(cards,btn);renderGacha(card);card.append(el('p','cal-note','매일 오전 5시(KST)에 갱신됩니다.'));
+}
+// v1.7.5 픽업(지정검색) 로테이션 — data/gacha.json (tools/client_extract/gacha.py). 기준일부터 days 일마다 다음 칸, 끝나면 처음으로
+let gachaData=null,gachaLoading=false;
+const redrawLanding=()=>{if(index&&category==null&&!openFolderId&&!$('#search').value.trim()&&!$('#library').classList.contains('hidden'))drawLibrary()};
+function gachaNow(){
+ const g=gachaData;if(!g?.slots?.length)return null;
+ const T=gameToday(),[ay,am,ad]=g.anchor.split('-').map(Number);
+ const since=Math.floor((Date.UTC(T.y,T.m-1,T.d)-Date.UTC(ay,am-1,ad))/864e5),n=g.slots.length;
+ const k=Math.floor(since/g.days),at=((k%n)+n)%n,left=g.days-(since-k*g.days);
+ const start=new Date(Date.UTC(ay,am-1,ad)+k*g.days*864e5);
+ return {at,left,start,slot:g.slots[at],next:g.slots[(at+1)%n]};
+}
+const gTitle=p=>p.title?.[window.UI_LANG||'ko']||p.title?.ko||'';
+function gachaDoll(id){
+ const x=(dolls?.dolls||[]).find(d=>+d.heroId===+id),di=(dollIndex?.dolls||[]).find(d=>+d.heroId===+id);
+ return {name:x?.name||di?.name||String(id),ko:x?.nameKo||x?.name||di?.name,career:di?.career,key:di?.voiceKey}}
+function gachaFace(id,cls){
+ const d=gachaDoll(id),b=el('button','gacha-face'+(cls?' '+cls:''));b.type='button';b.title=d.name;b.setAttribute('aria-label',d.name);
+ const face=el('span','avatar');const url=imageMap[d.ko]||imageMap[d.name];
+ if(url){const im=document.createElement('img');im.src=url.startsWith('./')?url:'./'+url;im.alt='';im.loading='lazy';im.onerror=()=>{im.remove();face.classList.add('fallback')};face.append(im)}else face.classList.add('fallback');
+ b.append(face);
+ if(d.career){const ci=el('span','dc-ic career gacha-career');ci.style.setProperty('--ci','url(/assets/img/class/career_'+d.career+'.png)');b.append(ci)}
+ if(d.key)b.onclick=()=>showDoll(d.key);
+ return b}
+function gachaBlock(p,full){
+ const box=el('div','gacha-pick'+(full?' full':''));
+ box.append(el('div','gacha-title',gTitle(p)));
+ const row=el('div','gacha-main');const m=gachaDoll(p.main);row.append(gachaFace(p.main,'main'));
+ const t=el('div','gacha-main-text');t.append(el('span','gacha-label','메인 픽업'),el('strong','',m.name));row.append(t);box.append(row);
+ const subs=el('div','gacha-subs');
+ for(const id of p.subs){if(full){const c=el('div','gacha-sub');c.append(gachaFace(id),el('span','gacha-sub-name',gachaDoll(id).name));subs.append(c)}else subs.append(gachaFace(id))}
+ box.append(subs);return box}
+const mmdd=d=>String(d.getUTCMonth()+1).padStart(2,'0')+'.'+String(d.getUTCDate()).padStart(2,'0');
+function renderGacha(card){
+ const sec=el('div','gacha-sec');card.append(sec);
+ if(!gachaData||!dollIndex){
+  sec.append(el('p','bm-empty','픽업 일정을 불러오는 중…'));
+  if(!gachaLoading){gachaLoading=true;Promise.all([gachaData||fetchJSON(new URL('/data/gacha.json',location.origin).href).then(d=>gachaData=d),loadDollIndex()]).then(redrawLanding).catch(()=>{gachaData=gachaData||{slots:[]};gachaLoading=false})}
+  return}
+ const now=gachaNow();if(!now){sec.remove();return}
+ const head=el('div','gacha-head');head.append(el('span','gacha-head-title','픽업 일정'),el('span','gacha-server','글로벌 서버'),el('span','bday-next-d','D-'+now.left));head.title='글로벌 서버 기준이에요. 중국 본섭과는 일정이 달라요.';sec.append(head);
+ const list=el('div','gacha-list');now.slot.forEach(p=>list.append(gachaBlock(p,false)));sec.append(list);
+ const btn=el('button','bday-open');btn.type='button';btn.append(ic('expand'),el('span','','전체 픽업 일정'));btn.onclick=openGachaSchedule;sec.append(btn);
+}
+function openGachaSchedule(){
+ openInfo({title:'픽업 일정',items:[]});
+ const host=el('div','gacha-pop');$('#infoBody').append(host);
+ const now=gachaNow();if(!now)return;const n=gachaData.slots.length,D=gachaData.days;
+ host.append(el('p','cal-note gacha-pop-note','글로벌 서버 기준이에요. 중국 본섭과는 일정이 달라요.'),el('p','cal-note gacha-pop-note','2주마다 픽업 2개가 같이 열리고, 같은 순서로 돌아요. 매일 오전 5시(KST) 기준.'));
+ for(let i=0;i<n;i++){
+  const at=(now.at+i)%n,st=new Date(now.start.getTime()+i*D*864e5),en=new Date(st.getTime()+D*864e5);
+  const sec=el('section','gacha-slot'+(i===0?' now':''));
+  const h=el('div','gacha-slot-head');h.append(el('span','gacha-slot-date',mmdd(st)+' ~ '+mmdd(en)));if(i===0)h.append(el('span','bday-next-d','지금 · D-'+now.left));else h.append(el('span','gacha-slot-in',(i===1?now.left:now.left+(i-1)*D)+'일 뒤'));
+  const body=el('div','gacha-slot-body');gachaData.slots[at].forEach(p=>body.append(gachaBlock(p,true)));
+  sec.append(h,body);host.append(sec)}
 }
 function openBirthdayCalendar(){
  openInfo({title:'생일 달력',items:[]});
