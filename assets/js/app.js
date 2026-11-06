@@ -1241,11 +1241,12 @@ voiceAudio.addEventListener('ended',()=>{if(!voiceAudio.loop)voiceStop()});
 voiceAudio.addEventListener('playing',()=>{voiceBtn?.classList.remove('loading');if(voiceState)voiceState.textContent=''});
 voiceAudio.addEventListener('waiting',()=>{if(voiceState&&voiceBtn)voiceState.textContent='불러오는 중…'});
 // ----- 목록 -----
+let dollArma=get('dollArma','off');
 async function showDolls({push=true}={}){
  const tok=++routeToken;showOnly('dollView');bgmLeave();voiceStop();closeArchiveMenu();$('#crumb').textContent='인형 기록';
  if(push)saveRoute({type:'dolls'});
  const host=$('#dollView');host.replaceChildren(el('p','loading-note','인형 기록을 불러오는 중…'));window.scrollTo(0,0);
- try{await loadDollIndex()}catch(e){if(tok===routeToken)host.replaceChildren(error('인형 기록을 불러오지 못했어요. ('+e.message+')'));return}
+ try{await Promise.all([loadDollIndex(),loadArma().catch(()=>null)])}catch(e){if(tok===routeToken)host.replaceChildren(error('인형 기록을 불러오지 못했어요. ('+e.message+')'));return}
  if(tok===routeToken)renderDollList();
 }
 const byName=(a,b)=>a.name.localeCompare(b.name,'ko');
@@ -1273,7 +1274,8 @@ function renderDollList(){
  const grid=el('div','doll-list-body');
  const drawGrid=()=>{
   const q=dnorm(dollQuery);
-  const list=sortDolls(all.filter(d=>dollMatches(d,q)));
+  const hasArma=d=>!!armaData?.heroes?.[String(d.heroId)];
+  const list=sortDolls(all.filter(d=>dollMatches(d,q)&&(dollArma!=='on'||hasArma(d))));
   count.textContent=list.length+'명';grid.replaceChildren();
   if(!list.length){grid.append(el('p','loading-note',q?'「'+dollQuery.trim()+'」에 맞는 인형이 없어요.':'인형이 없어요.'));return}
   const field=dollSort==='role'?'role':'company';
@@ -1284,6 +1286,11 @@ function renderDollList(){
   }
  };
  left.append(selectBox('정렬',[['company','기업별'],['role','직군별']],dollSort,v=>{dollSort=v;set('dollSort',v);drawGrid()}));
+ // v1.7.1 필터: 무장각인이 있는 인형만
+ if(armaData?.heroes){const fw=el('div','doll-ctl');fw.append(el('span','doll-ctl-label','필터'));
+  const tg=el('button','skill-arma-toggle doll-arma-filter');tg.type='button';
+  const paint=()=>{const on=dollArma==='on';tg.classList.toggle('on',on);tg.setAttribute('aria-pressed',String(on));tg.replaceChildren(el('span','skill-arma-dot'),el('span','','무장각인'),el('span','skill-arma-state',on?'ON':'OFF'))};
+  tg.onclick=()=>{dollArma=dollArma==='on'?'off':'on';set('dollArma',dollArma);paint();drawGrid()};paint();fw.append(tg);left.append(fw)}
  const sw=el('label','doll-ctl doll-search-wrap');sw.append(el('span','doll-ctl-label','인형 찾기'));
  const sbox=el('span','doll-search');const si=el('input');si.type='search';si.placeholder='이름 · 별명';si.value=dollQuery;si.setAttribute('aria-label','인형 이름으로 찾기');si.autocomplete='off';
  si.oninput=()=>{dollQuery=si.value;drawGrid()};sbox.append(el('span','doll-search-prompt','//:_'),si);sw.append(sbox);

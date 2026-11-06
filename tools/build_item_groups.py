@@ -7,7 +7,7 @@
   2 기본 아이템 · 3 소모 아이템 · 8 알고리즘 · 9 돌파 위젯 · 5 육성재료 · 6 공장재료 · 7 기념품 · 10 이벤트 보상
   - 알고리즘: 이름에 「알고리즘」, 또는 구성품이 모두 「○○-1」 꼴(세트 알고리즘 상자)
   - 돌파 위젯: 이름에 「돌파 위젯」
-  - 이벤트 보상: 획득처에 「○○」 이벤트 (위 둘이 아닐 때)
+  - 이벤트 보상: 획득처에 「○○」 이벤트 · 이벤트 「○○」 (이벤트 이름이 있으면 알고리즘 · 위젯보다 먼저)
 묶음 (grp) — 같은 탭 안에서 폴더 하나로
   - wbox:<등급>  돌파 위젯 선택박스 (기본 · (중) · (소))
   - widget:<등급> 돌파 위젯 (클래스 5종)
@@ -47,12 +47,13 @@ def main():
     for o in ko['items']:
         n, src = o['name'], o.get('source') or ''
         cont = o.get('contents') or []
-        if '알고리즘' in n or (cont and all(re.search(r'-\d+$', nm(i)) for i, _ in cont)):
+        # 이벤트 이름(「○○」)이 적힌 획득처는 그 이벤트 폴더가 먼저 (「○○」 이벤트 · 이벤트 「○○」 둘 다)
+        if re.search(r'「[^」]+」\s*이벤트|이벤트\s*「[^」]+」', src):
+            t = 10
+        elif '알고리즘' in n or (cont and all(re.search(r'-\d+$', nm(i)) for i, _ in cont)):
             t = 8
         elif '돌파 위젯' in n:
             t = 9
-        elif re.search(r'「[^」]+」\s*이벤트', src):
-            t = 10
         else:
             t = o['page']
         tab[o['id']] = t
