@@ -1815,7 +1815,7 @@ function skillPanel(p){
   top.append(el('span','skill-type t'+sk.type,SKILL_TYPE[sk.type]||''),el('strong','skill-name',ups.length?ups[ups.length-1].st.skill.name:sk.name));
   const meta=el('span','skill-meta');
   const preAt=l=>{if(!sk.pre)return null;let v=sk.pre[0];(sk.preLv||[]).forEach((L,i)=>{if(l>=L)v=sk.pre[i]});return v};
-  const drawMeta=()=>{meta.replaceChildren();const pv=preAt(lv);if(pv!=null)meta.append(el('span','skill-chip','예충전 '+fmtNum(pv)+'초'));if(sk.cd)meta.append(el('span','skill-chip','⏳ '+fmtNum(sk.cd)+'초'))};
+  const drawMeta=()=>{meta.replaceChildren();const pv=preAt(lv);if(pv!=null)meta.append(el('span','skill-chip','예충전 '+fmtNum(pv)+'초'));if(sk.cd){const c=el('span','skill-chip skill-cd');c.title='쿨타임';c.append(ic('hourglass'),el('span','',fmtNum(sk.cd)+'초'));meta.append(c)}};
   drawMeta();top.append(meta);
   const brief=el('span','skill-brief');skillText(brief,sk.brief);
   mid.append(top,brief);
