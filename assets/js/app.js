@@ -1398,9 +1398,9 @@ async function showRecord(id,{push=true}={}){
  host.append(back,head,meta,txt,foot);
 }
 // ----- v0.12.22 로딩 팁 (#tips) — 글만 (배경 그림 없음) -----
-const TIP_GROUPS=[['all','전체'],['doll','인형'],['wiki','마그라세아 백과사전'],['sector','섹터'],['etc','그 외']];
+const TIP_GROUPS=[['all','전체'],['wiki','마그라세아 백과사전'],['sector','섹터'],['etc','그 외']];
 const TIP_SUBS=[['corp','기업'],['faction','세력'],['etc','그 외']]; // 「그 외」 안 세부 분류
-let tipData=null,tipCat=get('tipCat','all'),tipQuery='';
+let tipData=null,tipCat=get('tipCat','all'),tipQuery='';if(!['all','wiki','sector','etc'].includes(tipCat))tipCat='all';
 // v1.5 자료실: 메뉴 「자료실」 항목을 한 화면에 카드로 (누르면 바로 그 화면)
 async function showArchive({push=true}={}){
  const tok=++routeToken;showOnly('dollView');bgmLeave();voiceStop();closeArchiveMenu();$('#crumb').textContent='자료실';
@@ -1412,14 +1412,17 @@ async function showArchive({push=true}={}){
   const tx=el('span','arc-text');tx.append(el('span','eyebrow',eyebrow),el('strong','arc-name',name),el('span','arc-desc',desc));
   const n=el('span','arc-n');b.append(tx,n,ic('right','tri'));c.append(b);grid.append(c);return {c,n}};
  const rec=card('WORLD RECORDS','시계 기록','게임 속 세계 기록 · 장문 기록',()=>showRecords({cat:'0'}));
- const tip=card('LOADING TIPS','로딩 팁','로딩 화면에 나오는 인형 · 섹터 팁',()=>showTips());
+ const tip=card('LOADING TIPS','로딩 팁','로딩 화면에 나오는 백과사전 · 섹터 팁',()=>showTips());
  const itm=card('ITEMS','아이템','창고 · 숙소 가구 · 이벤트 보상',()=>showItems());
  const cnt=(o,n)=>{if(tok===routeToken&&n)o.n.textContent=n.toLocaleString(window.UI_LOCALE||'ko-KR')+'개'};
  loadRecords().then(()=>{if(tok!==routeToken)return;cnt(rec,(wrData.records||[]).length);
-  const sub=el('div','arc-sub');for(const ty of (wrData.types||[]).filter(x=>x.id)){const k=(wrData.records||[]).filter(r=>r.type===ty.id).length;if(!k)continue;const b=el('button','arc-chip',ty.name);b.type='button';b.onclick=()=>showRecords({cat:String(ty.id)});sub.append(b)}
+  const sub=el('div','arc-sub');for(const ty of (wrData.types||[]).filter(x=>x.id)){const k=(wrData.records||[]).filter(r=>r.type===ty.id).length;if(!k)continue;const b=el('button','arc-chip rec',ty.name);b.type='button';b.onclick=()=>showRecords({cat:String(ty.id)});sub.append(b)}
   if(sub.childNodes.length)rec.c.append(sub)}).catch(()=>{});
- (tipData?Promise.resolve(tipData):fetchJSON(dataPath('loading_tips.json')).then(d=>tipData=d)).then(d=>cnt(tip,(d.tips||[]).length)).catch(()=>{});
- loadItems().then(d=>cnt(itm,(d.items||[]).length)).catch(()=>{});
+  const chipRow=(o,list)=>{const sub=el('div','arc-sub');for(const [name,go] of list){const b=el('button','arc-chip',name);b.type='button';b.onclick=go;sub.append(b)}if(sub.childNodes.length)o.c.append(sub)};
+ (tipData?Promise.resolve(tipData):fetchJSON(dataPath('loading_tips.json')).then(d=>tipData=d)).then(d=>{if(tok!==routeToken)return;cnt(tip,(d.tips||[]).length);
+  chipRow(tip,TIP_GROUPS.filter(([g])=>g!=='all'&&(d.tips||[]).some(x=>x.group===g)).map(([g,n])=>[n,()=>showTips({cat:g})]))}).catch(()=>{});
+ loadItems().then(d=>{if(tok!==routeToken)return;cnt(itm,(d.items||[]).filter(o=>!String(o.grp||'').startsWith('widget:')).length);
+  chipRow(itm,ITEM_PAGES.filter(([pg])=>pg).map(([pg,n])=>[n,()=>showItems({cat:String(pg)})]))}).catch(()=>{});
 }
 async function showTips({push=true,cat=null}={}){
  const tok=++routeToken;showOnly('dollView');bgmLeave();voiceStop();closeArchiveMenu();$('#crumb').textContent='로딩 팁';
