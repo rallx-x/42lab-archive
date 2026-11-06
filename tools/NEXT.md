@@ -57,3 +57,11 @@
 - explorationicon.ab_export: 함수 작업용 — ICON_tag_buff_* (chip_tag 묶음) · Corner_* (chip_mark) · ICON_xy_* · ICON_LBuff_* · ICON_Room_*
 - ui_fairylist.ab_export: 성령 목록 UI 틀 (등급 S·A·B·C, 카드 테두리, 스킬 칸) · 얼굴은 fairysmallheadicon
 
+
+## 지형 함수 · 버프 아이콘 (2026-11-06 기록만, 아직 작업 안 함)
+- 지형 함수 정리 화면: 스토리에도 나옴 (튜토리얼 cpt00_tutorial_01 「지형 함수」 — 전투 시작 때 발판 위 인형에게 효과)
+  - 아이콘: Sprite 폴더 `ICON_Grid001~025` (흰 육각형 테두리) · `ICON_Grid100~108 · 1100 · 1101` (인형 실루엣 + 효과)
+- 버프 / 디버프 / 중립 분류 만들기
+  - `ICON_LBuff_*` (작은 흰 글리프, 상태 효과 아이콘)
+  - `ICON_xy_*` (64×64, 색으로 구분: 초록 = 버프 · 빨강 = 디버프 · 노랑 = 중립/특수 로 보임 → 데이터로 확인)
+  - `ICON_g_buff_* · ICON_g_def_* · ICON_g_hp_*` (초록 · 노랑 빛나는 버프 아이콘)
