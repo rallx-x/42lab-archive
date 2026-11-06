@@ -1390,3 +1390,12 @@ button.doll-chip:hover{border-color:var(--accent)}
 .doll-class .dc-sep{color:var(--sub);font-weight:400}
 .doll-class.sm{gap:4px;margin:0 0 0 auto}
 .doll-class.sm .dc-ic{width:16px;height:16px}
+
+/* v1.5.12 스킬 육각 = 게임 4층 (common.ab: 角色详情_技能底含描边2 · ICON_*_base · 技能_*框) */
+.skill-hex .hex-fill,.skill-hex.max .hex-fill{inset:4% 5%;clip-path:none;background:url(../img/skill/bg.png) center/100% 100% no-repeat}
+.skill-hex .hex-base{position:absolute;left:14%;top:14%;width:72%;height:72%;background:var(--hx);-webkit-mask:url(../img/skill/base_1.png) center/contain no-repeat;mask:url(../img/skill/base_1.png) center/contain no-repeat}
+.skill-hex.t2 .hex-base{-webkit-mask-image:url(../img/skill/base_2.png);mask-image:url(../img/skill/base_2.png)}
+.skill-hex.t3 .hex-base{-webkit-mask-image:url(../img/skill/base_3.png);mask-image:url(../img/skill/base_3.png)}
+.skill-hex .item-ic img,.skill-hex[class] .item-ic img{filter:none!important}
+.skill-hex .item-ic{left:9%;top:8.5%;width:82%;height:83%;clip-path:none}
+.skill-hex.enh::before{content:none}

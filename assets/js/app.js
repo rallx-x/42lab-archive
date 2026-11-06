@@ -1736,7 +1736,7 @@ function skillPanel(p){
  }
  return box;
 }
-// 스킬 아이콘 = 게임처럼 3층: 회색 육각 바탕 + 아이콘(검은 부분을 분류 색으로 칠함, 흰 부분은 그대로) + 흰 테두리(종류별 틀)
+// 스킬 아이콘 = 게임처럼 4층: 회색 육각 바탕(bg) + 종류별 밑그림(ICON_skill/passive/ultimate_base)을 분류 색으로 + 아이콘(그대로) + 흰 테두리(종류별 틀)
 // 분류 cat: 1 공격 빨강 · 2 회복 연두 · 3 방어 파랑 · 4 특수 회청 / 궁극기 그림은 색이 들어 있어 그대로 / 무장각인 강화(enh)는 주황 테두리
 const HEX_TONE={1:[.82,.14,.14],2:[.57,.82,.16],3:[.11,.63,.85],4:[.49,.54,.63]}; // 게임 Consts.HeroConsts eBattleSkillTypeColor: Attack · Recovery · Defense · Special
 function hexFilters(){if(document.getElementById('skHexDefs'))return;
@@ -1748,7 +1748,8 @@ function hexFilters(){if(document.getElementById('skHexDefs'))return;
  document.body.append(svg)}
 function skillHex(icon,o={}){hexFilters();
  const w=el('span','skill-ic skill-hex t'+(o.type||1)+' c'+(o.cat||1)+(o.enh?' enh':''));
- w.append(el('span','hex-fill'));const ii=itemIcon(icon?'skill/'+icon:'');w.append(ii,el('span','hex-fr'));return w}
+ const tn=HEX_TONE[o.cat||1]||HEX_TONE[1];w.style.setProperty('--hx','rgb('+tn.map(v=>Math.round(v*255)).join(',')+')');
+ w.append(el('span','hex-fill'),el('span','hex-base'));const ii=itemIcon(icon?'skill/'+icon:'');w.append(ii,el('span','hex-fr'));return w}
 
 // ----- v1.4 무장각인 (data/<언어>/arma.json · 로고 = pnc-item arma/<heroId>.webp) -----
 let armaData=null;
