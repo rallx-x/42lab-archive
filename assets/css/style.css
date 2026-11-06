@@ -1399,3 +1399,8 @@ button.doll-chip:hover{border-color:var(--accent)}
 .skill-hex .item-ic img,.skill-hex[class] .item-ic img{filter:none!important}
 .skill-hex .item-ic{left:9%;top:8.5%;width:82%;height:83%;clip-path:none}
 .skill-hex.enh::before{content:none}
+/* v1.5.13 직군 · 분류 줄을 아래 줄(별 · 영문 이름)과 같은 크기 · 글꼴로 */
+.doll-class{font:inherit;font-size:13px;font-weight:400;line-height:1.5;color:var(--sub);gap:4px 8px;margin:0 0 4px}
+.doll-class .dc-career,.doll-class .dc-tag{gap:5px}
+.doll-class .dc-ic{width:16px;height:16px}
+.doll-class .dc-ic.tag{padding:0}
