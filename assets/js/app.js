@@ -1461,8 +1461,11 @@ function renderTips(){
 }
 // ----- v0.12.22 아이템 (#items) — 게임 창고 분류 -----
 // 그림: site_info.home.itemIconBase (Cloudflare 별도 프로젝트) + <icon 이름>.webp. 주소가 없거나 그림이 없으면 글만
-const ITEM_PAGES=[[0,'전체'],[2,'기본 아이템'],[3,'소모 아이템'],[8,'알고리즘'],[9,'돌파 위젯'],[5,'육성재료'],[6,'공장재료'],[7,'기념품'],[10,'이벤트 보상'],[100,'숙소']];
-const EVENT_TAB=10,itemTab=o=>o.tab??o.page;
+const ITEM_PAGES=[[0,'전체'],[2,'기본 아이템'],[11,'선물'],[3,'소모 아이템'],[8,'알고리즘'],[9,'돌파 위젯'],[5,'육성재료'],[6,'공장재료'],[7,'기념품'],[10,'이벤트 보상'],[100,'숙소']];
+// v1.5.9 선물(인형 좋아함 · 싫어함 선물, items.json gifts.byDoll)은 「선물」 탭(11)으로 따로
+let giftIds=null;const GIFT_TAB=11;
+const isGift=o=>{if(!giftIds){if(!itemData)return false;giftIds=new Set(Object.values(itemData.gifts?.byDoll||{}).flat(2))}return giftIds.has(o.id)};
+const EVENT_TAB=10,itemTab=o=>isGift(o)?GIFT_TAB:(o.tab??o.page);
 const DORM=100;let furnData=null,dormView=get('dormView','cat')==='theme'?'theme':'cat',dormCat=0;
 const loadFurniture=()=>furnData?Promise.resolve(furnData):fetchJSON(dataPath('furniture.json')).then(d=>furnData=d);
 let itemData=null,itemCat=+get('itemCat',0)||0,itemQuery='';
@@ -1576,7 +1579,7 @@ function renderItems(){
   list.classList.toggle('dorm-mode',itemCat===DORM);
   if(itemCat===DORM){drawDorm(list,count,q);return}
   list.classList.add('dorm-mode');list.replaceChildren();
-  const rows=all.filter(o=>(itemCat===0||itemTab(o)===itemCat)&&(!q||dnorm(o.name).includes(q)||dnorm(o.desc).includes(q)));
+  const rows=all.filter(o=>(itemCat===0||itemTab(o)===itemCat)&&(!q||dnorm(o.name).includes(q)||dnorm(o.desc).includes(q))).sort((a,b)=>(b.quality||0)-(a.quality||0));
   count.textContent=rows.length+'개';
   if(!rows.length){list.append(el('p','loading-note',q?'「'+itemQuery.trim()+'」에 맞는 기록이 없어요.':'기록이 없어요.'));return}
   if(q){const grid=el('div','item-list');rows.forEach(o=>grid.append(itemCard(o)));list.append(grid);return}
