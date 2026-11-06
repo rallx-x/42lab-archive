@@ -1475,7 +1475,7 @@ async function showAlgos({push=true,cat=null}={}){
    // 게임 세트 기호(assets/img/algo/suit_NN, 흰 그림 → 구역 색 바탕) + 아이템 그림 작게
    const em=el('span','algo-emblem a'+x.area);const nn=String(x.id).padStart(2,'0');em.style.setProperty('--em','url(/assets/img/algo/suit_'+nn+'.webp)');
    const probe=new Image();probe.onerror=()=>em.classList.add('none');probe.src='/assets/img/algo/suit_'+nn+'.webp';
-   top.append(em);const ii=itemIcon(x.icon);ii.classList.add('algo-item');top.append(ii);
+   top.append(em);const ii=el('span','item-ic algo-item');const im=el('img');im.alt='';im.decoding='async';im.src='/assets/img/algo/item_'+nn+'.webp';im.onerror=()=>ii.remove();ii.append(im);top.append(ii);
    const tt=el('div','algo-head');tt.append(el('strong','algo-name',x.name),el('span','algo-area a'+x.area,areas[x.area]?.name||''));top.append(tt);c.append(top);
    const ef=el('div','algo-effects');
    if(x.two){const r=el('p','algo-eff');r.append(el('span','algo-n','2세트'),el('span','algo-text',x.two));ef.append(r)}
@@ -1841,6 +1841,39 @@ function skillHex(icon,o={}){hexFilters();
  const tn=HEX_TONE[o.cat||1]||HEX_TONE[1];w.style.setProperty('--hx','rgb('+tn.map(v=>Math.round(v*255)).join(',')+')');
  w.append(el('span','hex-fill'),el('span','hex-base'));const ii=itemIcon(icon?'skill/'+icon:'');w.append(ii);if(o.enh)w.append(el('span','hex-arma'));w.append(el('span','hex-fr'));return w}
 
+// ----- v1.7 인형 능력치 · 친밀도 보너스 (data/<언어>/stats.json) -----
+let statsData=null;
+const loadStats=()=>statsData?Promise.resolve(statsData):fetchJSON(dataPath('stats.json')).then(d=>statsData=d);
+let friendLv=+get('friendLv',20)||20;
+const starLabel=n=>n%1?Math.floor(n)+'.5★':n+'★';
+function statsPanel(p){
+ const st=p.stats,order=statsData?.order||[],names=armaData?.attrs||{},icons=armaData?.attrIcons||{};
+ const wrap=el('div','stats-wrap');
+ // 왼쪽: 성급 · 레벨별 능력치
+ const left=el('section','stats-card');left.append(el('div','stats-head','능력치'));
+ const tb=el('table','algo-table stats-table');const th=el('tr');th.append(el('th','algo-th-stat',''));
+ for(const c of st.cols){const h=el('th','');h.append(el('span','stats-star',starLabel(c.star)),el('span','stats-lv','Lv.'+c.lv));th.append(h)}tb.append(th);
+ for(const a of order){if(!st.cols.some(c=>c.v[a]!=null))continue;const tr=el('tr');const td=el('td','algo-td-stat');td.append(attrLbl(icons[a],names[a]||a));tr.append(td);
+  for(const c of st.cols){const v=c.v[a];tr.append(el('td','',v==null?'-':typeof v==='number'?v.toLocaleString(window.UI_LOCALE||'ko-KR'):v))}tb.append(tr)}
+ const tw=el('div','algo-table-wrap');tw.append(tb);left.append(tw,el('p','load-note','Lv.60 · Lv.70 은 그 레벨에 필요한 마인드 확장을 포함한 값이에요. 알고리즘 · 무장각인 · 친밀도는 빼고 계산했어요.'));
+ // 오른쪽: 친밀도 보너스
+ const right=el('section','stats-card');const rh=el('div','stats-head');rh.append(document.createTextNode('친밀도 보너스'));right.append(rh);
+ const bar=el('div','arma-lvbar stats-fbar');const dn=el('button','arma-step','▼'),up=el('button','arma-step','▲');dn.type=up.type='button';
+ const range=el('input','arma-range');range.type='range';range.min=1;range.max=20;range.value=friendLv;range.setAttribute('aria-label','친밀도');
+ const lvTxt=el('span','arma-lvtxt');bar.append(el('span','arma-lvlabel','친밀도'),dn,range,up,lvTxt);right.append(bar);
+ const list=el('div','stats-bonus');right.append(list);
+ const draw=()=>{lvTxt.replaceChildren(el('b','',String(friendLv)),document.createTextNode(' / 20'));list.replaceChildren();
+  for(const b of st.bonus||[]){const got=b.steps.filter(x=>x.fl<=friendLv);const cur=got[got.length-1],next=b.steps[got.length];
+   const row=el('div','stats-brow'+(cur?'':' locked'));const ic=el('span','stats-fic');if(b.icon){const im=el('img');im.alt='';im.decoding='async';im.src='/assets/img/friend/'+b.icon+'.webp';im.onerror=()=>im.remove();ic.append(im)}row.append(ic);
+   const body=el('div','stats-bbody');const t=el('div','stats-btop');t.append(el('strong','stats-bname',b.name),el('span','stats-bstep','LV'+got.length+' / '+b.steps.length));body.append(t);
+   const line=el('div','stats-bline');line.append(attrLbl(icons[b.attr],names[b.attr]||''),el('b','stats-bval',cur?'+'+(typeof cur.v==='number'?cur.v.toLocaleString(window.UI_LOCALE||'ko-KR'):cur.v):'-'));body.append(line);
+   const req=el('div','stats-breq');
+   if(cur)req.append(el('span','skill-chip','인형 Lv.'+cur.hl+' 필요'));
+   if(next)req.append(el('span','skill-chip stats-next','다음: 친밀도 '+next.fl+' · +'+next.v));
+   body.append(req);row.append(body);list.append(row)}};
+ const setLv=v=>{friendLv=Math.min(Math.max(v,1),20);set('friendLv',friendLv);range.value=friendLv;draw()};
+ dn.onclick=()=>setLv(friendLv-1);up.onclick=()=>setLv(friendLv+1);range.oninput=()=>setLv(+range.value);
+ draw();wrap.append(left,right);return wrap}
 // ----- v1.4 무장각인 (data/<언어>/arma.json · 로고 = pnc-item arma/<heroId>.webp) -----
 let armaData=null;
 const loadArma=()=>armaData?Promise.resolve(armaData):fetchJSON(dataPath('arma.json')).then(d=>armaData=d);
@@ -1935,7 +1968,7 @@ async function showDoll(key,{push=true,part=null}={}){
  if(push)saveRoute({type:'doll',id:key,part});
  const host=$('#dollView');host.replaceChildren(el('p','loading-note','프로필을 불러오는 중…'));window.scrollTo(0,0);
  try{loadDollIndex().catch(()=>{});let p=dollCache.get(key);if(!p){p=await fetchJSON(dataPath('profiles/'+encodeURIComponent(key)+'.json'));dollCache.set(key,p)}
-  const [sk,am]=await Promise.all([loadSkills().catch(()=>null),loadArma().catch(()=>null),window.siteReady?.catch(()=>{}),loadDollIndex().catch(()=>null)]);if(sk&&!p.skills)p.skills=sk.heroes?.[String(p.heroId)]||null;if(am&&!p.arma)p.arma=am.heroes?.[String(p.heroId)]||null;
+  const [sk,am,stt]=await Promise.all([loadSkills().catch(()=>null),loadArma().catch(()=>null),loadStats().catch(()=>null),window.siteReady?.catch(()=>{}),loadDollIndex().catch(()=>null)]);if(stt&&!p.stats)p.stats=stt.heroes?.[String(p.heroId)]||null;if(sk&&!p.skills)p.skills=sk.heroes?.[String(p.heroId)]||null;if(am&&!p.arma)p.arma=am.heroes?.[String(p.heroId)]||null;
   if(tok!==routeToken)return;renderDoll(p,part)}
  catch(e){if(tok===routeToken){host.replaceChildren(error('프로필을 불러오지 못했어요. ('+e.message+')'))}}
 }
@@ -2115,6 +2148,7 @@ function renderDoll(p,startPart){
  parts.push(['affinity','친밀도','',box=>{if(affBox.childNodes.length)box.append(affBox);box.append(storyPanel(p))}]);
  if(vc)parts.push(['voice','보이스',vc+'개',box=>box.append(voicePanel(p))]);
  if(skins.length)parts.push(['skin','스킨',skins.length+'벌',box=>{box.append(el('p','load-note',LOAD_NOTE),gallery(p,skins,{label:'스킨',cls:'gal-skin'}))}]);
+ if(p.stats?.cols?.length)parts.unshift(['stats','능력치','',box=>box.append(statsPanel(p))]);
  parts.unshift(['profile','프로필','',box=>box.append(hero)]);
  // 프로필 칸이 아닐 때 위에 작은 이름 줄
  const mini=el('div','doll-mini');mini.append(el('span','eyebrow',[p.company,p.role].filter(Boolean).join(' / ').toUpperCase()||'DOLL RECORD'),el('strong','doll-mini-name',p.name));
