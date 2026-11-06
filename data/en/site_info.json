@@ -38,7 +38,10 @@
     "Skill icons now use the in-game hexagon frame, colored by skill category. Furniture, profile frames and outfits inside boxes now have images too.",
     "The search filter row now has an icon.",
     "Doll stories can be expanded and collapsed one by one.",
-    "Undine's Arma Inscripta is a fan translation of the CN server text."
+    "Undine's Arma Inscripta is a fan translation of the CN server text.",
+    "Loading Tips: added the \"Magrasea Knowledge Base\" category, and \"Others\" is now split into Companies · Factions · Other. Tips that mention a Doll now link to her profile.",
+    "Items: cards now show only the name and description; sources, gift preferences and contents open under \"Details\". Added a \"Gifts\" tab and sorted items from highest rarity.",
+    "Doll profiles and the Doll list now show class and role icons."
    ]
   },
   {
