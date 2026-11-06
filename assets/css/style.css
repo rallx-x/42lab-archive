@@ -1488,3 +1488,9 @@ button.doll-chip:hover{border-color:var(--accent)}
 .skill-hex .item-ic{left:8%;top:7%;width:84%;height:86%}
 .skill-hex .hex-fr{filter:drop-shadow(0 1px 1.5px rgba(0,0,0,.45))}
 .skill-hex.enh .hex-fr{filter:drop-shadow(0 0 3px #ff9a1f) drop-shadow(0 1px 1.5px rgba(0,0,0,.4))}
+/* v1.6.4 흰 스킬 그림: 회색 육각의 약 92% (게임 화면 실측), 빨간 밑그림 약 73% */
+.skill-hex .item-ic{left:9.75%;top:8.75%;width:80.5%;height:82.5%}
+/* v1.6.4 빨간 밑그림: 회색 육각의 약 63% (게임 실측) · 테두리 바깥 회색 그림자 (테마 글자색 따라감) */
+.skill-hex .hex-base{left:17.3%;top:16.5%;width:65.4%;height:67%}
+.skill-hex .hex-fr{filter:drop-shadow(0 0 1.5px color-mix(in srgb,var(--sub) 75%,transparent)) drop-shadow(0 1px 1px color-mix(in srgb,var(--sub) 55%,transparent))}
+.skill-hex.enh .hex-fr{filter:drop-shadow(0 0 3px #ff9a1f) drop-shadow(0 0 1.5px color-mix(in srgb,var(--sub) 70%,transparent))}
