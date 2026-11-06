@@ -1484,12 +1484,15 @@ async function showAlgos({push=true,cat=null}={}){
   const table=(heads,rows)=>{const tb=el('table','algo-table');const th=el('tr');heads.forEach((h,i)=>th.append(el('th',i?'':'algo-th-stat',h)));tb.append(th);
    for(const r of rows){const tr=el('tr');r.forEach((c,i)=>tr.append(el('td',i?'':'algo-td-stat',c)));tb.append(tr)}const w=el('div','algo-table-wrap');w.append(tb);return w};
   const pctIn=list=>{const c={};list.forEach(x=>c[x.stat]=(c[x.stat]||0)+1);return x=>x.stat+(x.pct&&c[x.stat]>1?' %':'')};
-  if(ak.length){basic.append(el('h3','tip-sub','주요 수치'),el('p','load-note','등급 · 칸 수별 기본값이에요. 알고리즘 효율에 따라 더 올라가요.'));
-   for(const k of ak){if(!d.main?.[k])continue;const box=el('div','algo-tbox');box.append(el('strong','algo-area a'+k,areas[k].name));
-    box.append(table(['','파랑 1칸','파랑 2칸','보라 1칸','보라 2칸','주황 1칸','주황 2칸'],d.main[k].map(x=>[pctIn(d.main[k])(x),...['b1','b2','p1','p2','o1','o2'].map(c=>x[c]||'-')])));basic.append(box)}
-   basic.append(el('h3','tip-sub','부가 수치'),el('p','load-note','품질별 값이에요. 알고리즘 효율의 영향을 받지 않아요.'));
-   for(const k of ak){if(!d.sub?.[k])continue;const box=el('div','algo-tbox');box.append(el('strong','algo-area a'+k,areas[k].name));
-    box.append(table(['','회색','파랑','보라','주황'],d.sub[k].map(x=>[pctIn(d.sub[k])(x),...x.v])));basic.append(box)}}
+  // 접기 · 펼치기 (처음엔 접힘, 상태 기억)
+  const fold=(key,title,note,fill)=>{const sec=el('section','algo-fold'+(get(key,'closed')==='open'?' open':''));const hb=el('button','algo-fold-head');hb.type='button';
+   hb.append(el('strong','',title),el('span','algo-fold-note',note),ic('right','tri'));hb.onclick=()=>{const on=sec.classList.toggle('open');set(key,on?'open':'closed')};
+   const bd=el('div','algo-fold-body');fill(bd);sec.append(hb,bd);basic.append(sec)};
+  if(ak.length){
+   fold('algoMain','주요 수치','등급 · 칸 수별 기본값이에요. 알고리즘 효율에 따라 더 올라가요.',bd=>{for(const k of ak){if(!d.main?.[k])continue;const box=el('div','algo-tbox');box.append(el('strong','algo-area a'+k,areas[k].name));
+    box.append(table(['','파랑 1칸','파랑 2칸','보라 1칸','보라 2칸','주황 1칸','주황 2칸'],d.main[k].map(x=>[pctIn(d.main[k])(x),...['b1','b2','p1','p2','o1','o2'].map(c=>x[c]||'-')])));bd.append(box)}});
+   fold('algoSub','부가 수치','품질별 값이에요. 알고리즘 효율의 영향을 받지 않아요.',bd=>{for(const k of ak){if(!d.sub?.[k])continue;const box=el('div','algo-tbox');box.append(el('strong','algo-area a'+k,areas[k].name));
+    box.append(table(['','회색','파랑','보라','주황'],d.sub[k].map(x=>[pctIn(d.sub[k])(x),...x.v])));bd.append(box)}})}
  };
  sync();draw();
 }
