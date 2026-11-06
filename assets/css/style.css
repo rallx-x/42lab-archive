@@ -1439,3 +1439,21 @@ button.doll-chip:hover{border-color:var(--accent)}
 .algo-emblem::after{content:"";position:absolute;inset:9px;background:#fff;-webkit-mask:var(--em) center/contain no-repeat;mask:var(--em) center/contain no-repeat}
 .algo-emblem.none{display:none}
 .algo-top .item-ic.algo-item{width:40px;height:40px;border-radius:8px;order:3;margin-left:auto}
+.algo-intro{background:var(--panel);border:1px solid var(--line);border-radius:16px;margin:0 0 16px;overflow:hidden}
+.algo-intro-head{width:100%;display:flex;align-items:center;gap:10px;text-align:left;border:0;border-radius:0;background:none;padding:14px 18px}
+.algo-intro-head strong{font-size:16px;flex:1}
+.algo-intro-head .tri{color:var(--sub);transition:transform .2s}
+.algo-intro.open .algo-intro-head .tri{transform:rotate(90deg)}
+.algo-intro-body{display:none;padding:0 18px 16px;gap:8px}
+.algo-intro.open .algo-intro-body{display:grid}
+.algo-intro-row{margin:0;display:grid;grid-template-columns:96px 1fr;gap:10px;line-height:1.65;font-size:14px}
+.algo-intro-h{color:var(--accent);font-size:13px}
+@media(max-width:750px){.algo-intro-row{grid-template-columns:1fr;gap:2px}}
+.algo-tbox{display:grid;gap:8px;margin:0 0 14px}
+.algo-tbox>.algo-area{justify-self:start}
+.algo-table-wrap{overflow-x:auto;background:var(--panel);border:1px solid var(--line);border-radius:14px}
+.algo-table{width:100%;border-collapse:collapse;font-size:13px;font-variant-numeric:tabular-nums}
+.algo-table th,.algo-table td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:center;white-space:nowrap}
+.algo-table tr:last-child td{border-bottom:0}
+.algo-table th{font-size:12px;color:var(--sub);font-weight:700}
+.algo-th-stat,.algo-td-stat{text-align:left!important;font-weight:700}

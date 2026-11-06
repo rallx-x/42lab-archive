@@ -1426,7 +1426,7 @@ async function showArchive({push=true}={}){
   const chipRow=(o,list)=>{const sub=el('div','arc-sub');for(const [name,go] of list){const b=el('button','arc-chip',name);b.type='button';b.onclick=go;sub.append(b)}if(sub.childNodes.length)o.c.append(sub)};
  (tipData?Promise.resolve(tipData):fetchJSON(dataPath('loading_tips.json')).then(d=>tipData=d)).then(d=>{if(tok!==routeToken)return;cnt(tip,(d.tips||[]).length);
   chipRow(tip,TIP_GROUPS.filter(([g])=>g!=='all'&&(d.tips||[]).some(x=>x.group===g)).map(([g,n])=>[n,()=>showTips({cat:g})]))}).catch(()=>{});
- loadAlgos().then(d=>{if(tok!==routeToken)return;cnt(alg,(d.sets||[]).length);chipRow(alg,Object.entries(d.areas||{}).filter(([k])=>(d.sets||[]).some(x=>String(x.area)===k)).map(([k,a])=>[a.name,()=>showAlgos({cat:k})]))}).catch(()=>{});
+ loadAlgos().then(d=>{if(tok!==routeToken)return;cnt(alg,(d.sets||[]).filter(x=>x.two||x.three).length);chipRow(alg,Object.entries(d.areas||{}).filter(([k])=>(d.sets||[]).some(x=>String(x.area)===k)).map(([k,a])=>[a.name,()=>showAlgos({cat:k})]))}).catch(()=>{});
  loadItems().then(d=>{if(tok!==routeToken)return;cnt(itm,(d.items||[]).filter(o=>!String(o.grp||'').startsWith('widget:')).length);
   chipRow(itm,ITEM_PAGES.filter(([pg])=>pg).map(([pg,n])=>[n,()=>showItems({cat:String(pg)})]))}).catch(()=>{});
 }
@@ -1440,7 +1440,7 @@ async function showAlgos({push=true,cat=null}={}){
  const host=$('#dollView');host.replaceChildren(el('p','loading-note','알고리즘을 불러오는 중…'));window.scrollTo(0,0);
  try{await Promise.all([loadAlgos(),window.siteReady?.catch(()=>{})])}catch(e){if(tok===routeToken)host.replaceChildren(error('알고리즘을 불러오지 못했어요. ('+e.message+')'));return}
  if(tok!==routeToken)return;
- const d=algoData,areas=d.areas||{},all=d.sets||[];
+ const d=algoData,areas=d.areas||{},all=(d.sets||[]).filter(x=>x.two||x.three);
  if(algoCat!=='all'&&!areas[algoCat])algoCat='all';
  host.replaceChildren();
  const head=el('div','doll-list-head');const t=el('div');t.append(el('div','eyebrow','DATABASE / ALGORITHMS'),el('h2','','알고리즘'));head.append(t);
@@ -1456,10 +1456,15 @@ async function showAlgos({push=true,cat=null}={}){
  const sw=el('label','doll-ctl doll-search-wrap');sw.append(el('span','doll-ctl-label','기록 찾기'));
  const sbox=el('span','doll-search');const si=el('input');si.type='search';si.placeholder='이름 · 효과';si.value=algoQuery;si.autocomplete='off';si.setAttribute('aria-label','알고리즘 찾기');
  si.oninput=()=>{algoQuery=si.value;draw()};sbox.append(el('span','doll-search-prompt','//:_'),si);sw.append(sbox);
+ // 알고리즘 설명 (접기 · 펼치기, 상태 기억)
+ if(d.intro?.length){const box=el('section','algo-intro'+(get('algoIntro','open')==='open'?' open':''));const hb=el('button','algo-intro-head');hb.type='button';
+  hb.append(el('span','eyebrow','GUIDE'),el('strong','','알고리즘이란?'),ic('right','tri'));hb.onclick=()=>{const on=box.classList.toggle('open');set('algoIntro',on?'open':'closed')};
+  const bd=el('div','algo-intro-body');for(const [h,tx] of d.intro){const r=el('p','algo-intro-row');r.append(el('strong','algo-intro-h',h),el('span','algo-intro-t',tx));bd.append(r)}
+  box.append(hb,bd);host.append(box)}
  bar.append(tabs,sw);const list=el('div','wr-list algo-list');const basic=el('section','algo-basic');host.append(bar,list,basic);
  const draw=()=>{
   const q=dnorm(algoQuery);
-  const rows=all.filter(x=>(algoCat==='all'||String(x.area)===algoCat)&&(!q||[x.name,x.two,x.three].some(v=>dnorm(v||'').includes(q))));
+  const rows=all.filter(x=>(algoCat==='all'||String(x.area)===algoCat)&&(!q||[x.name,x.two,x.three].some(v=>dnorm(v||'').includes(q)))).sort((a,b)=>(a.area||9)-(b.area||9)||(a.three?1:0)-(b.three?1:0)||a.id-b.id);
   count.textContent=rows.length+'개';list.replaceChildren();
   if(!rows.length)list.append(el('p','loading-note','「'+algoQuery.trim()+'」에 맞는 알고리즘이 없어요.'));
   for(const x of rows){
@@ -1473,12 +1478,18 @@ async function showAlgos({push=true,cat=null}={}){
    if(x.two){const r=el('p','algo-eff');r.append(el('span','algo-n','2세트'),el('span','algo-text',x.two));ef.append(r)}
    if(x.three){const r=el('p','algo-eff');r.append(el('span','algo-n','3세트'),el('span','algo-text',x.three));ef.append(r)}
    c.append(ef);list.append(c)}
-  // 기본 알고리즘 (세트 없음): 구역별 · 칸 수별 능력치
-  basic.replaceChildren();const b=d.basics||{};const keys=Object.keys(b).filter(k=>algoCat==='all'||k===algoCat);
-  if(keys.length&&!q){basic.append(el('h3','tip-sub','기본 알고리즘 (세트 없음)'));const g=el('div','algo-basic-grid');
-   for(const k of keys){const c=el('div','wr-card algo-bcard');c.append(el('strong','algo-area a'+k,areas[k]?.name||k));
-    for(const [size,names] of Object.entries(b[k])){const r=el('p','algo-eff');r.append(el('span','algo-n',size+'칸'),el('span','algo-text',names.join(' · ')));c.append(r)}g.append(c)}
-   basic.append(g)}
+  // 능력치 표: 주요 수치(등급 · 칸 수별) · 부가 수치(품질별) — 고른 구역만
+  basic.replaceChildren();if(q)return;
+  const ak=Object.keys(areas).filter(k=>(d.main?.[k]||d.sub?.[k])&&(algoCat==='all'||k===algoCat));
+  const table=(heads,rows)=>{const tb=el('table','algo-table');const th=el('tr');heads.forEach((h,i)=>th.append(el('th',i?'':'algo-th-stat',h)));tb.append(th);
+   for(const r of rows){const tr=el('tr');r.forEach((c,i)=>tr.append(el('td',i?'':'algo-td-stat',c)));tb.append(tr)}const w=el('div','algo-table-wrap');w.append(tb);return w};
+  const pctIn=list=>{const c={};list.forEach(x=>c[x.stat]=(c[x.stat]||0)+1);return x=>x.stat+(x.pct&&c[x.stat]>1?' %':'')};
+  if(ak.length){basic.append(el('h3','tip-sub','주요 수치'),el('p','load-note','등급 · 칸 수별 기본값이에요. 알고리즘 효율에 따라 더 올라가요.'));
+   for(const k of ak){if(!d.main?.[k])continue;const box=el('div','algo-tbox');box.append(el('strong','algo-area a'+k,areas[k].name));
+    box.append(table(['','파랑 1칸','파랑 2칸','보라 1칸','보라 2칸','주황 1칸','주황 2칸'],d.main[k].map(x=>[pctIn(d.main[k])(x),...['b1','b2','p1','p2','o1','o2'].map(c=>x[c]||'-')])));basic.append(box)}
+   basic.append(el('h3','tip-sub','부가 수치'),el('p','load-note','품질별 값이에요. 알고리즘 효율의 영향을 받지 않아요.'));
+   for(const k of ak){if(!d.sub?.[k])continue;const box=el('div','algo-tbox');box.append(el('strong','algo-area a'+k,areas[k].name));
+    box.append(table(['','회색','파랑','보라','주황'],d.sub[k].map(x=>[pctIn(d.sub[k])(x),...x.v])));basic.append(box)}}
  };
  sync();draw();
 }
