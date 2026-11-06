@@ -1297,7 +1297,7 @@ function dollCard(d){
  const face=el('div','doll-face');const url=dollFace(d);if(url){const im=el('img');im.src=url;im.alt='';im.loading='lazy';face.append(im)}else face.classList.add('unknown');
  const info=el('div','doll-card-info');info.append(el('strong','',d.name));
  info.append(el('span','doll-card-meta',[d.company,d.role].filter(Boolean).join(' · ')));
- const foot=el('span','doll-card-foot');foot.append(el('span','doll-stars',starText(d.stars)));{const cl=classLine(d,true);if(cl)foot.append(cl)}info.append(foot);
+ const foot=el('span','doll-card-foot');foot.append(el('span','doll-stars',starText(d.stars)));info.append(foot);
  b.append(face,info);b.onclick=()=>showDoll(d.voiceKey);return b;
 }
 // 게임 글의 <color=#..>…</color> 를 색 글자로 (나머지 꼬리표는 지움, innerHTML 쓰지 않음)
