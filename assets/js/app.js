@@ -655,7 +655,35 @@ function pagedCard(cls,pages){
 function gameToday(){const t=new Date(Date.now()+(9-5)*3600e3);return {y:t.getUTCFullYear(),m:t.getUTCMonth()+1,d:t.getUTCDate()}}
 let dolls=null;
 let calShift=0; // 0 = 이번 달, -1 = 지난달, +1 = 다음 달
+// v1.7.5 첫 화면 생일 칸은 오늘 생일인 인형(없으면 다음 생일)만, 달력은 「달력 펼치기」 팝업에서
+const bdayCard=(x,isToday)=>{
+ const c=el('div','bday-card'+(isToday?' today':''));
+ const face=el('div','avatar bday-face');const url=(x.portrait&&imageMap[x.portrait])||imageMap[x.nameKo]||imageMap[x.name];
+ if(url){const im=document.createElement('img');im.src=url.startsWith('./')?url:'./'+url;im.alt='';im.onerror=()=>{im.remove();face.classList.add('fallback')};face.append(im)}else face.classList.add('fallback');
+ const t=el('div','bday-text');t.append(el('strong','',x.birthday+'. Happy Birthday!'),el('span','',x.name));
+ c.append(face,t);return c};
+function nextBirthday(T){
+ const list=(dolls?.dolls||[]).filter(x=>/^\d{4}$/.test(x.birthday||''));if(!list.length)return null;
+ const base=Date.UTC(T.y,T.m-1,T.d);let best=null;
+ for(const x of list){const m=+x.birthday.slice(0,2),d=+x.birthday.slice(2);let t=Date.UTC(T.y,m-1,d);if(t<=base)t=Date.UTC(T.y+1,m-1,d);const n=Math.round((t-base)/864e5);if(!best||n<best.n)best={n,key:x.birthday,who:[]};}
+ best.who=list.filter(x=>x.birthday===best.key);return best}
 function renderBirthday(card){
+ const T=gameToday(),todayKey=String(T.m).padStart(2,'0')+String(T.d).padStart(2,'0');
+ const cards=el('div','bday-list');
+ if(!dolls)cards.append(el('p','bm-empty','생일 정보를 불러오는 중…'));
+ else{
+  const who=(dolls.dolls||[]).filter(x=>x.birthday===todayKey);
+  who.forEach(x=>cards.append(bdayCard(x,true)));
+  if(!who.length){cards.append(el('p','bm-empty','오늘 생일인 인형이 없어요.'));
+   const nx=nextBirthday(T);
+   if(nx){const r=el('div','bday-next');r.append(el('span','bday-next-label','다음 생일'),el('span','bday-next-date',nx.key.slice(0,2)+'.'+nx.key.slice(2)),el('span','bday-next-d','D-'+nx.n));cards.append(r);nx.who.forEach(x=>cards.append(bdayCard(x,false)))}}
+ }
+ const btn=el('button','bday-open');btn.type='button';btn.append(ic('expand'),el('span','','달력 펼치기'));btn.onclick=openBirthdayCalendar;
+ card.append(cards,btn,el('p','cal-note','매일 오전 5시(KST)에 갱신됩니다.'));
+}
+function openBirthdayCalendar(){
+ openInfo({title:'생일 달력',items:[]});
+ const host=el('div','bday-pop');$('#infoBody').append(host);
  const T=gameToday(),todayKey=String(T.m).padStart(2,'0')+String(T.d).padStart(2,'0');
  const box=el('div','cal-box');const cards=el('div','bday-list');
  let picked=null; // 달력에서 누른 날 (MMDD). 없으면 오늘
@@ -665,13 +693,7 @@ function renderBirthday(card){
   if(!dolls){cards.append(el('p','bm-empty','생일 정보를 불러오는 중…'));return}
   if(!isToday){const h=el('div','bday-pick-head');const back=el('button','bday-back','오늘로');back.type='button';back.onclick=()=>{picked=null;draw();showCards()};h.append(el('span','',key.slice(0,2)+'.'+key.slice(2)+' 생일'),back);cards.append(h)}
   if(!who.length)cards.append(el('p','bm-empty',isToday?'오늘 생일인 인형이 없어요.':'이날 생일인 인형이 없어요.'));
-  for(const x of who){
-   const c=el('div','bday-card'+(isToday?' today':''));
-   const face=el('div','avatar bday-face');const url=(x.portrait&&imageMap[x.portrait])||imageMap[x.nameKo]||imageMap[x.name];
-   if(url){const im=document.createElement('img');im.src=url.startsWith('./')?url:'./'+url;im.alt='';im.onerror=()=>{im.remove();face.classList.add('fallback')};face.append(im)}else face.classList.add('fallback');
-   const t=el('div','bday-text');t.append(el('strong','',x.birthday+'. Happy Birthday!'),el('span','',x.name));
-   c.append(face,t);cards.append(c);
-  }
+  for(const x of who)cards.append(bdayCard(x,isToday));
  };
  const draw=()=>{
   const v=new Date(Date.UTC(T.y,T.m-1+calShift,1)),Y=v.getUTCFullYear(),M=v.getUTCMonth()+1,mm=String(M).padStart(2,'0');
@@ -687,7 +709,6 @@ function renderBirthday(card){
   for(let i=0;i<first;i++)grid.append(el('span','cal-d blank',''));
   for(let d=1;d<=last;d++){
    const key=mm+String(d).padStart(2,'0'),cls='cal-d'+(days.has(d)?' bday':'')+(calShift===0&&d===T.d?' today':'')+(picked===key?' picked':'');
-   // v0.9.12 생일 동그라미는 눌러서 그날 생일인 인형을 아래에 보여줌
    const c=days.has(d)?el('button',cls,String(d)):el('span',cls,String(d));
    if(days.has(d)){const names=list.filter(x=>+x.birthday.slice(2)===d).map(x=>x.name).join(', ');c.type='button';c.title=names;c.setAttribute('aria-label',M+'월 '+d+'일 생일: '+names);c.setAttribute('aria-pressed',String(picked===key));
     c.onclick=()=>{picked=(picked===key||key===todayKey)?null:key;draw();showCards()}}
@@ -695,8 +716,8 @@ function renderBirthday(card){
   }
   box.replaceChildren(head,grid);
  };
- draw();card.append(box);showCards();
- card.append(cards,el('p','cal-note','동그라미를 누르면 그날 생일인 인형을 볼 수 있어요. 매일 오전 5시(KST)에 갱신됩니다.'));
+ draw();showCards();
+ host.append(box,cards,el('p','cal-note','동그라미를 누르면 그날 생일인 인형을 볼 수 있어요.'));
 }
 // Hierarchical navigation: category label navigates, chevron expands chapter links.
 function closeArchiveMenu(){const menu=$('#archiveMenu');menu.classList.remove('open');menu.setAttribute('aria-hidden','true');$('#menuBtn').setAttribute('aria-expanded','false');$('#menuBtn').classList.remove('is-open')}

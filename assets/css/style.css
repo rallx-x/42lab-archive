@@ -1589,3 +1589,13 @@ body.dark .item-ic.empty::before,body.dim .item-ic.empty::before,body.entropics 
 .ic-record{--ic:url(../icons/record.png)}
 .folder-tile-symbol .ic{font-size:.6em;vertical-align:middle}
 .folder-art-symbol .ic{font-size:.6em}
+/* v1.7.5 생일 칸: 오늘 생일 · 다음 생일 + 달력 팝업 */
+.home-birthday .bday-list{max-height:none}
+.bday-next{display:flex;align-items:center;gap:8px;font:700 13px ui-monospace,Consolas,"Noto Sans KR",monospace;color:var(--sub);margin-top:2px}
+.bday-next-date{color:var(--accent-text,var(--accent))}
+.bday-next-d{margin-left:auto;font-size:11px;border:1px solid var(--line);border-radius:999px;padding:2px 8px}
+.bday-open{margin-top:12px;width:100%;height:38px;display:flex;align-items:center;justify-content:center;gap:7px;border:1px solid var(--line);border-radius:12px;background:var(--panel2,transparent);color:var(--text);font-weight:700;cursor:pointer}
+.bday-open:hover{border-color:var(--accent)}
+.bday-open .ic{font-size:14px}
+.bday-pop{min-width:min(360px,80vw)}
+.bday-pop .bday-list{max-height:260px}
