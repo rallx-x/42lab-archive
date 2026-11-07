@@ -1522,7 +1522,7 @@ async function showArchive({push=true}={}){
  const tip=card('LOADING TIPS','로딩 팁','로딩 화면에 나오는 백과사전 · 섹터 팁',()=>showTips());
  const itm=card('ITEMS','아이템','창고 · 숙소 가구 · 이벤트 보상',()=>showItems());
  const alg=card('ALGORITHMS','알고리즘','세트 효과 · 구역 · 기본 능력치',()=>showAlgos());
- const efx=card('EFFECTS','효과 사전','버프 · 디버프 · 고유 효과',()=>showEffects());
+ const efx=card('EFFECTS','효과 사전','초록 · 빨간 · 주황 효과 · 인형 고유 효과',()=>showEffects());
  loadEffects().then(d=>{if(tok!==routeToken)return;cnt(efx,(d.effects||[]).length);chipRow(efx,(d.cats||[]).map(([k,n])=>[n,()=>showEffects({cat:k})]))}).catch(()=>{});
  const cnt=(o,n)=>{if(tok===routeToken&&n)o.n.textContent=n.toLocaleString(window.UI_LOCALE||'ko-KR')+'개'};
  loadRecords().then(()=>{if(tok!==routeToken)return;cnt(rec,(wrData.records||[]).length);
@@ -1605,10 +1605,10 @@ async function showAlgos({push=true,cat=null}={}){
  sync();draw();
 }
 // ---------- v1.7.7 효과 사전 (data/<언어>/effects.json ← tools/client_extract/effects.py) ----------
-// 분류: 버프 · 디버프 · 고유 효과 (인형 1명만 쓰는 효과 + 주황), 점 색은 게임 색 (1 초록 · 2 빨강 · 3 주황)
+// 분류: 게임 색(초록 · 빨강 · 주황) + 인형 고유 효과 (인형 1명 글에만 「이름」으로 나옴), 점 색은 게임 색
 let fxData=null,fxCat=get('fxCat','all'),fxQuery='';
 const loadEffects=()=>fxData?Promise.resolve(fxData):fetchJSON(dataPath('effects.json')).then(d=>fxData=d);
-const FX_COLOR={1:'버프 (초록)',2:'디버프 (빨강)',3:'주황',0:'색 없음'};
+const FX_COLOR={1:'초록',2:'빨강',3:'주황',0:'색 없음'};
 async function showEffects({push=true,cat=null}={}){
  const tok=++routeToken;showOnly('dollView');bgmLeave();voiceStop();closeArchiveMenu();$('#crumb').textContent='효과 사전';
  if(cat)fxCat=cat;
@@ -1636,7 +1636,7 @@ function renderEffects(){
  si.oninput=()=>{fxQuery=si.value;draw()};sbox.append(el('span','doll-search-prompt','//:_'),si);sw.append(sbox);
  bar.append(tabs,sw);
  const legend=el('div','fx-legend');for(const c of [1,2,3]){const s=el('span','fx-leg');s.append(el('span','fx-dot c'+c),document.createTextNode(FX_COLOR[c]));legend.append(s)}
- const note=el('p','load-note','게임 속 스킬 설명에서 효과 이름을 누르면 나오는 설명이에요. 점 색은 게임 안 색 그대로예요. 「고유 효과」는 인형 1명의 스킬 · 무장각인에만 나오는 효과와 주황 효과예요.');
+ const note=el('p','load-note','게임 속 스킬 설명에서 효과 이름을 누르면 나오는 설명이에요. 게임 안 색 그대로 나눴고, 「인형 고유 효과」는 인형 1명의 스킬 · 무장각인에만 나오는 고유명사 효과예요 (점 색은 게임 색).');
  const list=el('div','wr-list fx-list');host.append(note,legend,bar,list);
  const byHero=new Map((dollIndex?.dolls||[]).map(d=>[+d.heroId,d]));
  const draw=()=>{
