@@ -1754,3 +1754,8 @@ body.dark .item-ic.empty::before,body.dim .item-ic.empty::before,body.entropics 
 .fy-roll{border:1px solid var(--accent);color:var(--accent-text,var(--accent));background:none;border-radius:999px;padding:4px 14px;font-weight:700;cursor:pointer}
 .fy-costs{display:flex;flex-direction:column;gap:8px;margin-bottom:12px}
 .fy-cost-row{display:flex;flex-wrap:wrap;align-items:center;gap:10px}
+/* v1.8.1 프로토콜 유리 · 중립 · 불리 */
+.fx-side.good.on{border-color:#5bbf3a;color:#5bbf3a;background:color-mix(in srgb,#5bbf3a 12%,transparent)}
+.fx-side.neutral.on{border-color:#f0961f;color:#f0961f;background:color-mix(in srgb,#f0961f 12%,transparent)}
+.fx-side.bad.on{border-color:#e0453a;color:#e0453a;background:color-mix(in srgb,#e0453a 12%,transparent)}
+.fx-list .fx-grp{grid-column:1/-1;margin:14px 0 2px;font-size:15px}
