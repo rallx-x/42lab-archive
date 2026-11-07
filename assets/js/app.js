@@ -78,6 +78,8 @@ function routeHash(route){
  if(route.type==='effects')return '#effects'+(route.cat?'/'+encodeURIComponent(route.cat):'');
  if(route.type==='commander')return '#commander';
  if(route.type==='game')return '#game';
+ if(route.type==='achieve')return '#achievements'+(route.cat?'/'+route.cat:'');
+ if(route.type==='mile')return '#milestones'+(route.cat?'/'+route.cat:'');
  if(route.type==='grow')return '#grow'+(route.cat?'/'+route.cat.split('/').map(encodeURIComponent).join('/'):'');
  if(route.type==='fairy')return '#sprites'+(route.cat?'/'+route.cat:'');
  if(route.type==='functions')return '#functions'+(route.cat?'/'+route.cat.split('/').map(encodeURIComponent).join('/'):'');
@@ -101,6 +103,8 @@ function parseRoute(){
   if(raw==='tips'||raw.startsWith('tips/'))return {type:'tips',cat:raw.startsWith('tips/')?decodeURIComponent(raw.slice(5)):null};
   if(raw==='commander')return {type:'commander'};
   if(raw==='game')return {type:'game'};
+  if(raw==='achievements'||raw.startsWith('achievements/'))return {type:'achieve',cat:raw.startsWith('achievements/')?raw.slice(13):null};
+  if(raw==='milestones'||raw.startsWith('milestones/'))return {type:'mile',cat:raw.startsWith('milestones/')?raw.slice(11):null};
   if(raw==='grow'||raw.startsWith('grow/'))return {type:'grow',cat:raw.startsWith('grow/')?raw.slice(5).split('/').map(decodeURIComponent).join('/'):null};
   if(raw==='sprites'||raw.startsWith('sprites/'))return {type:'fairy',cat:raw.startsWith('sprites/')?raw.slice(8):null};
   if(raw==='functions'||raw.startsWith('functions/'))return {type:'functions',cat:raw.startsWith('functions/')?raw.slice(10).split('/').map(decodeURIComponent).join('/'):null};
@@ -184,6 +188,8 @@ async function restoreRoute(){
  if(route.type==='functions'){await showFunctions({push:false,cat:route.cat});return}
  if(route.type==='commander'){await showCommander({push:false});return}
  if(route.type==='game'){await showGame({push:false});return}
+ if(route.type==='achieve'){await showProgress('achieve',{push:false,cat:route.cat});return}
+ if(route.type==='mile'){await showProgress('mile',{push:false,cat:route.cat});return}
  if(route.type==='grow'){await showGrowth({push:false,cat:route.cat});return}
  if(route.type==='fairy'){await showFairy({push:false,cat:route.cat});return}
  if(route.type==='items'){await showItems({push:false,cat:route.cat});return}
@@ -836,6 +842,8 @@ function renderArchiveMenu(){
  // v1.8.5 큰 분류 「게임」: 육성(인형 · 성령) — 나중에 오아시스 건축 등
  {const sec=el('button','archive-menu-section archive-menu-section-link','게임');sec.type='button';sec.onclick=go(()=>showGame());host.append(sec)}
  host.append(foldRow('육성',go(()=>showGrowth()),box=>{subLink(box,'인형',()=>showGrowth({cat:'doll'}));subLink(box,'성령',()=>showGrowth({cat:'sprite'}))},'archive-menu-top'));
+ host.append(foldRow('업적',go(()=>showProgress('achieve')),lazyFill(loadProgress,(box,d)=>{for(const c of d.achievements||[])subLink(box,c.name,()=>showProgress('achieve',{cat:String(c.id)}));subLink(box,'업적 레벨',()=>showProgress('achieve',{cat:'level'}))}),'archive-menu-top'));
+ host.append(foldRow('클라우드 이정표',go(()=>showProgress('mile')),lazyFill(loadProgress,(box,d)=>{for(const m of d.milestones||[])subLink(box,m.name,()=>showProgress('mile',{cat:String(m.id)}))}),'archive-menu-top'));
 }
 $('#menuBtn').onclick=()=>{const menu=$('#archiveMenu');if(!menu.classList.contains('open')){renderArchiveMenu();menu.classList.add('open');menu.removeAttribute('aria-hidden');$('#menuBtn').setAttribute('aria-expanded','true');$('#menuBtn').classList.add('is-open')}else closeArchiveMenu()};
 $('#archiveMenuClose').onclick=closeArchiveMenu;
@@ -1792,6 +1800,8 @@ async function showGame({push=true}={}){
   const tx=el('span','arc-text');tx.append(el('span','eyebrow',eyebrow),el('strong','arc-name',name),el('span','arc-desc',desc));b.append(tx,el('span','arc-n'),ic('right','tri'));c.append(b);
   if(chips){const sub=el('div','arc-sub');for(const [n,g] of chips){const x=el('button','arc-chip',n);x.type='button';x.onclick=g;sub.append(x)}c.append(sub)}grid.append(c);return c};
  card('GROWTH','육성','인형 · 성령 육성 재료 계산',()=>showGrowth(),[['인형',()=>showGrowth({cat:'doll'})],['성령',()=>showGrowth({cat:'sprite'})]]);
+ card('ACHIEVEMENTS','업적','분류별 업적 · 업적 레벨 보상',()=>showProgress('achieve'));
+ card('CLOUD MILESTONES','클라우드 이정표','모듈별 할 일 · 단계 보상',()=>showProgress('mile'));
  const soon=card('OASIS','오아시스 건축','준비 중',()=>{});soon.classList.add('arc-soon');
 }
 let growTab=get('growTab','doll'),growDoll=get('growDoll','');
@@ -1831,6 +1841,42 @@ async function showGrowth({push=true,cat=null}={}){
   const hd=el('div','grow-who');const face=el('span','avatar');const url=dollFace(d);if(url){const im=el('img');im.src=url;im.alt='';face.append(im)}else face.classList.add('fallback');
   hd.append(face,el('strong','',d.name));box.append(hd,growthPanel({heroId:d.heroId,name:d.name,stars:d.stars}))};
  draw();
+}
+// ---------- v1.8.7 업적 · 클라우드 이정표 (data/<언어>/progress.json ← tools/client_extract/progress.py) ----------
+let progData=null,achCat=get('achCat',''),mileCat=get('mileCat','');
+const loadProgress=()=>progData?Promise.resolve(progData):fetchJSON(dataPath('progress.json')).then(d=>progData=d);
+async function showProgress(kind,{push=true,cat=null}={}){
+ const tok=++routeToken;showOnly('dollView');bgmLeave();voiceStop();closeArchiveMenu();
+ const isAch=kind==='achieve';$('#crumb').textContent=isAch?'업적':'클라우드 이정표';
+ if(cat){if(isAch){achCat=cat;set('achCat',cat)}else{mileCat=cat;set('mileCat',cat)}}
+ const host=$('#dollView');host.replaceChildren(el('p','loading-note','불러오는 중…'));window.scrollTo(0,0);
+ try{await loadProgress()}catch(e){if(tok===routeToken)host.replaceChildren(error('불러오지 못했어요. ('+e.message+')'));return}
+ if(tok!==routeToken)return;const D=progData;
+ const tabsList=isAch?[...(D.achievements||[]).map(c=>[String(c.id),c.name,c.tasks.length]),['level','업적 레벨',(D.achLevels||[]).length]]:(D.milestones||[]).map(m=>[String(m.id),m.name,m.groups.reduce((a,g)=>a+g.tasks.length,0)]);
+ let cur=isAch?achCat:mileCat;if(!tabsList.some(([k])=>k===cur))cur=tabsList[0]?.[0]||'';
+ if(push)saveRoute({type:isAch?'achieve':'mile',cat:cur});
+ host.replaceChildren();
+ const head=el('div','doll-list-head');const t=el('div');t.append(el('div','eyebrow',isAch?'GAME / ACHIEVEMENTS':'GAME / CLOUD MILESTONES'),el('h2','',isAch?'업적':'클라우드 이정표'));head.append(t);const count=el('span','section-sub');head.append(count);host.append(head);
+ const bar=el('div','doll-controls wr-controls');const tabs=el('div','wr-tabs');
+ for(const [k,n,c] of tabsList){const b=el('button','cat-tab wr-tab'+(k===cur?' selected':''));b.type='button';b.append(el('span','',n),el('span','wr-tab-n',String(c)));b.onclick=()=>showProgress(kind,{cat:k});tabs.append(b)}
+ bar.append(tabs);host.append(bar);
+ const fmt=n=>n.toLocaleString(window.UI_LOCALE||'ko-KR');
+ const chips=r=>{const w=el('span','fy-cost');for(const [i,n] of Object.entries(r||{})){const c=el('span','item-chip');c.append(itemIcon(D.items?.[i]?.[1]||'','sm'),el('span','item-chip-name',D.items?.[i]?.[0]||i),el('span','item-chip-n','×'+fmt(n)));w.append(c)}return w};
+ const taskCard=x=>{const c=el('div','pg-task'+(x.hidden?' hidden-task':''));const top=el('div','pg-task-top');top.append(el('strong','',x.name));if(x.hidden)top.append(el('span','fy-lock','숨은 업적'));c.append(top,el('p','pg-desc',cleanTags(x.desc)),chips(x.reward));return c};
+ const list=el('div','pg-list');host.append(list);
+ if(isAch&&cur==='level'){count.textContent=(D.achLevels||[]).length+'단계';
+  const tb=el('table','algo-table fy-table');const hr=el('tr');['업적 레벨','다음 레벨까지 경험치','보상'].forEach(x=>hr.append(el('th','',x)));tb.append(hr);
+  for(const l of D.achLevels||[]){const tr=el('tr');tr.append(el('td','','Lv.'+l.lv),el('td','',l.exp?fmt(l.exp):'-'));const td=el('td','');td.append(chips(l.reward));tr.append(td);tb.append(tr)}
+  const w=el('div','algo-table-wrap');w.append(tb);list.append(w,el('p','load-note','업적을 달성하면 「업적 경험치」를 받아 업적 레벨이 올라가요.'));return}
+ if(isAch){const c=(D.achievements||[]).find(x=>String(x.id)===cur);if(!c)return;count.textContent=c.tasks.length+'개';
+  const g=el('div','pg-grid');c.tasks.forEach(x=>g.append(taskCard(x)));list.append(g);return}
+ const m=(D.milestones||[]).find(x=>String(x.id)===cur);if(!m)return;
+ count.textContent=m.groups.reduce((a,g)=>a+g.tasks.length,0)+'개';
+ // 단계 보상
+ const rs=el('section','fy-sec');rs.append(el('h3','',m.name+' · 단계 보상'));const tb=el('table','algo-table fy-table');const hr=el('tr');['단계','필요 점수','보상'].forEach(x=>hr.append(el('th','',x)));tb.append(hr);
+ for(const r of m.rewards){const tr=el('tr');tr.append(el('td','',String(r.level)),el('td','',fmt(r.score)));const td=el('td','');td.append(chips(r.reward));tr.append(td);tb.append(tr)}
+ const w=el('div','algo-table-wrap');w.append(tb);rs.append(w);list.append(rs);
+ for(const g of m.groups){if(!g.tasks.length)continue;const sec=el('section','fy-sec');sec.append(el('h3','',(g.name||m.name)+' · '+g.tasks.length));const gg=el('div','pg-grid');g.tasks.forEach(x=>gg.append(taskCard(x)));sec.append(gg);list.append(sec)}
 }
 // ---------- v1.7.9 지휘 스킬 (data/<언어>/commander.json ← tools/client_extract/commander.py) ----------
 let cmdData=null,cmdLv=get('cmdLv','max'),cmdFocus=null;

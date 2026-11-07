@@ -1783,3 +1783,10 @@ body.dark .item-ic.empty::before,body.dim .item-ic.empty::before,body.entropics 
 .grow-sug-item .avatar{width:30px;height:30px;flex:none}
 .grow-sug-name{font-weight:700}
 .grow-sug-role{margin-left:auto;font-size:12px;color:var(--sub)}
+/* v1.8.7 업적 · 클라우드 이정표 */
+.pg-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:10px}
+.pg-task{border:1px solid var(--line);border-radius:12px;padding:10px 12px;background:var(--panel);display:flex;flex-direction:column;gap:6px}
+.pg-task-top{display:flex;align-items:center;gap:6px;position:relative}
+.pg-task-top .fy-lock{position:static}
+.pg-desc{margin:0;font-size:13px;color:var(--sub);line-height:1.5}
+.pg-task.hidden-task{border-style:dashed}
