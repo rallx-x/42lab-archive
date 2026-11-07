@@ -1629,3 +1629,12 @@ body.dark .item-ic.empty::before,body.dim .item-ic.empty::before,body.entropics 
 .gacha-pick.full .gacha-subs{gap:8px 4px}
 .gacha-sub{display:flex;flex-direction:column;align-items:center;gap:3px;width:52px}
 .gacha-sub-name{font-size:10px;color:var(--sub);text-align:center;line-height:1.2;word-break:keep-all}
+/* v1.7.6 회색 육각을 프레임 종류별 안쪽 구멍에 맞춤 (프레임 그림은 그대로)
+   프레임 그림 크기가 달라서(fr_1 117×127 · fr_2 110×123 · fr_3 117×128) 구멍 위치도 다름 → 구멍 + 선 두께 절반만큼
+   빨간 밑그림 · 흰 그림은 회색 육각 안 비율 그대로 (밑그림 7% 안쪽 86% · 흰 그림 -2.9% 바깥 105.8%) */
+.skill-hex{--gx:11.2%;--gy:9.3%}
+.skill-hex.t2{--gx:9%;--gy:8.2%}
+.skill-hex.t3{--gx:11.2%;--gy:9.3%}
+.skill-hex .hex-fill,.skill-hex.max .hex-fill{inset:var(--gy) var(--gx)}
+.skill-hex .hex-base{left:calc(var(--gx) + (100% - 2*var(--gx))*.0698);top:calc(var(--gy) + (100% - 2*var(--gy))*.0693);width:calc((100% - 2*var(--gx))*.86);height:calc((100% - 2*var(--gy))*.861)}
+.skill-hex .item-ic{left:calc(var(--gx) - (100% - 2*var(--gx))*.029);top:calc(var(--gy) - (100% - 2*var(--gy))*.029);width:calc((100% - 2*var(--gx))*1.058);height:calc((100% - 2*var(--gy))*1.058)}
