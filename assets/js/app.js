@@ -1646,7 +1646,7 @@ function renderEffects(){
   if(!rows.length){list.append(el('p','loading-note',q?'「'+fxQuery.trim()+'」에 맞는 효과가 없어요.':'효과가 없어요.'));return}
   for(const x of rows){
    const c=el('div','wr-card fx-card');c.id='fx-'+x.id;
-   const top=el('div','wr-card-top');top.append(el('span','fx-dot c'+x.color));
+   const top=el('div','wr-card-top');top.append(el('span','fx-dot c'+x.color));if(x.icon){const ii=itemIcon('buff/'+x.icon,'sm fx-ic c'+x.color);top.append(ii)}
    const body=el('div','wr-body');body.append(el('strong','wr-name',x.name),el('p','tip-text',cleanTags(x.desc)));
    if(x.dolls?.length||x.algo){const w=el('div','tip-dolls');
     for(const h of x.dolls||[]){const d=byHero.get(+h);if(!d)continue;const b=el('button','doll-chip link tip-doll');b.type='button';b.append(ic('user'),document.createTextNode(' '+d.name));b.onclick=()=>showDoll(d.voiceKey,{part:'skill'});w.append(b)}

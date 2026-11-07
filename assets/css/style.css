@@ -1659,3 +1659,7 @@ body.dark .item-ic.empty::before,body.dim .item-ic.empty::before,body.entropics 
 .fx-card .wr-card-top{padding-top:4px}
 .fx-legend{display:flex;flex-wrap:wrap;gap:14px;margin:0 0 10px;font-size:12px;color:var(--sub)}
 .fx-leg{display:inline-flex;align-items:center;gap:6px}
+.fx-card .wr-card-top{display:flex;align-items:center;gap:8px}
+.fx-ic.item-ic{width:26px;height:26px;border-radius:7px;background:#2c2f36}
+.fx-ic.c1.item-ic{background:#2f6b25}.fx-ic.c2.item-ic{background:#8a2a24}.fx-ic.c3.item-ic{background:#8a5612}
+.fx-ic img{width:80%;height:80%;object-fit:contain}
