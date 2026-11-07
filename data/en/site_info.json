@@ -26,6 +26,15 @@
    ]
   },
   {
+   "id": "2026-11-07-v1.8.4",
+   "date": "2026-11-07",
+   "kind": "update",
+   "title": "Update v1.8.4 · Function modes",
+   "lines": [
+    "The Functions compendium now has a \"Mode\" row: Standard · Matrix · Entropic Survivor · Protocols · Function Chain · Warchess · Support. (First-pass grouping, to be refined after review.)"
+   ]
+  },
+  {
    "id": "2026-11-07-v1.8.3",
    "date": "2026-11-07",
    "kind": "update",
