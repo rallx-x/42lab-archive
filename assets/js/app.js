@@ -76,6 +76,7 @@ function routeHash(route){
  if(route.type==='items')return '#items'+(route.cat?'/'+encodeURIComponent(route.cat):'');
  if(route.type==='tips')return '#tips'+(route.cat?'/'+encodeURIComponent(route.cat):'');
  if(route.type==='effects')return '#effects'+(route.cat?'/'+encodeURIComponent(route.cat):'');
+ if(route.type==='commander')return '#commander';
  if(route.type==='functions')return '#functions'+(route.cat?'/'+route.cat.split('/').map(encodeURIComponent).join('/'):'');
  if(route.type==='records')return '#records'+(route.cat?'/'+encodeURIComponent(route.cat):'');
  if(route.type==='doll')return '#doll/'+encodeURIComponent(route.id)+(route.part&&route.part!=='profile'?'/'+encodeURIComponent(route.part):'');
@@ -95,6 +96,7 @@ function parseRoute(){
   if(raw.startsWith('dorm/'))return {type:'dorm',id:decodeURIComponent(raw.slice(5))};
   if(raw==='items'||raw.startsWith('items/'))return {type:'items',cat:raw.startsWith('items/')?decodeURIComponent(raw.slice(6)):null};
   if(raw==='tips'||raw.startsWith('tips/'))return {type:'tips',cat:raw.startsWith('tips/')?decodeURIComponent(raw.slice(5)):null};
+  if(raw==='commander')return {type:'commander'};
   if(raw==='functions'||raw.startsWith('functions/'))return {type:'functions',cat:raw.startsWith('functions/')?raw.slice(10).split('/').map(decodeURIComponent).join('/'):null};
   if(raw==='effects'||raw.startsWith('effects/'))return {type:'effects',cat:raw.startsWith('effects/')?decodeURIComponent(raw.slice(8)):null};
   if(raw==='records'||raw.startsWith('records/'))return {type:'records',cat:raw.startsWith('records/')?decodeURIComponent(raw.slice(8)):null};
@@ -174,6 +176,7 @@ async function restoreRoute(){
  if(route.type==='tips'){await showTips({push:false,cat:route.cat});return}
  if(route.type==='effects'){await showEffects({push:false,cat:route.cat});return}
  if(route.type==='functions'){await showFunctions({push:false,cat:route.cat});return}
+ if(route.type==='commander'){await showCommander({push:false});return}
  if(route.type==='items'){await showItems({push:false,cat:route.cat});return}
  if(route.type==='doll'){await showDoll(route.id,{push:false,part:route.part});return}
  if(route.type==='chapter'&&showChapter(route.id,route.category,{push:false}))return;
@@ -844,7 +847,8 @@ function spans(parent,unit){
 function showLore(id){let record=(data.worldRecords||{})[String(id)]||{};openLore(record.name||'세계기록 '+id,record.description,id)}
 function openLore(name,desc,id,eyebrow,tone){const dl=$('#lore');dl.querySelector('.eyebrow').textContent=eyebrow||'WORLD RECORD';dl.dataset.tone=tone||'';$('#loreTitle').textContent=name;$('#loreText').textContent=cleanTags(desc)||'설명 정보가 없습니다.';
  const f=$('#lore form');f.querySelector('.lore-link')?.remove();
- if(id!=null){const b=linkBtn('#record/'+id,name);b.classList.add('lore-link');f.append(b)}
+ if(id&&typeof id==='object'&&id.fx!=null){const b=el('button','lore-link lore-fx');b.type='button';b.append(document.createTextNode('효과 사전에서 보기 '),ic('right'));b.onclick=e=>{e.preventDefault();dl.close();fxFocus=id.fx;fxQuery='';showEffects({cat:'all'})};f.append(b)}
+ else if(id!=null){const b=linkBtn('#record/'+id,name);b.classList.add('lore-link');f.append(b)}
  $('#lore').showModal()}
 let imageMap={},speakerAliases={};
 const SYSTEM_SPEAKERS=new Set(['시스템','시스템 음성','통신 시스템']);
@@ -1527,6 +1531,8 @@ async function showArchive({push=true}={}){
  const alg=card('ALGORITHMS','알고리즘','세트 효과 · 구역 · 기본 능력치',()=>showAlgos());
  const fnc=card('FUNCTIONS','함수','대상별 · 세트별 함수 도감',()=>showFunctions());
  loadFunctions().then(d=>{if(tok!==routeToken)return;cnt(fnc,(d.functions||[]).length);chipRow(fnc,[['대상별',()=>showFunctions({cat:'mark'})],['세트별',()=>showFunctions({cat:'tag'})]])}).catch(()=>{});
+ const cmd=card('COMMANDER SKILLS','지휘 스킬','교수의 지휘 스킬 · 변형 · 성령 변형',()=>showCommander());
+ loadCommander().then(d=>{if(tok!==routeToken)return;cnt(cmd,(d.families||[]).reduce((a,f)=>a+f.skills.length,0))}).catch(()=>{});
  const efx=card('EFFECTS','효과 사전','초록 · 빨간 · 주황 · 인형 고유 · 필드 효과',()=>showEffects());
  loadEffects().then(d=>{if(tok!==routeToken)return;cnt(efx,(d.effects||[]).length);chipRow(efx,(d.cats||[]).map(([k,n])=>[n,()=>showEffects({cat:k})]))}).catch(()=>{});
  const cnt=(o,n)=>{if(tok===routeToken&&n)o.n.textContent=n.toLocaleString(window.UI_LOCALE||'ko-KR')+'개'};
@@ -1611,7 +1617,7 @@ async function showAlgos({push=true,cat=null}={}){
 }
 // ---------- v1.7.7 효과 사전 (data/<언어>/effects.json ← tools/client_extract/effects.py) ----------
 // 분류: 게임 색(초록 · 빨강 · 주황) + 인형 고유 효과 (인형 1명 글에만 「이름」으로 나옴), 점 색은 게임 색
-let fxData=null,fxCat=get('fxCat','all'),fxQuery='';
+let fxData=null,fxCat=get('fxCat','all'),fxQuery='',fxFocus=null;
 const loadEffects=()=>fxData?Promise.resolve(fxData):fetchJSON(dataPath('effects.json')).then(d=>fxData=d);
 const FX_COLOR={1:'초록',2:'빨강',3:'주황',0:'색 없음'};
 async function showEffects({push=true,cat=null}={}){
@@ -1658,7 +1664,33 @@ function renderEffects(){
     if(x.algo){const b=el('button','doll-chip link tip-doll','알고리즘');b.type='button';b.onclick=()=>showAlgos();w.append(b)}
     body.append(w)}
    c.append(top,body);list.append(c)}
+  if(fxFocus!=null){const t=document.getElementById('fx-'+fxFocus);fxFocus=null;if(t){t.classList.add('fx-focus');requestAnimationFrame(()=>t.scrollIntoView({block:'center'}))}}
  };
+ draw();
+}
+// ---------- v1.7.9 지휘 스킬 (data/<언어>/commander.json ← tools/client_extract/commander.py) ----------
+let cmdData=null,cmdLv=get('cmdLv','max');
+const loadCommander=()=>cmdData?Promise.resolve(cmdData):fetchJSON(dataPath('commander.json')).then(d=>cmdData=d);
+async function showCommander({push=true}={}){
+ const tok=++routeToken;showOnly('dollView');bgmLeave();voiceStop();closeArchiveMenu();$('#crumb').textContent='지휘 스킬';
+ if(push)saveRoute({type:'commander'});
+ const host=$('#dollView');host.replaceChildren(el('p','loading-note','지휘 스킬을 불러오는 중…'));window.scrollTo(0,0);
+ try{await Promise.all([loadCommander(),loadEffects().catch(()=>null)])}catch(e){if(tok===routeToken)host.replaceChildren(error('지휘 스킬을 불러오지 못했어요. ('+e.message+')'));return}
+ if(tok!==routeToken)return;
+ host.replaceChildren();
+ const head=el('div','doll-list-head');const t=el('div');t.append(el('div','eyebrow','DATABASE / COMMANDER SKILLS'),el('h2','','지휘 스킬'));head.append(t);host.append(head);
+ host.append(el('p','load-note','교수가 전투 중 쓰는 지휘 스킬이에요. 계열마다 기본 스킬과 변형이 있고, 「성령」 표시는 성령으로 바뀌는 변형이에요.'));
+ const bar=el('div','skill-arma-bar');const tabs=el('div','wr-tabs');
+ const lvBtns=[['1','Lv.1'],['max','Lv.MAX']].map(([k,n])=>{const b=el('button','cat-tab wr-tab',n);b.type='button';b.onclick=()=>{cmdLv=k;set('cmdLv',k);draw()};tabs.append(b);return [k,b]});
+ bar.append(tabs);host.append(bar);
+ const list=el('div','cmd-list');host.append(list);
+ const draw=()=>{lvBtns.forEach(([k,b])=>b.classList.toggle('selected',k===cmdLv));list.replaceChildren();
+  for(const f of cmdData.families||[]){
+   const sec=el('section','cmd-fam');const h=el('div','cmd-fam-head');h.append(itemIcon(f.skills[0].icon,'cmd-ic big'),el('h3','',f.name),el('span','wr-tab-n',String(f.skills.length)));sec.append(h);
+   for(const sk of f.skills){const row=el('div','cmd-skill'+(sk.fairy?' fairy':''));row.append(itemIcon(sk.icon,'cmd-ic'));
+    const body=el('div','cmd-body');const nm=el('div','cmd-name');nm.append(el('strong','',sk.name));if(sk.fairy)nm.append(el('span','cmd-badge','성령'));body.append(nm);
+    const det=el('p','skill-detail');skillText(det,skillDetail(sk,cmdLv==='max'?sk.maxLv:1));body.append(det);row.append(body);sec.append(row)}
+   list.append(sec)}};
  draw();
 }
 // ---------- v1.7.8 함수 도감 (data/<언어>/functions.json ← tools/client_extract/functions.py) ----------
@@ -1672,7 +1704,7 @@ async function showFunctions({push=true,cat=null}={}){
  if(cat){const [m,sub]=cat.split('/');if(m==='mark'||m==='tag'){fnMode=m;fnSub=sub||'all'}}
  if(push)saveRoute({type:'functions',cat:fnMode+(fnSub!=='all'?'/'+fnSub:'')});
  const host=$('#dollView');host.replaceChildren(el('p','loading-note','함수를 불러오는 중…'));window.scrollTo(0,0);
- try{await loadFunctions()}catch(e){if(tok===routeToken)host.replaceChildren(error('함수를 불러오지 못했어요. ('+e.message+')'));return}
+ try{await Promise.all([loadFunctions(),loadEffects().catch(()=>null)])}catch(e){if(tok===routeToken)host.replaceChildren(error('함수를 불러오지 못했어요. ('+e.message+')'));return}
  if(tok===routeToken)renderFunctions();
 }
 function renderFunctions(){
@@ -1707,7 +1739,7 @@ function renderFunctions(){
   body.append(el('strong','fn-name',o.name),top);
   const desc=el('p','fn-desc');body.append(desc);
   const steps=o.steps||[];
-  const show=i=>{const st=steps[i]||o;desc.replaceChildren();richText(desc,String(st.detail||st.brief||'').replace(/\\n/g,'\n'));c.className='fn-card q'+(st.q||o.q||3)};
+  const show=i=>{const st=steps[i]||o;desc.replaceChildren();skillText(desc,String(st.detail||st.brief||''));c.className='fn-card q'+(st.q||o.q||3)};
   if(steps.length>1){const row=el('div','fn-steps');row.append(el('span','fn-steps-label','단계'));
    steps.forEach((st,i)=>{const b=el('button','fn-step q'+st.q,String(i+1));b.type='button';b.onclick=()=>{fnStep.set(o.id,i);row.querySelectorAll('.fn-step').forEach((x,k)=>x.classList.toggle('on',k===i));show(i)};row.append(b)});
    body.append(row);const i0=fnStep.get(o.id)||0;row.querySelectorAll('.fn-step')[i0]?.classList.add('on');show(i0)}
@@ -2001,17 +2033,25 @@ const loadSkills=()=>skillData?Promise.resolve(skillData):fetchJSON(dataPath('sk
 const SKILL_TYPE={1:'자동',2:'패시브',3:'궁극기'},SKILL_ORDER={2:0,1:1,3:2};
 const TERM_TONE={1:'green',2:'red',3:'orange'};
 let skillLv=get('skillLv','max');
-function skillTerm(text){const terms=skillData?.terms||[];const t=text.replace(/\s+/g,'');let best=null;
+// v1.7.9 효과 이름 → 효과 사전 (스킬 용어 + 효과 사전 데이터, 지형 함수 제외)
+function skillTerm(text){const terms=fxData?.effects?fxData.effects.filter(x=>!x.grid):(skillData?.terms||[]);const t=text.replace(/\s+/g,'');let best=null;
  for(const x of terms){const n=x.name.replace(/\s+/g,'');if(!n)continue;if((t===n||t.includes(n))&&(!best||n.length>best.name.replace(/\s+/g,'').length))best=x}return best}
-// 색 글자 = 게임 표기 그대로, 용어 사전에 있는 말이면 누르면 설명 창
+// 색 글자 = 게임 표기 그대로, 용어 사전에 있는 말이면 누르면 설명 창 (v1.7.9: 「이름」 도, 설명 창에서 효과 사전으로)
+const openTerm=term=>openLore(term.name,term.desc,{fx:term.id},'EFFECT',TERM_TONE[term.color]||'');
 function skillText(parent,text){
  const src=String(text||'').replace(/<cmdr>/gi,()=>nick()).replace(/\\n/g,'\n').replace(/\s+$/,'');
  const re=/<color=(#[0-9a-fA-F]{6,8})>([\s\S]*?)<\/color>/gi;let last=0,m;
  const plain=t=>t.replace(/<\/?(?:color|i|b|size)(?:=[^>]*)?>/gi,'');
- const put=t=>{if(t)parent.append(document.createTextNode(plain(t)))};
+ const put=t=>{t=plain(t||'');if(!t)return;
+  // 「이름」 이 효과 이름과 똑같으면 누를 수 있게
+  const q=/「([^」]{1,20})」/g;let a=0,k;
+  while((k=q.exec(t))){const term=skillTerm(k[1]);if(!term||term.name.replace(/\s+/g,'')!==k[1].replace(/\s+/g,''))continue;
+   if(k.index>a)parent.append(document.createTextNode(t.slice(a,k.index)));
+   const b=el('button','skill-hl skill-term skill-quote',k[0]);b.type='button';b.onclick=e=>{e.stopPropagation();openTerm(term)};parent.append(b);a=q.lastIndex}
+  if(a<t.length)parent.append(document.createTextNode(t.slice(a)))};
  while((m=re.exec(src))){put(src.slice(last,m.index));const word=plain(m[2]);const term=skillTerm(word);
   const sp=el(term?'button':'span','skill-hl'+(term?' skill-term':''),word);sp.style.setProperty('--hl',m[1].slice(0,7));
-  if(term){sp.type='button';sp.onclick=e=>{e.stopPropagation();openLore(term.name,term.desc,null,'SKILL TERM',TERM_TONE[term.color]||'')}}
+  if(term){sp.type='button';sp.onclick=e=>{e.stopPropagation();openTerm(term)}}
   parent.append(sp);last=re.lastIndex}
  put(src.slice(last));
 }

@@ -6,7 +6,7 @@
   - tables BattleSkillCfg (함수 스킬: 4 간략 설명 · 5 상세 설명 {0}… · 7~10 수치 공식) — 수치는 skills.py 와 같은 계산기, 레벨 1 값
 이름 · 대상(markid) · 설명 틀(숫자를 뺀 글)이 같으면 하나로 합침 (한국어 기준) → 수치만 다른 것은 steps (카드 색 낮은 것부터)
   · 이름이 같아도 효과가 다르면 따로 (적 쪽 효과 · 모드별 다른 함수)
-설명이 없는 함수(능력치 상승 같은 내부 함수)는 뺌
+능력치 상승 함수(스킬 설명 없음)는 게임 chip_intro 틀로 설명을 만듦: 「아군 모든 인형의 %s」 + 「최대체력 +8%」 (attribute num_type 2 = %, 값 ÷ 10)
 그림: pnc-item fn/<item.icon>.webp (궁극기 그림 *_ultimate 는 skill/)
 사용: python functions.py   (skills.py 의 SERVERS 와 같은 곳에서, tables_<서버>/ 필요)
 """
@@ -49,6 +49,26 @@ def server(lang, tag, cdir):
     chip, _ = root(cdir + '/LuaConfigs.chip.lua')
     mark, _ = root(cdir + '/LuaConfigs.chip_mark.lua')
     tagt, _ = root(cdir + '/LuaConfigs.chip_tag.lua')
+    intro, _ = root(cdir + '/LuaConfigs.chip_intro.lua')
+    attr, _ = root(cdir + '/LuaConfigs.attribute.lua')
+
+    def attr_text(c):
+        # 능력치 상승 함수: 게임 chip_intro 틀 (influence · arg) + 능력치 이름 + 값 (num_type 2 = %, 10 으로 나눔)
+        ids, ini = c.get('attribute_id'), c.get('attribute_initial')
+        if not isinstance(ids, dict) or not ids:
+            return ''
+        parts = []
+        for j in sorted(ids):
+            a = attr.get(ids[j]) if isinstance(attr.get(ids[j]), dict) else {}
+            v = (ini or {}).get(j, 0) if isinstance(ini, dict) else 0
+            pct = a.get('num_type') == 2
+            val = v / 10 if pct else v
+            vs = str(int(val)) if float(val).is_integer() else '%g' % val
+            parts.append('%s +%s%s' % (T(a.get('name')), vs, '%' if pct else ''))
+        row = intro.get(c.get('influence')) if isinstance(intro.get(c.get('influence')), dict) else {}
+        sub = row.get(c.get('arg') or 0) if isinstance(row.get(c.get('arg') or 0), dict) else {}
+        tpl = T(sub.get('intro') or row.get('intro')) or '%s'
+        return tpl.replace('%s', ', '.join(parts), 1)
 
     def text(d, f):
         v = d[f][0][1] if d and f in d else None
@@ -80,13 +100,20 @@ def server(lang, tag, cdir):
         sl = c.get('skill_list')
         sid = [sl[x] for x in sorted(sl)] if isinstance(sl, dict) else []
         d = sk.get(sid[0]) if sid else None
-        if not nm or not d:
+        if not nm:
             continue
-        v = vals(d)
-        brief, detail = fill(text(d, 4), v), fill(text(d, 5), v)
+        if d:
+            v = vals(d)
+            brief, detail = fill(text(d, 4), v), fill(text(d, 5), v)
+            raw = text(d, 5) or text(d, 4)
+        else:
+            brief = detail = raw = ''
+        if not (brief or detail):
+            brief = detail = attr_text(c)
+            raw = re.sub(r'[\d.]+', '#', detail)
         if not (brief or detail):
             continue
-        rows[k] = {'id': k, 'name': nm, 'brief': brief, 'detail': detail, 'q': it.get('quality') or 3, 'tpl': re.sub(r'\{\d+\}|[\d.]+', '#', text(d, 5) or text(d, 4)),
+        rows[k] = {'id': k, 'name': nm, 'brief': brief, 'detail': detail, 'q': it.get('quality') or 3, 'tpl': re.sub(r'\{\d+\}|[\d.]+', '#', raw),
                    'icon': (('skill/' if (it.get('icon') or '').endswith('_ultimate') else 'fn/') + it['icon']) if it.get('icon') else '', 'mark': c.get('markid') or 0, 'tag': c.get('fun_tag') or 0}
     marks = [[k, T(v.get('name')), v.get('icon') or ''] for k, v in sorted(mark.items()) if isinstance(v, dict)]
     tags = [[k, T(v.get('tag_name')), v.get('tag_icon') or '', v.get('suit_max') or 0] for k, v in sorted(tagt.items()) if isinstance(v, dict) and T(v.get('tag_name'))]

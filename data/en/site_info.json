@@ -26,6 +26,17 @@
    ]
   },
   {
+   "id": "2026-11-07-v1.7.9",
+   "date": "2026-11-07",
+   "kind": "update",
+   "title": "Update v1.7.9 · Commander Skills · Tappable effects",
+   "lines": [
+    "The Library now has \"Commander Skills\": 28 skills in 8 families (base · variants · Sprite variants), with Lv.1 / Lv.MAX values.",
+    "Tap an effect name (colored text or \"「name」\") in skill, Arma Inscripta or function text to see its description, then jump with \"View in Effect Glossary\".",
+    "Added 307 stat-boost functions to the Functions compendium (using the game's own wording)."
+   ]
+  },
+  {
    "id": "2026-11-07-v1.7.8",
    "date": "2026-11-07",
    "kind": "update",
