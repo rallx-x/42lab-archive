@@ -1881,7 +1881,7 @@ async function showOasis({push=true,cat=null}={}){
    count.textContent=n+'개';return}
   const bs=D.buildings.filter(b=>b.kind===oasisTab&&(!q||dnorm(b.name).includes(q)||dnorm(b.intro).includes(q)));count.textContent=bs.length+'개';
   const g=el('div','oa-grid');
-  for(const b of bs){const c=el('div','oa-card');const top=el('div','oa-top');top.append(itemIcon(b.icon?'oasis/'+b.icon:'','oa-ic'));const tx=el('div','');tx.append(el('strong','oa-name',b.name),el('span','oa-en',b.en||''));top.append(tx);c.append(top);
+  for(const b of bs){const c=el('div','oa-card');const top=el('div','oa-top');top.append(itemIcon((b.kind==='oasis'&&b.small)?'oasis/'+b.small:(b.icon?'oasis/'+b.icon:''),'oa-ic'));/* 오아시스 큰 그림(OasisBuliding_*)은 내보내기에 없어서 작은 그림 */const tx=el('div','');tx.append(el('strong','oa-name',b.name),el('span','oa-en',b.en||''));top.append(tx);c.append(top);
    if(b.intro)c.append(el('p','pg-desc',cleanTags(b.intro)));
    if(b.levels.length){const det=el('details','oa-levels');det.append(el('summary','','레벨 '+b.levels.length+'단계 · 재료 · 효과'));
     const tb=el('table','algo-table fy-table oa-table');const hr=el('tr');['레벨','강화 재료','효과','조건'].forEach(x=>hr.append(el('th','',x)));tb.append(hr);
