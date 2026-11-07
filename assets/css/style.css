@@ -1767,3 +1767,10 @@ body.dark .item-ic.empty::before,body.dim .item-ic.empty::before,body.entropics 
 .grow-out{display:flex;flex-direction:column;gap:8px}
 .grow-total{padding-top:10px;border-top:1px solid var(--line)}
 .fn-games{margin-bottom:0;align-items:center}.fn-games .fy-label{margin-right:4px}
+/* v1.8.5 게임 · 육성 */
+.grow-pick{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin:6px 0 14px}
+.grow-doll{min-width:220px}
+.grow-who{display:flex;align-items:center;gap:10px;margin:4px 0 6px}
+.grow-who .avatar{width:44px;height:44px}
+.grow-who strong{font-size:18px}
+.arc-soon{opacity:.55}.arc-soon .arc-main{cursor:default}
