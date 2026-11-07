@@ -1713,3 +1713,7 @@ body.dark .item-ic.empty::before,body.dim .item-ic.empty::before,body.entropics 
 .cmd-badge{font-size:10.5px;font-weight:700;color:#fff;background:#9a5ad6;border-radius:6px;padding:1px 6px}
 .cmd-body .skill-detail{margin:0}
 @media(max-width:640px){.cmd-list{grid-template-columns:1fr}}
+/* v1.7.10 모드 효과 (탐색 · 던전 · 워체스): 아이콘 자체가 색 그림 */
+.fx-ic.xy.item-ic{width:38px;height:38px;background:none!important;border-radius:0}
+.fx-ic.xy img{width:100%;height:100%}
+.fx-mode-tab{border-style:dashed}
