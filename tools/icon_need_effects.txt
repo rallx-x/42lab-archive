@@ -1,0 +1,47 @@
+# 효과 사전 · 함수 · 지형 함수에 필요한 그림 (게임 configs 에서 쓰이는 이름, 2026-11-07). 「## 이름 개수 ← 쓰는 표」
+## Corner 15 개 ← chip_mark
+   Corner_0 Corner_1 Corner_10 Corner_11 Corner_12 Corner_13 Corner_14 Corner_2 Corner_3 Corner_4 Corner_5 Corner_6 Corner_7 Corner_8 Corner_9
+## ICON_Grid 48 개 ← battle_grid
+   ICON_Grid001 ICON_Grid002 ICON_Grid003 ICON_Grid004 ICON_Grid005 ICON_Grid006 ICON_Grid007 ICON_Grid008 ICON_Grid009 ICON_Grid010 ICON_Grid011 ICON_Grid012 ICON_Grid013 ICON_Grid014 ICON_Grid015 ICON_Grid016 ICON_Grid017 ICON_Grid018 ICON_Grid019 ICON_Grid020 ICON_Grid021 ICON_Grid022 ICON_Grid024 ICON_Grid025 ICON_Grid100 ICON_Grid101 ICON_Grid102 ICON_Grid103 ICON_Grid104 ICON_Grid105 ICON_Grid106 ICON_Grid107 ICON_Grid108 ICON_Grid1100 ICON_Grid1101 ICON_Grid1102 ICON_Grid1103 ICON_Grid1114 ICON_Grid1115 ICON_Grid1116 ICON_Grid1117 ICON_Grid1118 ICON_Grid1121 ICON_Grid37 ICON_Grid38 ICON_Grid39 ICON_Grid40 ICON_Grid41
+## ICON_LBuff 151 개 ← battle_buff, skill_label_info
+   ICON_LBuff_1 ICON_LBuff_10 ICON_LBuff_100 ICON_LBuff_101 ICON_LBuff_102 ICON_LBuff_103 ICON_LBuff_104 ICON_LBuff_105 ICON_LBuff_106 ICON_LBuff_107 ICON_LBuff_108 ICON_LBuff_109 ICON_LBuff_110 ICON_LBuff_111 ICON_LBuff_112 ICON_LBuff_113 ICON_LBuff_114 ICON_LBuff_115 ICON_LBuff_116 ICON_LBuff_117 ICON_LBuff_118 ICON_LBuff_12 ICON_LBuff_120 ICON_LBuff_121 ICON_LBuff_122 ICON_LBuff_123 ICON_LBuff_124 ICON_LBuff_125 ICON_LBuff_126 ICON_LBuff_127 ICON_LBuff_128 ICON_LBuff_129 ICON_LBuff_13 ICON_LBuff_130 ICON_LBuff_131 ICON_LBuff_132 ICON_LBuff_133 ICON_LBuff_134 ICON_LBuff_135 ICON_LBuff_136 ICON_LBuff_137 ICON_LBuff_138 ICON_LBuff_139 ICON_LBuff_14 ICON_LBuff_140 ICON_LBuff_141 ICON_LBuff_142 ICON_LBuff_143 ICON_LBuff_144 ICON_LBuff_147 ICON_LBuff_148 ICON_LBuff_149 ICON_LBuff_15 ICON_LBuff_150 ICON_LBuff_151 ICON_LBuff_152 ICON_LBuff_153 ICON_LBuff_154 ICON_LBuff_155 ICON_LBuff_156 ICON_LBuff_157 ICON_LBuff_158 ICON_LBuff_159 ICON_LBuff_16 ICON_LBuff_160 ICON_LBuff_161 ICON_LBuff_162 ICON_LBuff_163 ICON_LBuff_164 ICON_LBuff_17 ICON_LBuff_18 ICON_LBuff_19 ICON_LBuff_2 ICON_LBuff_20 ICON_LBuff_21 ICON_LBuff_25 ICON_LBuff_26 ICON_LBuff_28 ICON_LBuff_29 ICON_LBuff_3 ICON_LBuff_30 ICON_LBuff_31 ICON_LBuff_32 ICON_LBuff_33 ICON_LBuff_34 ICON_LBuff_36 ICON_LBuff_37 ICON_LBuff_38 ICON_LBuff_39 ICON_LBuff_4 ICON_LBuff_40 ICON_LBuff_41 ICON_LBuff_42 ICON_LBuff_43 ICON_LBuff_44 ICON_LBuff_45 ICON_LBuff_46 ICON_LBuff_47 ICON_LBuff_49 ICON_LBuff_51 ICON_LBuff_53 ICON_LBuff_54 ICON_LBuff_55 ICON_LBuff_56 ICON_LBuff_57 ICON_LBuff_58 ICON_LBuff_59 ICON_LBuff_6 ICON_LBuff_60 ICON_LBuff_61 ICON_LBuff_62 ICON_LBuff_63 ICON_LBuff_64 ICON_LBuff_65 ICON_LBuff_66 ICON_LBuff_67 ICON_LBuff_68 ICON_LBuff_69 ICON_LBuff_7 ICON_LBuff_70 ICON_LBuff_71 ICON_LBuff_72 ICON_LBuff_73 ICON_LBuff_74 ICON_LBuff_75 ICON_LBuff_76 ICON_LBuff_77 ICON_LBuff_78 ICON_LBuff_79 ICON_LBuff_8 ICON_LBuff_80 ICON_LBuff_81 ICON_LBuff_82 ICON_LBuff_83 ICON_LBuff_84 ICON_LBuff_85 ICON_LBuff_86 ICON_LBuff_87 ICON_LBuff_88 ICON_LBuff_89 ICON_LBuff_9 ICON_LBuff_90 ICON_LBuff_91 ICON_LBuff_92 ICON_LBuff_93 ICON_LBuff_94 ICON_LBuff_95 ICON_LBuff_96 ICON_LBuff_97 ICON_LBuff_98 ICON_LBuff_99
+## ICON_g_buff 11 개 ← dungeon_buff, exploration_buff, warchess_buff
+   ICON_g_buff_1 ICON_g_buff_15 ICON_g_buff_16 ICON_g_buff_17 ICON_g_buff_18 ICON_g_buff_19 ICON_g_buff_3 ICON_g_buff_4 ICON_g_buff_5 ICON_g_buff_6 ICON_g_buff_7
+## ICON_g_def 1 개 ← dungeon_buff, exploration_buff, warchess_buff
+   ICON_g_def_1
+## ICON_g_hp 1 개 ← exploration_buff, warchess_buff
+   ICON_g_hp_1
+## ICON_tag_buff 47 개 ← chip_tag
+   ICON_tag_buff_1 ICON_tag_buff_10 ICON_tag_buff_101 ICON_tag_buff_102 ICON_tag_buff_103 ICON_tag_buff_11 ICON_tag_buff_12 ICON_tag_buff_13 ICON_tag_buff_14 ICON_tag_buff_15 ICON_tag_buff_16 ICON_tag_buff_17 ICON_tag_buff_18 ICON_tag_buff_19 ICON_tag_buff_2 ICON_tag_buff_20 ICON_tag_buff_21 ICON_tag_buff_22 ICON_tag_buff_23 ICON_tag_buff_24 ICON_tag_buff_25 ICON_tag_buff_26 ICON_tag_buff_27 ICON_tag_buff_28 ICON_tag_buff_29 ICON_tag_buff_3 ICON_tag_buff_30 ICON_tag_buff_31 ICON_tag_buff_32 ICON_tag_buff_33 ICON_tag_buff_34 ICON_tag_buff_35 ICON_tag_buff_36 ICON_tag_buff_37 ICON_tag_buff_38 ICON_tag_buff_39 ICON_tag_buff_4 ICON_tag_buff_40 ICON_tag_buff_41 ICON_tag_buff_42 ICON_tag_buff_43 ICON_tag_buff_44 ICON_tag_buff_5 ICON_tag_buff_6 ICON_tag_buff_7 ICON_tag_buff_8 ICON_tag_buff_9
+## ICON_xy 144 개 ← dungeon_buff, exploration_buff, item, warchess_buff
+   ICON_xy_1 ICON_xy_10 ICON_xy_100 ICON_xy_101 ICON_xy_102 ICON_xy_103 ICON_xy_104 ICON_xy_105 ICON_xy_106 ICON_xy_107 ICON_xy_108 ICON_xy_11 ICON_xy_110 ICON_xy_12 ICON_xy_13 ICON_xy_14 ICON_xy_15 ICON_xy_16 ICON_xy_17 ICON_xy_18 ICON_xy_19 ICON_xy_2 ICON_xy_20 ICON_xy_21 ICON_xy_21266 ICON_xy_22 ICON_xy_23 ICON_xy_24 ICON_xy_25 ICON_xy_26 ICON_xy_27 ICON_xy_27001 ICON_xy_27002 ICON_xy_27003 ICON_xy_27004 ICON_xy_27005 ICON_xy_27006 ICON_xy_27007 ICON_xy_27008 ICON_xy_27009 ICON_xy_27010 ICON_xy_27011 ICON_xy_27012 ICON_xy_27013 ICON_xy_27036 ICON_xy_27037 ICON_xy_27038 ICON_xy_27039 ICON_xy_27040 ICON_xy_27041 ICON_xy_27042 ICON_xy_27043 ICON_xy_27044 ICON_xy_28 ICON_xy_28001 ICON_xy_28002 ICON_xy_28003 ICON_xy_28004 ICON_xy_28005 ICON_xy_28006 ICON_xy_28007 ICON_xy_28008 ICON_xy_28009 ICON_xy_29 ICON_xy_3 ICON_xy_30 ICON_xy_31 ICON_xy_32 ICON_xy_33 ICON_xy_34 ICON_xy_35 ICON_xy_36 ICON_xy_38 ICON_xy_39 ICON_xy_4 ICON_xy_40 ICON_xy_41 ICON_xy_5 ICON_xy_52 ICON_xy_53 ICON_xy_54 ICON_xy_55 ICON_xy_56 ICON_xy_57 ICON_xy_58 ICON_xy_59 ICON_xy_6 ICON_xy_60 ICON_xy_61 ICON_xy_62 ICON_xy_63 ICON_xy_64 ICON_xy_65 ICON_xy_66 ICON_xy_67 ICON_xy_68 ICON_xy_69 ICON_xy_7 ICON_xy_70 ICON_xy_71 ICON_xy_72 ICON_xy_73 ICON_xy_74 ICON_xy_75 ICON_xy_76 ICON_xy_77 ICON_xy_78 ICON_xy_79 ICON_xy_8 ICON_xy_80 ICON_xy_81 ICON_xy_82 ICON_xy_83 ICON_xy_85 ICON_xy_88 ICON_xy_882 ICON_xy_883 ICON_xy_885 ICON_xy_886 ICON_xy_887 ICON_xy_888 ICON_xy_89 ICON_xy_890 ICON_xy_892 ICON_xy_893 ICON_xy_895 ICON_xy_9 ICON_xy_90 ICON_xy_902 ICON_xy_903 ICON_xy_904 ICON_xy_905 ICON_xy_91 ICON_xy_92 ICON_xy_93 ICON_xy_94 ICON_xy_940 ICON_xy_941 ICON_xy_942 ICON_xy_95 ICON_xy_96 ICON_xy_97 ICON_xy_98 ICON_xy_99
+## ICON_xy_23Anniversary 1 개 ← exploration_buff
+   ICON_xy_23Anniversary_01
+## ICON_xy_23Sum 6 개 ← dungeon_buff, exploration_buff
+   ICON_xy_23Sum_1 ICON_xy_23Sum_2 ICON_xy_23Sum_3 ICON_xy_23Sum_4 ICON_xy_23Sum_5 ICON_xy_23Sum_6
+## ICON_xy_24SUM 13 개 ← exploration_buff
+   ICON_xy_24SUM_1 ICON_xy_24SUM_10 ICON_xy_24SUM_11 ICON_xy_24SUM_12 ICON_xy_24SUM_13 ICON_xy_24SUM_2 ICON_xy_24SUM_3 ICON_xy_24SUM_4 ICON_xy_24SUM_5 ICON_xy_24SUM_6 ICON_xy_24SUM_7 ICON_xy_24SUM_8 ICON_xy_24SUM_9
+## ICON_xy_DC 10 개 ← dungeon_buff, exploration_buff
+   ICON_xy_DC1 ICON_xy_DC10 ICON_xy_DC2 ICON_xy_DC3 ICON_xy_DC4 ICON_xy_DC5 ICON_xy_DC6 ICON_xy_DC7 ICON_xy_DC8 ICON_xy_DC9
+## ICON_xy_JNH 44 개 ← dungeon_buff, exploration_buff, warchess_buff
+   ICON_xy_JNH_1 ICON_xy_JNH_10 ICON_xy_JNH_11 ICON_xy_JNH_12 ICON_xy_JNH_13 ICON_xy_JNH_14 ICON_xy_JNH_15 ICON_xy_JNH_16 ICON_xy_JNH_18 ICON_xy_JNH_19 ICON_xy_JNH_2 ICON_xy_JNH_20 ICON_xy_JNH_21 ICON_xy_JNH_22 ICON_xy_JNH_23 ICON_xy_JNH_24 ICON_xy_JNH_25 ICON_xy_JNH_28 ICON_xy_JNH_29 ICON_xy_JNH_3 ICON_xy_JNH_30 ICON_xy_JNH_31 ICON_xy_JNH_32 ICON_xy_JNH_33 ICON_xy_JNH_34 ICON_xy_JNH_35 ICON_xy_JNH_36 ICON_xy_JNH_37 ICON_xy_JNH_38 ICON_xy_JNH_39 ICON_xy_JNH_4 ICON_xy_JNH_40 ICON_xy_JNH_41 ICON_xy_JNH_42 ICON_xy_JNH_43 ICON_xy_JNH_44 ICON_xy_JNH_45 ICON_xy_JNH_46 ICON_xy_JNH_47 ICON_xy_JNH_48 ICON_xy_JNH_5 ICON_xy_JNH_6 ICON_xy_JNH_7 ICON_xy_JNH_9
+## ICON_xy_JNH_CZ 8 개 ← dungeon_buff, exploration_buff
+   ICON_xy_JNH_CZ1 ICON_xy_JNH_CZ2 ICON_xy_JNH_CZ3 ICON_xy_JNH_CZ4 ICON_xy_JNH_CZ5 ICON_xy_JNH_CZ6 ICON_xy_JNH_CZ7 ICON_xy_JNH_CZ8
+## ICON_xy_LD 11 개 ← dungeon_buff, exploration_buff
+   ICON_xy_LD1 ICON_xy_LD11 ICON_xy_LD12 ICON_xy_LD2 ICON_xy_LD3 ICON_xy_LD4 ICON_xy_LD5 ICON_xy_LD6 ICON_xy_LD7 ICON_xy_LD8 ICON_xy_LD9
+## ICON_xy_WCDG_GJ 2 개 ← warchess_buff
+   ICON_xy_WCDG_GJ1 ICON_xy_WCDG_GJ2
+## ICON_xy_WCDG_HD 2 개 ← warchess_buff
+   ICON_xy_WCDG_HD1 ICON_xy_WCDG_HD2
+## ICON_xy_WCDG_SB 2 개 ← dungeon_buff, exploration_buff, warchess_buff
+   ICON_xy_WCDG_SB1 ICON_xy_WCDG_SB2
+## ICON_xy_WCZE 8 개 ← warchess_buff
+   ICON_xy_WCZE1 ICON_xy_WCZE2 ICON_xy_WCZE3 ICON_xy_WCZE4 ICON_xy_WCZE5 ICON_xy_WCZE6 ICON_xy_WCZE7 ICON_xy_WCZE8
+## ICON_xy_WTN 1 개 ← dungeon_buff, exploration_buff
+   ICON_xy_WTN1
+## ICON_xy_Warchess 22 개 ← dungeon_buff, exploration_buff, warchess_buff
+   ICON_xy_Warchess_1 ICON_xy_Warchess_10 ICON_xy_Warchess_13 ICON_xy_Warchess_14 ICON_xy_Warchess_19 ICON_xy_Warchess_2 ICON_xy_Warchess_20 ICON_xy_Warchess_21 ICON_xy_Warchess_22 ICON_xy_Warchess_23 ICON_xy_Warchess_24 ICON_xy_Warchess_25 ICON_xy_Warchess_26 ICON_xy_Warchess_27 ICON_xy_Warchess_28 ICON_xy_Warchess_3 ICON_xy_Warchess_4 ICON_xy_Warchess_5 ICON_xy_Warchess_6 ICON_xy_Warchess_7 ICON_xy_Warchess_8 ICON_xy_Warchess_9
+## ICON_xy_bro 1 개 ← exploration_buff
+   ICON_xy_bro1
+## ICON_xy_curse 10 개 ← dungeon_buff, exploration_buff
+   ICON_xy_curse_1 ICON_xy_curse_10 ICON_xy_curse_13 ICON_xy_curse_2 ICON_xy_curse_3 ICON_xy_curse_4 ICON_xy_curse_5 ICON_xy_curse_6 ICON_xy_curse_7 ICON_xy_curse_9
