@@ -3,7 +3,7 @@
 원본: tables BattleSkillCfg — 지휘 스킬은 그림 이름이 CommanderSkill_1_* (기본 · 변형) · CommanderElfSkill_* (성령 변형) 인 스킬
   - 5011~5199 (기본 · 변형), 8201~8299 (성령 변형). 이름에 buff 가 붙은 내부 스킬 · 같은 이름(번호만 다름)은 뺌
   - 계열 = 이름의 「-」 앞 (일점타격 · 일점타격-처단 · 일점타격-심판 …)
-  - 2 이름 · 5 상세 설명 {0}… · 7~10 수치 공식 (skills.py 계산기, 레벨 1~10 · 성령 변형은 1~3) · 17 쿨타임(프레임 ÷ 15)
+  - 2 이름 · 5 상세 설명 {0}… · 7~10 수치 공식 (skills.py 계산기, 레벨 1~10 · 성령 변형은 C · B · A · S 4단계) · 17 쿨타임(프레임 ÷ 15)
 그림: pnc-item commander/<그림 이름>.webp
 사용: python commander.py   (skills.py 의 SERVERS 와 같은 곳에서, tables_<서버>/ 필요)
 """
@@ -50,7 +50,7 @@ def main():
             b1 = packed(*d[8][0]) if 8 in d else []
             g2 = packed(*d[9][0]) if 9 in d else []
             l3 = packed(*d[10][0]) if 10 in d else []
-            mx = 3 if i >= 8200 else MAXLV  # 성령 변형은 성령 등급 3단계 (게임 간략 설명의 30%/40%/… 세 값)
+            mx = 4 if i >= 8200 else MAXLV  # 성령 변형은 성령 스킬 등급 C · B · A · S 4단계 (fairy_skill_weight skill_level 1~4)
             vals = []
             for k, fid in enumerate(fx):
                 env = {'$1': b1[k] if k < len(b1) else 0, '$2': g2[k] if k < len(g2) else 0, '$3': l3[k] if k < len(l3) else 1}

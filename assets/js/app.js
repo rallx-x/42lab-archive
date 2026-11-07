@@ -77,6 +77,7 @@ function routeHash(route){
  if(route.type==='tips')return '#tips'+(route.cat?'/'+encodeURIComponent(route.cat):'');
  if(route.type==='effects')return '#effects'+(route.cat?'/'+encodeURIComponent(route.cat):'');
  if(route.type==='commander')return '#commander';
+ if(route.type==='fairy')return '#sprites'+(route.cat?'/'+route.cat:'');
  if(route.type==='functions')return '#functions'+(route.cat?'/'+route.cat.split('/').map(encodeURIComponent).join('/'):'');
  if(route.type==='records')return '#records'+(route.cat?'/'+encodeURIComponent(route.cat):'');
  if(route.type==='doll')return '#doll/'+encodeURIComponent(route.id)+(route.part&&route.part!=='profile'?'/'+encodeURIComponent(route.part):'');
@@ -97,6 +98,7 @@ function parseRoute(){
   if(raw==='items'||raw.startsWith('items/'))return {type:'items',cat:raw.startsWith('items/')?decodeURIComponent(raw.slice(6)):null};
   if(raw==='tips'||raw.startsWith('tips/'))return {type:'tips',cat:raw.startsWith('tips/')?decodeURIComponent(raw.slice(5)):null};
   if(raw==='commander')return {type:'commander'};
+  if(raw==='sprites'||raw.startsWith('sprites/'))return {type:'fairy',cat:raw.startsWith('sprites/')?raw.slice(8):null};
   if(raw==='functions'||raw.startsWith('functions/'))return {type:'functions',cat:raw.startsWith('functions/')?raw.slice(10).split('/').map(decodeURIComponent).join('/'):null};
   if(raw==='effects'||raw.startsWith('effects/'))return {type:'effects',cat:raw.startsWith('effects/')?decodeURIComponent(raw.slice(8)):null};
   if(raw==='records'||raw.startsWith('records/'))return {type:'records',cat:raw.startsWith('records/')?decodeURIComponent(raw.slice(8)):null};
@@ -177,6 +179,7 @@ async function restoreRoute(){
  if(route.type==='effects'){await showEffects({push:false,cat:route.cat});return}
  if(route.type==='functions'){await showFunctions({push:false,cat:route.cat});return}
  if(route.type==='commander'){await showCommander({push:false});return}
+ if(route.type==='fairy'){await showFairy({push:false,cat:route.cat});return}
  if(route.type==='items'){await showItems({push:false,cat:route.cat});return}
  if(route.type==='doll'){await showDoll(route.id,{push:false,part:route.part});return}
  if(route.type==='chapter'&&showChapter(route.id,route.category,{push:false}))return;
@@ -1531,6 +1534,8 @@ async function showArchive({push=true}={}){
  const alg=card('ALGORITHMS','알고리즘','세트 효과 · 구역 · 기본 능력치',()=>showAlgos());
  const fnc=card('FUNCTIONS','함수','대상별 · 세트별 함수 도감',()=>showFunctions());
  loadFunctions().then(d=>{if(tok!==routeToken)return;cnt(fnc,(d.functions||[]).length);chipRow(fnc,[['대상별',()=>showFunctions({cat:'mark'})],['세트별',()=>showFunctions({cat:'tag'})]])}).catch(()=>{});
+ const fry=card('SPRITES','성령','성령 정보 · 강화 시뮬레이터',()=>showFairy());
+ loadFairy().then(d=>{if(tok!==routeToken)return;cnt(fry,(d.sprites||[]).length);chipRow(fry,[['성령 정보',()=>showFairy({cat:'info'})],['강화 시뮬레이터',()=>showFairy({cat:'sim'})]])}).catch(()=>{});
  const cmd=card('COMMANDER SKILLS','지휘 스킬','교수의 지휘 스킬 · 변형 · 성령 변형',()=>showCommander());
  loadCommander().then(d=>{if(tok!==routeToken)return;cnt(cmd,(d.families||[]).reduce((a,f)=>a+f.skills.length,0))}).catch(()=>{});
  const efx=card('EFFECTS','효과 사전','초록 · 빨간 · 주황 · 인형 고유 · 필드 효과',()=>showEffects());
@@ -1671,6 +1676,87 @@ function renderEffects(){
    c.append(top,body);list.append(c)}
   if(rows.length>400)list.append(el('p','load-note','처음 400개만 보여요. 기록 찾기로 좁혀 보세요.'));
   if(fxFocus!=null){const t=document.getElementById('fx-'+fxFocus);fxFocus=null;if(t){t.classList.add('fx-focus');requestAnimationFrame(()=>t.scrollIntoView({block:'center'}))}}
+ };
+ draw();
+}
+// ---------- v1.8.0 성령 (data/<언어>/fairy.json ← tools/client_extract/fairy.py): 성령 정보(스펙표) · 강화 시뮬레이터 ----------
+let fairyData=null,fairyTab=get('fairyTab','info'),fairySel=+get('fairySel',1)||1,fairyRar=+get('fairyRar',4)||4;
+const loadFairy=()=>fairyData?Promise.resolve(fairyData):fetchJSON(dataPath('fairy.json')).then(d=>fairyData=d);
+const RAR=['C','B','A','S'],RAR_CLS=['c','b','a','s'];
+let fsim=null; // 시뮬레이터 상태 (이 창에서만)
+async function showFairy({push=true,cat=null}={}){
+ const tok=++routeToken;showOnly('dollView');bgmLeave();voiceStop();closeArchiveMenu();$('#crumb').textContent='성령';
+ if(cat==='info'||cat==='sim')fairyTab=cat;
+ if(push)saveRoute({type:'fairy',cat:fairyTab});
+ const host=$('#dollView');host.replaceChildren(el('p','loading-note','성령을 불러오는 중…'));window.scrollTo(0,0);
+ try{await Promise.all([loadFairy(),loadEffects().catch(()=>null)])}catch(e){if(tok===routeToken)host.replaceChildren(error('성령을 불러오지 못했어요. ('+e.message+')'));return}
+ if(tok===routeToken)renderFairy();
+}
+function renderFairy(){
+ const D=fairyData,host=$('#dollView');host.replaceChildren();
+ const head=el('div','doll-list-head');const t=el('div');t.append(el('div','eyebrow','DATABASE / SPRITES'),el('h2','','성령'));head.append(t);host.append(head);
+ const bar=el('div','doll-controls wr-controls');const tabs=el('div','wr-tabs');
+ for(const [k,n] of [['info','성령 정보'],['sim','강화 시뮬레이터']]){const b=el('button','cat-tab wr-tab'+(k===fairyTab?' selected':''),n);b.type='button';b.onclick=()=>{fairyTab=k;set('fairyTab',k);history.replaceState(history.state,'',location.pathname+location.search+routeHash({type:'fairy',cat:k}));renderFairy()};tabs.append(b)}
+ bar.append(tabs);host.append(bar);
+ const itemName=i=>D.items?.[i]?.[0]||i;
+ const costChips=(obj,mult=1)=>{const w=el('span','fy-cost');for(const [i,n] of Object.entries(obj||{})){const c=el('span','item-chip');c.append(itemIcon(D.items?.[i]?.[1]||'','sm'),el('span','item-chip-name',itemName(i)),el('span','item-chip-n','×'+(n*mult).toLocaleString(window.UI_LOCALE||'ko-KR')));w.append(c)}return w};
+ const attrVal=(a,v)=>{const m=D.attrs?.[a];return m&&m[1]===2?(v/10)+'%':String(v)};
+ const attrIds=Object.keys(D.attrs||{});
+ const sprite=()=>D.sprites.find(x=>x.id===fairySel)||D.sprites[0];
+ const pick=el('div','fy-pick');
+ for(const sp of D.sprites){const b=el('button','fy-sprite'+(sp.id===sprite().id?' on':''));b.type='button';b.append(itemIcon(sp.icon,'fy-ic'),el('strong','',sp.name),el('span','fy-suit',sp.suit));if(sp.locked)b.append(el('span','fy-lock','미공개'));b.onclick=()=>{fairySel=sp.id;set('fairySel',sp.id);fsim=null;renderFairy()};pick.append(b)}
+ host.append(pick);
+ const skillCard=(sk,lvl,extra)=>{const c=el('div','fy-skill'+(sk.special?' special':''));const top=el('div','fy-skill-top');top.append(el('strong','',sk.name));if(sk.special)top.append(el('span','cmd-badge','고유'));if(extra)top.append(extra);c.append(top);
+  const det=el('p','skill-detail');skillText(det,skillDetail(sk,lvl));c.append(det);
+  if(sk.to){const b=el('button','fy-link');b.type='button';b.append(document.createTextNode('지휘 스킬 변형 '),ic('right'));b.onclick=()=>showCommander();c.append(b)}
+  return c};
+ if(fairyTab==='info'){
+  const sp=sprite();
+  // 스킬 (등급 C · B · A · S 단추)
+  const ss=el('section','fy-sec');const sh=el('div','fy-sec-head');sh.append(el('h3','',sp.name+' · 스킬 '+sp.skills.length));
+  const rb=el('div','fy-rar');D.rarity.slice().sort((a,b)=>a.level-b.level).forEach(r=>{const b=el('button','fy-rar-b '+RAR_CLS[r.level-1]+(r.level===fairyRar?' on':''));b.type='button';b.append(el('b','',r.name),el('small','',r.rate+'%'));b.onclick=()=>{fairyRar=r.level;set('fairyRar',r.level);renderFairy()};rb.append(b)});
+  sh.append(rb);ss.append(sh,el('p','load-note','스킬은 등급(C · B · A · S)에 따라 수치가 달라요. 단추 아래 숫자는 게임에 표시된 등급 확률이에요. 「고유」는 이 성령만의 스킬이에요.'));
+  const g=el('div','fy-skills');sp.skills.filter(x=>x.special).concat(sp.skills.filter(x=>!x.special)).forEach(x=>g.append(skillCard(x,fairyRar)));ss.append(g);host.append(ss);
+  // 랭크
+  const rs=el('section','fy-sec');rs.append(el('h3','','랭크 (공통)'));const rt=el('table','algo-table fy-table');const rh=el('tr');['랭크','최대 레벨','스킬 칸','랭크업 재료','분해 시 얻는 것'].forEach(x=>rh.append(el('th','',x)));rt.append(rh);
+  for(const r of D.ranks){const tr=el('tr');tr.append(el('td','',r.rank+'★'),el('td','','Lv.'+r.levelMax),el('td','',String(r.slots)));const c1=el('td','');c1.append(costChips(r.cost));const c2=el('td','');c2.append(costChips(r.recycle));tr.append(c1,c2);rt.append(tr)}
+  const rw=el('div','algo-table-wrap');rw.append(rt);rs.append(rw,el('p','load-note','재료는 게임 데이터의 랭크별 값 그대로예요.'));host.append(rs);
+  // 레벨
+  const ls=el('section','fy-sec');ls.append(el('h3','','레벨별 능력치 (공통)'));const lt=el('table','algo-table fy-table');const lh=el('tr');['레벨','다음 레벨까지 경험치'].concat(attrIds.map(a=>D.attrs[a][0])).forEach(x=>lh.append(el('th','',x)));lt.append(lh);
+  const caps=new Set(D.ranks.map(r=>r.levelMax));
+  for(const l of D.levels){const tr=el('tr',caps.has(l.lv)?'fy-cap':'');tr.append(el('td','','Lv.'+l.lv),el('td','',l.exp?l.exp.toLocaleString(window.UI_LOCALE||'ko-KR'):'-'));attrIds.forEach(a=>tr.append(el('td','',attrVal(a,l.attrs[a]||0))));lt.append(tr)}
+  const lw=el('div','algo-table-wrap');lw.append(lt);ls.append(lw,el('p','load-note','능력치는 그 레벨까지 쌓인 값이에요. 진한 줄은 랭크별 최대 레벨이에요. 경험치는 「'+itemName(D.expItem)+'」로 채워요.'));host.append(ls);
+  return}
+ // ----- 강화 시뮬레이터 -----
+ const sp=sprite();
+ if(!fsim||fsim.id!==sp.id)fsim={id:sp.id,rank:1,lv:1,slots:[],rerolls:0};
+ const R=()=>D.ranks.find(r=>r.rank===fsim.rank);
+ const box=el('section','fy-sec fy-sim');host.append(box);
+ const draw=()=>{box.replaceChildren();const rk=R();if(fsim.lv>rk.levelMax)fsim.lv=rk.levelMax;
+  while(fsim.slots.length<rk.slots)fsim.slots.push(null);fsim.slots.length=rk.slots;
+  const ctl=el('div','fy-ctl');
+  const rkb=el('div','fy-ranks');D.ranks.forEach(r=>{const b=el('button','cat-tab wr-tab'+(r.rank===fsim.rank?' selected':''),r.rank+'★');b.type='button';b.onclick=()=>{fsim.rank=r.rank;draw()};rkb.append(b)});
+  const lvbar=el('div','arma-lvbar stats-fbar');const dn=icBtn('down','arma-step'),up=icBtn('up','arma-step');const range=el('input','arma-range');range.type='range';range.min=1;range.max=rk.levelMax;range.value=fsim.lv;
+  const lvTxt=el('span','arma-lvtxt');lvTxt.append(el('b','',String(fsim.lv)),document.createTextNode(' / '+rk.levelMax));
+  const setLv=v=>{fsim.lv=Math.min(Math.max(v,1),rk.levelMax);draw()};dn.onclick=()=>setLv(fsim.lv-1);up.onclick=()=>setLv(fsim.lv+1);range.oninput=()=>setLv(+range.value);
+  lvbar.append(dn,range,up,lvTxt);ctl.append(el('div','fy-label','랭크'),rkb,el('div','fy-label','레벨'),lvbar);box.append(ctl);
+  // 능력치
+  const L=D.levels.find(l=>l.lv===fsim.lv)||D.levels[0];const st=el('div','fy-stats');attrIds.forEach(a=>{const c=el('div','fy-stat');c.append(el('span','',D.attrs[a][0]),el('b','',attrVal(a,L.attrs[a]||0)));st.append(c)});box.append(el('h3','',sp.name+' · '+fsim.rank+'★ Lv.'+fsim.lv),st);
+  // 스킬 칸 · 재구성 (게임 등급 확률로 뽑기)
+  const roll=()=>{let x=Math.random()*100,acc=0;const rs=D.rarity.slice().sort((a,b)=>b.level-a.level);let lvl=1;for(const r of rs){acc+=r.rate;if(x<acc){lvl=r.level;break}}const pool=sp.skills;return {sk:pool[Math.floor(Math.random()*pool.length)],lvl}};
+  const sl=el('div','fy-slots');fsim.slots.forEach((cur,i)=>{const c=el('div','fy-slot');const hd=el('div','fy-slot-head');hd.append(el('span','fy-label','스킬 칸 '+(i+1)));
+   const b=el('button','fy-roll');b.type='button';b.append(document.createTextNode(cur?'재구성':'스킬 뽑기'));b.onclick=()=>{fsim.slots[i]=roll();fsim.rerolls++;draw()};hd.append(b);c.append(hd);
+   if(cur)c.append(skillCard(cur.sk,cur.lvl,el('span','fy-rar-tag '+RAR_CLS[cur.lvl-1],RAR[cur.lvl-1])));else c.append(el('p','load-note','아직 스킬이 없어요.'));sl.append(c)});
+  box.append(el('h3','','스킬 칸 '+rk.slots),sl);
+  // 비용 (1★ Lv.1 부터 지금까지)
+  let exp=0;for(const l of D.levels)if(l.lv<fsim.lv)exp+=l.exp;
+  const cost={};D.ranks.filter(r=>r.rank>1&&r.rank<=fsim.rank).forEach(r=>{for(const [k,n] of Object.entries(r.cost))cost[k]=(cost[k]||0)+n});
+  const cs=el('div','fy-costs');
+  const row=(label,node)=>{const r=el('div','fy-cost-row');r.append(el('span','fy-label',label),node);cs.append(r)};
+  row('경험치',costChips({[D.expItem]:exp}));row('랭크업 ('+(fsim.rank>1?'2★~'+fsim.rank+'★':'없음')+')',Object.keys(cost).length?costChips(cost):el('span','load-note','-'));
+  row('재구성 '+fsim.rerolls+'회',costChips({'1923':fsim.rerolls}));
+  const reset=el('button','fy-roll');reset.type='button';reset.textContent='처음부터';reset.onclick=()=>{fsim=null;renderFairy()};
+  box.append(el('h3','','들어간 재료 (1★ Lv.1 부터)'),cs,reset,el('p','load-note','경험치 1 = 「'+itemName(D.expItem)+'」 1개로 계산했어요. 랭크업 재료는 랭크 표의 2★부터 지금 랭크까지 더한 값이에요. 재구성은 1회에 「'+itemName('1923')+'」 1개로 계산했어요. 뽑기는 게임 등급 확률(S '+(D.rarity.find(r=>r.level===4)?.rate)+'% …)로 하는 흉내예요.'));
  };
  draw();
 }
