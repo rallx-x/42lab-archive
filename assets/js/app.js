@@ -76,6 +76,7 @@ function routeHash(route){
  if(route.type==='items')return '#items'+(route.cat?'/'+encodeURIComponent(route.cat):'');
  if(route.type==='tips')return '#tips'+(route.cat?'/'+encodeURIComponent(route.cat):'');
  if(route.type==='effects')return '#effects'+(route.cat?'/'+encodeURIComponent(route.cat):'');
+ if(route.type==='functions')return '#functions'+(route.cat?'/'+route.cat.split('/').map(encodeURIComponent).join('/'):'');
  if(route.type==='records')return '#records'+(route.cat?'/'+encodeURIComponent(route.cat):'');
  if(route.type==='doll')return '#doll/'+encodeURIComponent(route.id)+(route.part&&route.part!=='profile'?'/'+encodeURIComponent(route.part):'');
  if(route.type==='chapter')return '#chapter/'+encodeURIComponent(route.category)+':'+encodeURIComponent(route.id);
@@ -94,6 +95,7 @@ function parseRoute(){
   if(raw.startsWith('dorm/'))return {type:'dorm',id:decodeURIComponent(raw.slice(5))};
   if(raw==='items'||raw.startsWith('items/'))return {type:'items',cat:raw.startsWith('items/')?decodeURIComponent(raw.slice(6)):null};
   if(raw==='tips'||raw.startsWith('tips/'))return {type:'tips',cat:raw.startsWith('tips/')?decodeURIComponent(raw.slice(5)):null};
+  if(raw==='functions'||raw.startsWith('functions/'))return {type:'functions',cat:raw.startsWith('functions/')?raw.slice(10).split('/').map(decodeURIComponent).join('/'):null};
   if(raw==='effects'||raw.startsWith('effects/'))return {type:'effects',cat:raw.startsWith('effects/')?decodeURIComponent(raw.slice(8)):null};
   if(raw==='records'||raw.startsWith('records/'))return {type:'records',cat:raw.startsWith('records/')?decodeURIComponent(raw.slice(8)):null};
   if(raw.startsWith('doll/')){const [k,pt]=raw.slice(5).split('/');return {type:'doll',id:decodeURIComponent(k),part:pt?decodeURIComponent(pt):null}}
@@ -171,6 +173,7 @@ async function restoreRoute(){
  if(route.type==='records'){await showRecords({push:false,cat:route.cat});return}
  if(route.type==='tips'){await showTips({push:false,cat:route.cat});return}
  if(route.type==='effects'){await showEffects({push:false,cat:route.cat});return}
+ if(route.type==='functions'){await showFunctions({push:false,cat:route.cat});return}
  if(route.type==='items'){await showItems({push:false,cat:route.cat});return}
  if(route.type==='doll'){await showDoll(route.id,{push:false,part:route.part});return}
  if(route.type==='chapter'&&showChapter(route.id,route.category,{push:false}))return;
@@ -1522,6 +1525,8 @@ async function showArchive({push=true}={}){
  const tip=card('LOADING TIPS','로딩 팁','로딩 화면에 나오는 백과사전 · 섹터 팁',()=>showTips());
  const itm=card('ITEMS','아이템','창고 · 숙소 가구 · 이벤트 보상',()=>showItems());
  const alg=card('ALGORITHMS','알고리즘','세트 효과 · 구역 · 기본 능력치',()=>showAlgos());
+ const fnc=card('FUNCTIONS','함수','대상별 · 세트별 함수 도감',()=>showFunctions());
+ loadFunctions().then(d=>{if(tok!==routeToken)return;cnt(fnc,(d.functions||[]).length);chipRow(fnc,[['대상별',()=>showFunctions({cat:'mark'})],['세트별',()=>showFunctions({cat:'tag'})]])}).catch(()=>{});
  const efx=card('EFFECTS','효과 사전','초록 · 빨간 · 주황 · 인형 고유 · 필드 효과',()=>showEffects());
  loadEffects().then(d=>{if(tok!==routeToken)return;cnt(efx,(d.effects||[]).length);chipRow(efx,(d.cats||[]).map(([k,n])=>[n,()=>showEffects({cat:k})]))}).catch(()=>{});
  const cnt=(o,n)=>{if(tok===routeToken&&n)o.n.textContent=n.toLocaleString(window.UI_LOCALE||'ko-KR')+'개'};
@@ -1653,6 +1658,75 @@ function renderEffects(){
     if(x.algo){const b=el('button','doll-chip link tip-doll','알고리즘');b.type='button';b.onclick=()=>showAlgos();w.append(b)}
     body.append(w)}
    c.append(top,body);list.append(c)}
+ };
+ draw();
+}
+// ---------- v1.7.8 함수 도감 (data/<언어>/functions.json ← tools/client_extract/functions.py) ----------
+// 탭: 대상별(세부 탭 = 카드 모서리 표시) · 세트별(세부 탭 = 세트). 카드 테두리 색 = 게임 카드 색(파랑 · 보라 · 주황)
+// 수치만 다른 같은 함수는 설명 아래 색 단추로 단계 전환
+let fnData=null,fnMode=get('fnMode','mark'),fnSub=get('fnSub','all'),fnQuery='';
+const loadFunctions=()=>fnData?Promise.resolve(fnData):fetchJSON(dataPath('functions.json')).then(d=>fnData=d);
+const fnStep=new Map();
+async function showFunctions({push=true,cat=null}={}){
+ const tok=++routeToken;showOnly('dollView');bgmLeave();voiceStop();closeArchiveMenu();$('#crumb').textContent='함수';
+ if(cat){const [m,sub]=cat.split('/');if(m==='mark'||m==='tag'){fnMode=m;fnSub=sub||'all'}}
+ if(push)saveRoute({type:'functions',cat:fnMode+(fnSub!=='all'?'/'+fnSub:'')});
+ const host=$('#dollView');host.replaceChildren(el('p','loading-note','함수를 불러오는 중…'));window.scrollTo(0,0);
+ try{await loadFunctions()}catch(e){if(tok===routeToken)host.replaceChildren(error('함수를 불러오지 못했어요. ('+e.message+')'));return}
+ if(tok===routeToken)renderFunctions();
+}
+function renderFunctions(){
+ const host=$('#dollView');host.replaceChildren();
+ const all=fnData.functions||[],marks=fnData.marks||[];
+ // 같은 이름 세트(모드 · 버전마다 번호만 다름)는 하나로: 처음 번호가 대표
+ const canon=new Map(),tags=[];for(const t of fnData.tags||[]){const f=tags.find(x=>x[1]===t[1]);if(f)canon.set(t[0],f[0]);else{canon.set(t[0],t[0]);tags.push(t)}}
+ const tagsOf=o=>[...new Set((o.tags||[]).map(t=>canon.get(t)??t))];
+ const markOf=new Map(marks.map(m=>[m[0],m])),tagOf=new Map(tags.map(t=>[t[0],t]));
+ const head=el('div','doll-list-head');const t=el('div');t.append(el('div','eyebrow','DATABASE / FUNCTIONS'),el('h2','','함수'));head.append(t);
+ const count=el('span','section-sub');head.append(count);host.append(head);
+ host.append(el('p','load-note','게임 속 함수 카드예요. 카드 테두리 색은 게임 카드 색(파랑 · 보라 · 주황)이고, 수치만 다른 같은 함수는 설명 아래 단추로 바꿔 볼 수 있어요.'));
+ const bar=el('div','doll-controls wr-controls');const tabs=el('div','wr-tabs');tabs.setAttribute('role','tablist');
+ const modeBtns=[];
+ for(const [m,name] of [['mark','대상별'],['tag','세트별']]){const b=el('button','cat-tab wr-tab',name);b.type='button';b.onclick=()=>{fnMode=m;fnSub='all';set('fnMode',m);set('fnSub','all');go()};modeBtns.push([m,b]);tabs.append(b)}
+ const sw=el('label','doll-ctl doll-search-wrap');sw.append(el('span','doll-ctl-label','기록 찾기'));
+ const sbox=el('span','doll-search');const si=el('input');si.type='search';si.placeholder='이름 · 내용';si.value=fnQuery;si.setAttribute('aria-label','함수 찾기');si.autocomplete='off';
+ si.oninput=()=>{fnQuery=si.value;draw()};sbox.append(el('span','doll-search-prompt','//:_'),si);sw.append(sbox);
+ bar.append(tabs,sw);host.append(bar);
+ const subs=el('div','fn-subs');host.append(subs);
+ const list=el('div','fn-list');host.append(list);
+ const go=()=>{history.replaceState(history.state,'',location.pathname+location.search+routeHash({type:'functions',cat:fnMode+(fnSub!=='all'?'/'+fnSub:'')}));draw()};
+ const cornerIc=m=>{const s=el('span','fn-corner');if(m?.[2])s.style.setProperty('--ci','url('+itemIconBase().replace(/\/?$/,'/')+'fx/'+m[2]+'.webp)');return s};
+ const tagIc=t=>{const s=el('span','fn-tagic');if(t?.[2])s.style.backgroundImage='url('+itemIconBase().replace(/\/?$/,'/')+'fx/'+t[2]+'.webp)';return s};
+ const inSub=o=>fnSub==='all'?(fnMode==='tag'?tagsOf(o).length>0:true):(fnMode==='mark'?String(o.mark)===fnSub:tagsOf(o).map(String).includes(fnSub));
+ const card=o=>{
+  const c=el('div','fn-card q'+(o.q||3));
+  const art=itemIcon(o.icon,'fn-art');c.append(art);
+  const body=el('div','fn-body');
+  const top=el('div','fn-top');const m=markOf.get(o.mark);if(m){const mk=el('span','fn-mark');mk.append(cornerIc(m),el('span','',m[1]));top.append(mk)}
+  for(const tg of tagsOf(o)){const tt=tagOf.get(tg);if(!tt)continue;const b=el('button','fn-tag');b.type='button';b.append(tagIc(tt),el('span','',tt[1]));b.onclick=()=>{fnMode='tag';fnSub=String(tg);set('fnMode','tag');set('fnSub',fnSub);go();window.scrollTo(0,0)};top.append(b)}
+  body.append(el('strong','fn-name',o.name),top);
+  const desc=el('p','fn-desc');body.append(desc);
+  const steps=o.steps||[];
+  const show=i=>{const st=steps[i]||o;desc.replaceChildren();richText(desc,String(st.detail||st.brief||'').replace(/\\n/g,'\n'));c.className='fn-card q'+(st.q||o.q||3)};
+  if(steps.length>1){const row=el('div','fn-steps');row.append(el('span','fn-steps-label','단계'));
+   steps.forEach((st,i)=>{const b=el('button','fn-step q'+st.q,String(i+1));b.type='button';b.onclick=()=>{fnStep.set(o.id,i);row.querySelectorAll('.fn-step').forEach((x,k)=>x.classList.toggle('on',k===i));show(i)};row.append(b)});
+   body.append(row);const i0=fnStep.get(o.id)||0;row.querySelectorAll('.fn-step')[i0]?.classList.add('on');show(i0)}
+  else show(-1);
+  c.append(body);return c};
+ const draw=()=>{
+  modeBtns.forEach(([m,b])=>{b.classList.toggle('selected',m===fnMode);b.setAttribute('aria-selected',String(m===fnMode))});
+  subs.replaceChildren();
+  const opts=fnMode==='mark'?[['all','모든 함수',null],...marks.map(m=>[String(m[0]),m[1],m])]:[['all','모든 세트',null],...tags.map(t=>[String(t[0]),t[1],t])];
+  if(!opts.some(([k])=>k===fnSub))fnSub='all';
+  for(const [k,name,ref] of opts){const n=all.filter(o=>k==='all'?(fnMode==='tag'?tagsOf(o).length>0:true):(fnMode==='mark'?String(o.mark)===k:tagsOf(o).map(String).includes(k))).length;if(!n)continue;
+   const b=el('button','fn-sub'+(k===fnSub?' on':''));b.type='button';if(ref)b.append(fnMode==='mark'?cornerIc(ref):tagIc(ref));b.append(el('span','',name),el('span','wr-tab-n',String(n)));
+   b.onclick=()=>{fnSub=k;set('fnSub',k);go()};subs.append(b)}
+  const q=dnorm(fnQuery);
+  const rows=all.filter(o=>inSub(o)&&(!q||dnorm(o.name).includes(q)||dnorm(cleanTags(o.detail||o.brief||'')).includes(q)));
+  count.textContent=rows.length+'개';list.replaceChildren();
+  if(!rows.length){list.append(el('p','loading-note',q?'「'+fnQuery.trim()+'」에 맞는 함수가 없어요.':'함수가 없어요.'));return}
+  if(fnMode==='tag'&&fnSub==='all'){for(const tg of tags){const part=rows.filter(o=>tagsOf(o).includes(tg[0]));if(!part.length)continue;const h=el('h3','fn-group');h.append(tagIc(tg),el('span','',tg[1]+' · '+part.length));list.append(h);const g=el('div','fn-grid');part.forEach(o=>g.append(card(o)));list.append(g)}}
+  else{const g=el('div','fn-grid');rows.slice(0,400).forEach(o=>g.append(card(o)));list.append(g);if(rows.length>400)list.append(el('p','load-note','처음 400개만 보여요. 세부 탭이나 기록 찾기로 좁혀 보세요.'))}
  };
  draw();
 }

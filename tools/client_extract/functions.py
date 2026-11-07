@@ -7,6 +7,7 @@
 이름 · 대상(markid) · 설명 틀(숫자를 뺀 글)이 같으면 하나로 합침 (한국어 기준) → 수치만 다른 것은 steps (카드 색 낮은 것부터)
   · 이름이 같아도 효과가 다르면 따로 (적 쪽 효과 · 모드별 다른 함수)
 설명이 없는 함수(능력치 상승 같은 내부 함수)는 뺌
+그림: pnc-item fn/<item.icon>.webp (궁극기 그림 *_ultimate 는 skill/)
 사용: python functions.py   (skills.py 의 SERVERS 와 같은 곳에서, tables_<서버>/ 필요)
 """
 import json, os, re, sys
@@ -86,7 +87,7 @@ def server(lang, tag, cdir):
         if not (brief or detail):
             continue
         rows[k] = {'id': k, 'name': nm, 'brief': brief, 'detail': detail, 'q': it.get('quality') or 3, 'tpl': re.sub(r'\{\d+\}|[\d.]+', '#', text(d, 5) or text(d, 4)),
-                   'icon': it.get('icon') or '', 'mark': c.get('markid') or 0, 'tag': c.get('fun_tag') or 0}
+                   'icon': (('skill/' if (it.get('icon') or '').endswith('_ultimate') else 'fn/') + it['icon']) if it.get('icon') else '', 'mark': c.get('markid') or 0, 'tag': c.get('fun_tag') or 0}
     marks = [[k, T(v.get('name')), v.get('icon') or ''] for k, v in sorted(mark.items()) if isinstance(v, dict)]
     tags = [[k, T(v.get('tag_name')), v.get('tag_icon') or '', v.get('suit_max') or 0] for k, v in sorted(tagt.items()) if isinstance(v, dict) and T(v.get('tag_name'))]
     return rows, marks, tags
