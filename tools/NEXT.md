@@ -99,3 +99,9 @@
 - tools/client_extract/functions.py MODES: 일반 7000~15999 · 매트릭스 90000~93999 · 엔트로픽 서바이버 17000~17999 · 프로토콜 20000~28999 · 40000번대
   · 함수 연쇄 30000~31999 · 워체스 94000번대 · 지원 901000~911999 · 그 밖 「기타」(16xxx · 80/81 · 108 · 4001~4020 · 9004 · 9910 · 랜덤 알고리즘 8xxx)
 - 확인할 것: 15000번대 중 ICON_JNH23 그림 42개(엔트로픽 서바이버일 수도), 16000번대, 4001~4020(스피릿 = 적 쪽?), 9004(이벤트 보스?), 21093 도약 재정비(나무위키 「도약 함수」)
+
+## 다음: 스펙 계산기 「작전 능력」 (2026-11-07 조사만)
+- 계산식 원문: tools/combat_formula_notes.txt (attr_combat 101 능력치 → 작전 능력 · 102 알고리즘(% 능력치 포함) · 103 체력 비율 보정 · 104 power//10 · 105 스킬 레벨 배율, star_score 성급 점수, ath_efficiency 알고리즘 효율(attribute_promote ‰), hero_score)
+- 합치는 순서 코드: luascripts Game.PlayerData.Hero.HeroData (GetCacheFightPower · _InitFightPower) · Game.PlayerData.Arithmetic.ArithmeticData (GetAthFightPower) · GetBattleSkillFightPower — disasm.py 로 풀기
+- 화면: 게임 › 육성 › 인형 계산기 옆에 「스펙」: 레벨 · 성급 · 마인드 확장 · 스킬 레벨 · 친밀도 · 알고리즘(세트 · 주/부 옵션 · 효율) 고르기 → 최종 능력치 + 작전 능력
+- 확인: 게임 화면의 작전 능력 숫자 1~2개 (인형 · 레벨 · 알고리즘 구성과 함께) 받아서 맞는지 대조

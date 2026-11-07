@@ -1,0 +1,45 @@
+# 작전 능력(전투력) 계산 재료 — 게임 configs 원문 (2026-11-07 조사, 아직 계산기 안 만듦)
+# 계산 순서 코드는 luascripts Game.PlayerData.Hero.HeroData (GetCacheFightPower · _InitFightPower) · Game.PlayerData.Arithmetic.ArithmeticData (GetAthFightPower) — 바이트코드, disasm.py 로 풀어야 함
+
+## attr_combat
+101 {"formula": "(tab[2]*1+tab[3]*25+tab[4]*11+tab[5]*33+tab[6]*0+tab[7]*35+tab[9]*17+tab[10]*8+tab[11]*0+tab[12]*11+tab[13]*0+tab[14]*27+tab[15]*1+tab[16]*0+tab[26]*25+tab[17]*11+tab[18]*11+tab[19]*40+tab[20]*40+tab[21]*27+tab[22]*27+tab[23]*22+tab[24]*27+tab[25]*49+tab[27]*11+tab[28]*11-3000)*5//100*(95+tab[16]*5)//100-430", "id": 101}
+102 {"formula": "(tab[2]*1+tab[3]*24+tab[4]*43+tab[5]*38+tab[6]*0+tab[7]*34+tab[9]*31+tab[10]*25+tab[11]*0+tab[12]*43+tab[13]*0+tab[14]*43+tab[15]*1+tab[16]*0+tab[26]*24+tab[17]*17+tab[18]*17+tab[19]*64+tab[20]*64+tab[21]*43+tab[22]*43+tab[23]*34+tab[24]*43+tab[25]*77+tab[27]*43+tab[28]*43+tab[202]*15+tab[203]*15+tab[204]*15+tab[212]*15+tab[226]*15+tab[227]*15+tab[228]*15)*2//40", "id": 102}
+103 {"formula": "((tab[2]*1+tab[3]*25+tab[4]*11+tab[5]*33+tab[6]*0+tab[7]*35+tab[9]*17+tab[10]*8+tab[11]*0+tab[12]*11+tab[13]*0+tab[14]*27+tab[15]*1+tab[16]*0+tab[26]*25+tab[17]*11+tab[18]*11+tab[19]*40+tab[20]*40+tab[21]*27+tab[22]*27+tab[23]*22+tab[24]*27+tab[25]*49+tab[27]*11+tab[28]*11-3000)*5//100*(95+tab[16]*5)//100-430)*math.min(1,2*tab[1]/tab[2])", "id": 103}
+104 {"formula": "tab.power//10", "id": 104}
+105 {"formula": "tab.lv>10 and (1+((tab.lv-10)/10+4.5)*0.8) or (tab.lv>1 and ( 1+((tab.lv-1)*1-((tab.lv-0)*(tab.lv-1)*0.05))*0.8) or ( 1+(tab.lv-1)*0.9 ) )", "id": 105}
+106 {"formula": "", "id": 106}
+107 {"formula": "", "id": 107}
+108 {"formula": "math.max(50,((tab[2]*1+tab[3]*25+tab[4]*11+tab[5]*33+tab[6]*0+tab[7]*35+tab[9]*17+tab[10]*8+tab[11]*0+tab[12]*11+tab[13]*0+tab[14]*0+tab[15]*1+tab[16]*0+tab[26]*25+tab[17]*11+tab[18]*11+tab[19]*40+tab[20]*40+tab[21]*27+tab[22]*27+tab[23]*22+tab[24]*27+tab[25]*49+tab[27]*11+tab[28]*11-3000)*5//100*(95+tab[16]*5)//100-430))*math.min(1,2*tab[1]/tab[2])", "id": 108}
+1000 {"formula": "", "id": 1000}
+
+## star_score
+1 {"rank_id": 1, "score": 1000}
+2 {"rank_id": 2, "score": 1295}
+3 {"rank_id": 3, "score": 1560}
+4 {"rank_id": 4, "score": 1703}
+5 {"rank_id": 5, "score": 1911}
+6 {"rank_id": 6, "score": 2184}
+7 {"rank_id": 7, "score": 2536}
+8 {"rank_id": 8, "score": 2953}
+9 {"rank_id": 9, "score": 3435}
+10 {"rank_id": 10, "score": 4000}
+
+## ath_efficiency
+1 {"algorithm_space": {"1": 0, "2": 0, "3": 0}, "attribute_promote": 1000, "level": 1, "shard": 100}
+2 {"algorithm_space": {"1": 0, "2": 0, "3": 0}, "attribute_promote": 1100, "level": 2, "shard": 150}
+3 {"algorithm_space": {"1": 0, "2": 0, "3": 0}, "attribute_promote": 1200, "level": 3, "shard": 200}
+4 {"algorithm_space": {"1": 0, "2": 0, "3": 0}, "attribute_promote": 1300, "level": 4, "shard": 300}
+5 {"algorithm_space": {"1": 0, "2": 0, "3": 0}, "attribute_promote": 1400, "level": 5, "shard": 450}
+6 {"algorithm_space": {"1": 0, "2": 0, "3": 0}, "attribute_promote": 1500, "level": 6, "shard": 550}
+7 {"algorithm_space": {"1": 0, "2": 0, "3": 0}, "attribute_promote": 1600, "level": 7, "shard": 900}
+8 {"algorithm_space": {"1": 0, "2": 0, "3": 0}, "attribute_promote": 1700, "level": 8, "shard": 1200}
+9 {"algorithm_space": {"1": 0, "2": 0, "3": 0}, "attribute_promote": 1800, "level": 9, "shard": 1400}
+10 {"algorithm_space": {"1": 0, "2": 0, "3": 0}, "attribute_promote": 1900, "level": 10, "shard": 1650}
+11 {"algorithm_space": {"1": 0, "2": 0, "3": 0}, "attribute_promote": 2000, "level": 11, "shard": 0}
+
+## hero_score
+1 {"attribute_id": 103, "attribute_name": "공격 성장", "id": 1, "score": {"1": 3755, "2": 3185, "3": 2450, "4": 0}, "sortId": 1, "upper_limit": 4900}
+2 {"attribute_id": 104, "attribute_name": "물방 성장", "id": 2, "score": {"1": 4950, "2": 2750, "3": 2200, "4": 0}, "sortId": 4, "upper_limit": 5500}
+3 {"attribute_id": 127, "attribute_name": "산방 성장", "id": 3, "score": {"1": 4950, "2": 2750, "3": 2200, "4": 0}, "sortId": 5, "upper_limit": 5500}
+4 {"attribute_id": 102, "attribute_name": "체력 성장", "id": 4, "score": {"1": 130000, "2": 96000, "3": 80000, "4": 0}, "sortId": 3, "upper_limit": 160000}
+5 {"attribute_id": 126, "attribute_name": "연산 성장", "id": 5, "score": {"1": 3755, "2": 3185, "3": 2450, "4": 0}, "sortId": 2, "upper_limit": 4900}
