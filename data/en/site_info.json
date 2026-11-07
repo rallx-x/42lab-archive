@@ -26,6 +26,16 @@
    ]
   },
   {
+   "id": "2026-11-07-v1.8.3",
+   "date": "2026-11-07",
+   "kind": "update",
+   "title": "Update v1.8.3 · Doll growth",
+   "lines": [
+    "Doll pages now have a \"Growth\" tab: pick now → target for stars · level · Mind Expansion · skills · Arma Inscripta (on/off) to calculate the materials needed.",
+    "Each Library entry in the left menu can be expanded with ▶."
+   ]
+  },
+  {
    "id": "2026-11-07-v1.8.1",
    "date": "2026-11-07",
    "kind": "update",
