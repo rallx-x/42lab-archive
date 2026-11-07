@@ -1629,3 +1629,27 @@ body.dark .item-ic.empty::before,body.dim .item-ic.empty::before,body.entropics 
 .gacha-pick.full .gacha-subs{gap:8px 4px}
 .gacha-sub{display:flex;flex-direction:column;align-items:center;gap:3px;width:52px}
 .gacha-sub-name{font-size:10px;color:var(--sub);text-align:center;line-height:1.2;word-break:keep-all}
+/* v1.7.6 회색 육각을 프레임 종류별 안쪽 구멍에 맞춤 (프레임 그림은 그대로)
+   프레임 그림 크기가 달라서(fr_1 117×127 · fr_2 110×123 · fr_3 117×128) 구멍 위치도 다름 → 구멍 + 선 두께 절반만큼
+   빨간 밑그림 · 흰 그림은 회색 육각 안 비율 그대로 (밑그림 7% 안쪽 86% · 흰 그림 -2.9% 바깥 105.8%) */
+.skill-hex{--gx:11.2%;--gy:9.3%}
+.skill-hex.t2{--gx:9%;--gy:8.2%}
+.skill-hex.t3{--gx:11.2%;--gy:9.3%}
+.skill-hex .hex-fill,.skill-hex.max .hex-fill{inset:var(--gy) var(--gx)}
+.skill-hex .hex-base{left:calc(var(--gx) + (100% - 2*var(--gx))*.0698);top:calc(var(--gy) + (100% - 2*var(--gy))*.0693);width:calc((100% - 2*var(--gx))*.86);height:calc((100% - 2*var(--gy))*.861)}
+.skill-hex .item-ic{left:calc(var(--gx) - (100% - 2*var(--gx))*.029);top:calc(var(--gy) - (100% - 2*var(--gy))*.029);width:calc((100% - 2*var(--gx))*1.058);height:calc((100% - 2*var(--gy))*1.058)}
+/* v1.7.6 무장각인 주황 테두리: 바깥면이 흰 프레임 안쪽 구멍에 꽉 맞게 (흰 프레임과 겹치지 않음, 회색 육각보다 선 두께 절반만큼 안쪽) */
+.skill-hex .hex-arma{left:calc(var(--gx) + 1.2%);top:calc(var(--gy) + 1.1%);width:calc(100% - 2*var(--gx) - 2.4%);height:calc(100% - 2*var(--gy) - 2.2%);-webkit-mask-size:100% 100%;mask-size:100% 100%;filter:none}
+/* v1.7.6 회색 육각 · 무장각인 주황 테두리 = 프레임 그림에서 따낸 안쪽 구멍 모양 (tools/client_extract/skill_frame_masks.py)
+   프레임과 같은 캔버스 · 같은 크기(inset:0 · contain)로 그려서 흰 프레임 밖으로 1px 도 안 나감 */
+.skill-hex.t3{--gy:9.2%}
+.skill-hex .hex-fill,.skill-hex.max .hex-fill,.skill-hex.enh .hex-fill{inset:0;clip-path:none;box-shadow:none;background:url(../img/skill/bg.png) center/76% 80% no-repeat;-webkit-mask:url(../img/skill/hole_1.png) center/contain no-repeat;mask:url(../img/skill/hole_1.png) center/contain no-repeat}
+.skill-hex.t2 .hex-fill{background-size:80% 82%;-webkit-mask-image:url(../img/skill/hole_2.png);mask-image:url(../img/skill/hole_2.png)}
+.skill-hex.t3 .hex-fill{-webkit-mask-image:url(../img/skill/hole_3.png);mask-image:url(../img/skill/hole_3.png)}
+.skill-hex .hex-arma{inset:0;left:0;top:0;width:100%;height:100%;-webkit-mask:url(../img/skill/arma_1.png) center/contain no-repeat;mask:url(../img/skill/arma_1.png) center/contain no-repeat;filter:none}
+.skill-hex.t2 .hex-arma{-webkit-mask-image:url(../img/skill/arma_2.png);mask-image:url(../img/skill/arma_2.png)}
+.skill-hex.t3 .hex-arma{-webkit-mask-image:url(../img/skill/arma_3.png);mask-image:url(../img/skill/arma_3.png)}
+/* v1.7.6 흰 스킬 그림 크게 (회색 육각의 120%, 가운데) — 무장각인 주황 테두리가 위에 겹쳐도 됨 */
+.skill-hex .item-ic{left:calc(var(--gx) - (100% - 2*var(--gx))*.1);top:calc(var(--gy) - (100% - 2*var(--gy))*.1);width:calc((100% - 2*var(--gx))*1.2);height:calc((100% - 2*var(--gy))*1.2);clip-path:none}
+/* v1.7.6 궁극기 그림은 조금 더 크게 (프레임과 1~2px 틈) */
+.skill-hex.t3 .item-ic{left:calc(var(--gx) - (100% - 2*var(--gx))*.13);top:calc(var(--gy) - (100% - 2*var(--gy))*.13);width:calc((100% - 2*var(--gx))*1.26);height:calc((100% - 2*var(--gy))*1.26)}
