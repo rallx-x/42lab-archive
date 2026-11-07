@@ -1698,3 +1698,18 @@ body.dark .item-ic.empty::before,body.dim .item-ic.empty::before,body.entropics 
 .lore-fx{display:inline-flex;align-items:center;gap:4px}
 .fx-card.fx-focus{outline:2px solid var(--accent);outline-offset:4px;border-radius:12px;animation:fxFocus 1.6s ease-out}
 @keyframes fxFocus{0%{background:color-mix(in srgb,var(--accent) 22%,transparent)}100%{background:transparent}}
+/* v1.7.9 지휘 스킬 */
+.cmd-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(420px,1fr));gap:14px}
+.cmd-fam{border:1px solid var(--line);border-radius:16px;padding:14px;background:var(--panel)}
+.cmd-fam-head{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.cmd-fam-head h3{margin:0;font-size:17px}
+.cmd-skill{display:flex;gap:10px;padding:10px 0;border-top:1px solid var(--line)}
+.cmd-ic.item-ic{width:44px;height:44px;flex:none;border-radius:10px;background:#23262d}
+.cmd-ic.big.item-ic{width:52px;height:52px}
+.cmd-ic img{width:100%;height:100%;object-fit:contain}
+.cmd-skill.fairy .cmd-ic.item-ic{box-shadow:0 0 0 2px #9a5ad6}
+.cmd-body{min-width:0;flex:1}
+.cmd-name{display:flex;align-items:center;gap:6px;margin-bottom:3px}
+.cmd-badge{font-size:10.5px;font-weight:700;color:#fff;background:#9a5ad6;border-radius:6px;padding:1px 6px}
+.cmd-body .skill-detail{margin:0}
+@media(max-width:640px){.cmd-list{grid-template-columns:1fr}}

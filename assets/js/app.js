@@ -76,6 +76,7 @@ function routeHash(route){
  if(route.type==='items')return '#items'+(route.cat?'/'+encodeURIComponent(route.cat):'');
  if(route.type==='tips')return '#tips'+(route.cat?'/'+encodeURIComponent(route.cat):'');
  if(route.type==='effects')return '#effects'+(route.cat?'/'+encodeURIComponent(route.cat):'');
+ if(route.type==='commander')return '#commander';
  if(route.type==='functions')return '#functions'+(route.cat?'/'+route.cat.split('/').map(encodeURIComponent).join('/'):'');
  if(route.type==='records')return '#records'+(route.cat?'/'+encodeURIComponent(route.cat):'');
  if(route.type==='doll')return '#doll/'+encodeURIComponent(route.id)+(route.part&&route.part!=='profile'?'/'+encodeURIComponent(route.part):'');
@@ -95,6 +96,7 @@ function parseRoute(){
   if(raw.startsWith('dorm/'))return {type:'dorm',id:decodeURIComponent(raw.slice(5))};
   if(raw==='items'||raw.startsWith('items/'))return {type:'items',cat:raw.startsWith('items/')?decodeURIComponent(raw.slice(6)):null};
   if(raw==='tips'||raw.startsWith('tips/'))return {type:'tips',cat:raw.startsWith('tips/')?decodeURIComponent(raw.slice(5)):null};
+  if(raw==='commander')return {type:'commander'};
   if(raw==='functions'||raw.startsWith('functions/'))return {type:'functions',cat:raw.startsWith('functions/')?raw.slice(10).split('/').map(decodeURIComponent).join('/'):null};
   if(raw==='effects'||raw.startsWith('effects/'))return {type:'effects',cat:raw.startsWith('effects/')?decodeURIComponent(raw.slice(8)):null};
   if(raw==='records'||raw.startsWith('records/'))return {type:'records',cat:raw.startsWith('records/')?decodeURIComponent(raw.slice(8)):null};
@@ -174,6 +176,7 @@ async function restoreRoute(){
  if(route.type==='tips'){await showTips({push:false,cat:route.cat});return}
  if(route.type==='effects'){await showEffects({push:false,cat:route.cat});return}
  if(route.type==='functions'){await showFunctions({push:false,cat:route.cat});return}
+ if(route.type==='commander'){await showCommander({push:false});return}
  if(route.type==='items'){await showItems({push:false,cat:route.cat});return}
  if(route.type==='doll'){await showDoll(route.id,{push:false,part:route.part});return}
  if(route.type==='chapter'&&showChapter(route.id,route.category,{push:false}))return;
@@ -1528,6 +1531,8 @@ async function showArchive({push=true}={}){
  const alg=card('ALGORITHMS','알고리즘','세트 효과 · 구역 · 기본 능력치',()=>showAlgos());
  const fnc=card('FUNCTIONS','함수','대상별 · 세트별 함수 도감',()=>showFunctions());
  loadFunctions().then(d=>{if(tok!==routeToken)return;cnt(fnc,(d.functions||[]).length);chipRow(fnc,[['대상별',()=>showFunctions({cat:'mark'})],['세트별',()=>showFunctions({cat:'tag'})]])}).catch(()=>{});
+ const cmd=card('COMMANDER SKILLS','지휘 스킬','교수의 지휘 스킬 · 변형 · 성령 변형',()=>showCommander());
+ loadCommander().then(d=>{if(tok!==routeToken)return;cnt(cmd,(d.families||[]).reduce((a,f)=>a+f.skills.length,0))}).catch(()=>{});
  const efx=card('EFFECTS','효과 사전','초록 · 빨간 · 주황 · 인형 고유 · 필드 효과',()=>showEffects());
  loadEffects().then(d=>{if(tok!==routeToken)return;cnt(efx,(d.effects||[]).length);chipRow(efx,(d.cats||[]).map(([k,n])=>[n,()=>showEffects({cat:k})]))}).catch(()=>{});
  const cnt=(o,n)=>{if(tok===routeToken&&n)o.n.textContent=n.toLocaleString(window.UI_LOCALE||'ko-KR')+'개'};
@@ -1661,6 +1666,31 @@ function renderEffects(){
    c.append(top,body);list.append(c)}
   if(fxFocus!=null){const t=document.getElementById('fx-'+fxFocus);fxFocus=null;if(t){t.classList.add('fx-focus');requestAnimationFrame(()=>t.scrollIntoView({block:'center'}))}}
  };
+ draw();
+}
+// ---------- v1.7.9 지휘 스킬 (data/<언어>/commander.json ← tools/client_extract/commander.py) ----------
+let cmdData=null,cmdLv=get('cmdLv','max');
+const loadCommander=()=>cmdData?Promise.resolve(cmdData):fetchJSON(dataPath('commander.json')).then(d=>cmdData=d);
+async function showCommander({push=true}={}){
+ const tok=++routeToken;showOnly('dollView');bgmLeave();voiceStop();closeArchiveMenu();$('#crumb').textContent='지휘 스킬';
+ if(push)saveRoute({type:'commander'});
+ const host=$('#dollView');host.replaceChildren(el('p','loading-note','지휘 스킬을 불러오는 중…'));window.scrollTo(0,0);
+ try{await Promise.all([loadCommander(),loadEffects().catch(()=>null)])}catch(e){if(tok===routeToken)host.replaceChildren(error('지휘 스킬을 불러오지 못했어요. ('+e.message+')'));return}
+ if(tok!==routeToken)return;
+ host.replaceChildren();
+ const head=el('div','doll-list-head');const t=el('div');t.append(el('div','eyebrow','DATABASE / COMMANDER SKILLS'),el('h2','','지휘 스킬'));head.append(t);host.append(head);
+ host.append(el('p','load-note','교수가 전투 중 쓰는 지휘 스킬이에요. 계열마다 기본 스킬과 변형이 있고, 「성령」 표시는 성령으로 바뀌는 변형이에요.'));
+ const bar=el('div','skill-arma-bar');const tabs=el('div','wr-tabs');
+ const lvBtns=[['1','Lv.1'],['max','Lv.MAX']].map(([k,n])=>{const b=el('button','cat-tab wr-tab',n);b.type='button';b.onclick=()=>{cmdLv=k;set('cmdLv',k);draw()};tabs.append(b);return [k,b]});
+ bar.append(tabs);host.append(bar);
+ const list=el('div','cmd-list');host.append(list);
+ const draw=()=>{lvBtns.forEach(([k,b])=>b.classList.toggle('selected',k===cmdLv));list.replaceChildren();
+  for(const f of cmdData.families||[]){
+   const sec=el('section','cmd-fam');const h=el('div','cmd-fam-head');h.append(itemIcon(f.skills[0].icon,'cmd-ic big'),el('h3','',f.name),el('span','wr-tab-n',String(f.skills.length)));sec.append(h);
+   for(const sk of f.skills){const row=el('div','cmd-skill'+(sk.fairy?' fairy':''));row.append(itemIcon(sk.icon,'cmd-ic'));
+    const body=el('div','cmd-body');const nm=el('div','cmd-name');nm.append(el('strong','',sk.name));if(sk.fairy)nm.append(el('span','cmd-badge','성령'));body.append(nm);
+    const det=el('p','skill-detail');skillText(det,skillDetail(sk,cmdLv==='max'?sk.maxLv:1));body.append(det);row.append(body);sec.append(row)}
+   list.append(sec)}};
  draw();
 }
 // ---------- v1.7.8 함수 도감 (data/<언어>/functions.json ← tools/client_extract/functions.py) ----------
