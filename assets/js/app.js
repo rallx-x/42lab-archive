@@ -756,12 +756,27 @@ function openGachaSchedule(){
  const host=el('div','gacha-pop');$('#infoBody').append(host);
  const now=gachaNow();if(!now)return;const n=gachaData.slots.length,D=gachaData.days;
  host.append(el('p','cal-note gacha-pop-note','글로벌 서버 기준이에요. 중국 본섭과는 일정이 달라요.'),el('p','cal-note gacha-pop-note','2주마다 픽업 2개가 같이 열리고, 같은 순서로 돌아요. 매일 오전 5시(KST) 기준.'));
- for(let i=0;i<n;i++){
-  const at=(now.at+i)%n,st=new Date(now.start.getTime()+i*D*864e5),en=new Date(st.getTime()+D*864e5);
-  const sec=el('section','gacha-slot'+(i===0?' now':''));
-  const h=el('div','gacha-slot-head');h.append(el('span','gacha-slot-date',mmdd(st)+' ~ '+mmdd(en)));if(i===0)h.append(el('span','bday-next-d','지금 · D-'+now.left));else h.append(el('span','gacha-slot-in',(i===1?now.left:now.left+(i-1)*D)+'일 뒤'));
-  const body=el('div','gacha-slot-body');gachaData.slots[at].forEach(p=>body.append(gachaBlock(p,true)));
-  sec.append(h,body);host.append(sec)}
+ // 찾기: 인형 이름 · 별명 · 픽업 이름 → 그 인형이 나오는 칸만 (메인 / 서브 표시)
+ const sw=el('label','doll-search gacha-search');const si=el('input');si.type='search';si.placeholder='인형 · 픽업 이름으로 찾기';si.autocomplete='off';si.setAttribute('aria-label','픽업 찾기');sw.append(el('span','doll-search-prompt','//:_'),si);host.append(sw);
+ const box=el('div','gacha-slots');host.append(box);
+ const hitId=(id,q)=>{const d=(dollIndex?.dolls||[]).find(x=>+x.heroId===+id);return d?dollMatches(d,q):dnorm(gachaDoll(id).name).includes(q)};
+ const draw=()=>{const q=dnorm(si.value.trim());box.replaceChildren();let shown=0;
+  for(let i=0;i<n;i++){
+   const at=(now.at+i)%n,st=new Date(now.start.getTime()+i*D*864e5),en=new Date(st.getTime()+D*864e5);
+   const picks=gachaData.slots[at];let tags=[];
+   if(q){for(const p of picks){if(hitId(p.main,q))tags.push(['main',gTitle(p),gachaDoll(p.main).name]);for(const id of p.subs)if(hitId(id,q))tags.push(['sub',gTitle(p),gachaDoll(id).name]);if(!tags.length&&dnorm(gTitle(p)).includes(q))tags.push(['title',gTitle(p),''])}
+    if(!tags.length)continue}
+   shown++;
+   const sec=el('section','gacha-slot'+(i===0?' now':''));
+   const h=el('div','gacha-slot-head');h.append(el('span','gacha-slot-date',mmdd(st)+' ~ '+mmdd(en)));if(i===0)h.append(el('span','bday-next-d','지금 · D-'+now.left));else h.append(el('span','gacha-slot-in',(i===1?now.left:now.left+(i-1)*D)+'일 뒤'));
+   sec.append(h);
+   if(tags.length){const tw=el('div','gacha-hits');for(const [k,t,nm] of tags)if(k!=='title'){const x=el('span','gacha-hit '+k);x.append(el('b','',nm),el('span','',' · '),el('span','',k==='main'?'메인 픽업':'서브 픽업'),el('span','',' · '+t));tw.append(x)};if(tw.childNodes.length)sec.append(tw)}
+   const body=el('div','gacha-slot-body');picks.forEach(p=>body.append(gachaBlock(p,true)));
+   if(q){const nm=new Set(tags.map(t=>t[2]));body.querySelectorAll('.gacha-face').forEach(f=>{if(nm.has(f.title))f.classList.add('hit')})}
+   sec.append(body);box.append(sec)}
+  if(!shown)box.append(el('p','bm-empty','이 인형이 나오는 픽업이 일정에 없어요.'));
+ };
+ si.oninput=draw;draw();
 }
 function openBirthdayCalendar(){
  openInfo({title:'생일 달력',items:[]});
