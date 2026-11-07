@@ -2,7 +2,7 @@
 
 프레임 그림(fr_1 · fr_2 · fr_3)은 그대로 두고, 그 안쪽 구멍 모양을 프레임 그림에서 직접 따낸다.
   - hole_N.png : 구멍(가운데에서 투명한 곳을 채워 나감) + 1px 넓힘 → 회색 육각이 흰 프레임 선 밑까지만, 밖으로는 절대 안 나감
-  - arma_N.png : 무장각인 주황 테두리(fr_arma)를 구멍 크기에 맞춰 늘린 뒤 구멍 모양으로 잘라냄 → 흰 프레임 바로 안쪽을 꽉 채움, 겹치지 않음
+  - arma_N.png : 무장각인 주황 테두리(fr_arma)를 구멍 + 2px 크기로 늘린 뒤 (구멍 + 2px) 모양으로 잘라냄 → 흰 프레임 바로 안쪽에 착 붙음 (넘친 2px 는 흰 선 밑에 숨음)
   - 둘 다 프레임과 같은 캔버스 크기라서 CSS 에서 프레임과 똑같이 (inset:0 · center/contain) 그리면 위치가 딱 맞는다
   - 빨간 밑그림 · 흰 그림 위치용 구멍 범위(%)를 출력 (60×66 칸 기준)
 사용: python skill_frame_masks.py
@@ -43,10 +43,12 @@ def main():
         out.putalpha(grow)
         out.save(os.path.join(D, 'hole_%d.png' % n))
         x0, y0, x1, y1 = m.getbbox()
-        a = arma.resize((x1 - x0, y1 - y0), Image.LANCZOS)
+        # 주황은 흰 선 밑으로 2px 들어가게 (흰 선 안쪽 흐린 가장자리 사이로 회색이 안 보이게, 흰 프레임이 위에 덮음)
+        E = 2
+        a = arma.resize((x1 - x0 + 2 * E, y1 - y0 + 2 * E), Image.LANCZOS)
         layer = Image.new('RGBA', (w, h), (0, 0, 0, 0))
-        layer.paste(a, (x0, y0))
-        al = ImageChops.multiply(layer.split()[3], m)
+        layer.paste(a, (x0 - E, y0 - E))
+        al = ImageChops.multiply(layer.split()[3], m.filter(ImageFilter.MaxFilter(2 * E + 1)))
         res = Image.new('RGBA', (w, h), (255, 255, 255, 0))
         res.putalpha(al)
         res.save(os.path.join(D, 'arma_%d.png' % n))
