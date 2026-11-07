@@ -26,6 +26,16 @@
    ]
   },
   {
+   "id": "2026-11-07-v1.8.5",
+   "date": "2026-11-07",
+   "kind": "update",
+   "title": "Update v1.8.5 · Game › Growth",
+   "lines": [
+    "Added a new \"Game\" category to the shortcuts and menu. \"Growth\" has Doll (material calculator) and Sprite (info · upgrade simulator) tabs. Sprites moved here from the Library.",
+    "Oasis Construction and more are coming soon."
+   ]
+  },
+  {
    "id": "2026-11-07-v1.8.4",
    "date": "2026-11-07",
    "kind": "update",

@@ -77,6 +77,8 @@ function routeHash(route){
  if(route.type==='tips')return '#tips'+(route.cat?'/'+encodeURIComponent(route.cat):'');
  if(route.type==='effects')return '#effects'+(route.cat?'/'+encodeURIComponent(route.cat):'');
  if(route.type==='commander')return '#commander';
+ if(route.type==='game')return '#game';
+ if(route.type==='grow')return '#grow'+(route.cat?'/'+route.cat.split('/').map(encodeURIComponent).join('/'):'');
  if(route.type==='fairy')return '#sprites'+(route.cat?'/'+route.cat:'');
  if(route.type==='functions')return '#functions'+(route.cat?'/'+route.cat.split('/').map(encodeURIComponent).join('/'):'');
  if(route.type==='records')return '#records'+(route.cat?'/'+encodeURIComponent(route.cat):'');
@@ -98,6 +100,8 @@ function parseRoute(){
   if(raw==='items'||raw.startsWith('items/'))return {type:'items',cat:raw.startsWith('items/')?decodeURIComponent(raw.slice(6)):null};
   if(raw==='tips'||raw.startsWith('tips/'))return {type:'tips',cat:raw.startsWith('tips/')?decodeURIComponent(raw.slice(5)):null};
   if(raw==='commander')return {type:'commander'};
+  if(raw==='game')return {type:'game'};
+  if(raw==='grow'||raw.startsWith('grow/'))return {type:'grow',cat:raw.startsWith('grow/')?raw.slice(5).split('/').map(decodeURIComponent).join('/'):null};
   if(raw==='sprites'||raw.startsWith('sprites/'))return {type:'fairy',cat:raw.startsWith('sprites/')?raw.slice(8):null};
   if(raw==='functions'||raw.startsWith('functions/'))return {type:'functions',cat:raw.startsWith('functions/')?raw.slice(10).split('/').map(decodeURIComponent).join('/'):null};
   if(raw==='effects'||raw.startsWith('effects/'))return {type:'effects',cat:raw.startsWith('effects/')?decodeURIComponent(raw.slice(8)):null};
@@ -179,6 +183,8 @@ async function restoreRoute(){
  if(route.type==='effects'){await showEffects({push:false,cat:route.cat});return}
  if(route.type==='functions'){await showFunctions({push:false,cat:route.cat});return}
  if(route.type==='commander'){await showCommander({push:false});return}
+ if(route.type==='game'){await showGame({push:false});return}
+ if(route.type==='grow'){await showGrowth({push:false,cat:route.cat});return}
  if(route.type==='fairy'){await showFairy({push:false,cat:route.cat});return}
  if(route.type==='items'){await showItems({push:false,cat:route.cat});return}
  if(route.type==='doll'){await showDoll(route.id,{push:false,part:route.part});return}
@@ -573,11 +579,11 @@ function chapterDisplayTitle(group){
 }
 
 // v1.5 퀵 바: 홈 · 전체 기록 · 인형 기록 · 자료실 (스토리 분류는 전체 기록 안에서)
-const QUICK=[['home','홈'],['all','전체 기록'],['dolls','인형 기록'],['archive','자료실']];
+const QUICK=[['home','홈'],['all','전체 기록'],['dolls','인형 기록'],['archive','자료실'],['game','게임']];
 function renderCatTabs(){
  const nav=$('#catTabs');if(!nav)return;
  if(nav.childElementCount!==QUICK.length){nav.replaceChildren();for(const [id,name] of QUICK){const b=el('button','cat-tab'+(id==='home'?' cat-home':''),name);b.type='button';b.dataset.quick=id;
-  b.onclick=()=>{$('#search').value='';if(id==='home')showHome(null);else if(id==='all')showHome('all');else if(id==='dolls')showDolls();else showArchive()};nav.append(b)}}
+  b.onclick=()=>{$('#search').value='';if(id==='home')showHome(null);else if(id==='all')showHome('all');else if(id==='dolls')showDolls();else if(id==='game')showGame();else showArchive()};nav.append(b)}}
  const cur=category==null?'home':'all';
  nav.querySelectorAll('.cat-tab').forEach(b=>{const on=b.dataset.quick===cur;b.classList.toggle('selected',on);b.setAttribute('aria-pressed',String(on))});
 }
@@ -827,7 +833,9 @@ function renderArchiveMenu(){
  host.append(foldRow('함수',go(()=>showFunctions()),box=>{subLink(box,'대상별',()=>showFunctions({cat:'mark'}));subLink(box,'세트별',()=>showFunctions({cat:'tag'}))},'archive-menu-top'));
  host.append(foldRow('효과 사전',go(()=>showEffects()),lazyFill(loadEffects,(box,d)=>{for(const [k,n] of d.cats||[])subLink(box,n,()=>showEffects({cat:k}))}),'archive-menu-top'));
  host.append(foldRow('지휘 스킬',go(()=>showCommander()),lazyFill(loadCommander,(box,d)=>{for(const f of d.families||[])subLink(box,f.name,()=>{cmdFocus=f.key;showCommander()})}),'archive-menu-top'));
- host.append(foldRow('성령',go(()=>showFairy()),box=>{subLink(box,'성령 정보',()=>showFairy({cat:'info'}));subLink(box,'강화 시뮬레이터',()=>showFairy({cat:'sim'}))},'archive-menu-top'));
+ // v1.8.5 큰 분류 「게임」: 육성(인형 · 성령) — 나중에 오아시스 건축 등
+ {const sec=el('button','archive-menu-section archive-menu-section-link','게임');sec.type='button';sec.onclick=go(()=>showGame());host.append(sec)}
+ host.append(foldRow('육성',go(()=>showGrowth()),box=>{subLink(box,'인형',()=>showGrowth({cat:'doll'}));subLink(box,'성령',()=>showGrowth({cat:'sprite'}))},'archive-menu-top'));
 }
 $('#menuBtn').onclick=()=>{const menu=$('#archiveMenu');if(!menu.classList.contains('open')){renderArchiveMenu();menu.classList.add('open');menu.removeAttribute('aria-hidden');$('#menuBtn').setAttribute('aria-expanded','true');$('#menuBtn').classList.add('is-open')}else closeArchiveMenu()};
 $('#archiveMenuClose').onclick=closeArchiveMenu;
@@ -1542,8 +1550,6 @@ async function showArchive({push=true}={}){
  const alg=card('ALGORITHMS','알고리즘','세트 효과 · 구역 · 기본 능력치',()=>showAlgos());
  const fnc=card('FUNCTIONS','함수','대상별 · 세트별 함수 도감',()=>showFunctions());
  loadFunctions().then(d=>{if(tok!==routeToken)return;cnt(fnc,(d.functions||[]).length);chipRow(fnc,[['대상별',()=>showFunctions({cat:'mark'})],['세트별',()=>showFunctions({cat:'tag'})]])}).catch(()=>{});
- const fry=card('SPRITES','성령','성령 정보 · 강화 시뮬레이터',()=>showFairy());
- loadFairy().then(d=>{if(tok!==routeToken)return;cnt(fry,(d.sprites||[]).length);chipRow(fry,[['성령 정보',()=>showFairy({cat:'info'})],['강화 시뮬레이터',()=>showFairy({cat:'sim'})]])}).catch(()=>{});
  const cmd=card('COMMANDER SKILLS','지휘 스킬','교수의 지휘 스킬 · 변형 · 성령 변형',()=>showCommander());
  loadCommander().then(d=>{if(tok!==routeToken)return;cnt(cmd,(d.families||[]).reduce((a,f)=>a+f.skills.length,0))}).catch(()=>{});
  const efx=card('EFFECTS','효과 사전','초록 · 빨간 · 주황 · 인형 고유 · 필드 효과',()=>showEffects());
@@ -1704,13 +1710,14 @@ async function showFairy({push=true,cat=null}={}){
  if(push)saveRoute({type:'fairy',cat:fairyTab});
  const host=$('#dollView');host.replaceChildren(el('p','loading-note','성령을 불러오는 중…'));window.scrollTo(0,0);
  try{await Promise.all([loadFairy(),loadEffects().catch(()=>null)])}catch(e){if(tok===routeToken)host.replaceChildren(error('성령을 불러오지 못했어요. ('+e.message+')'));return}
- if(tok===routeToken)renderFairy();
+ if(tok===routeToken){fairyHost=null;renderFairy()}
 }
+let fairyHost=null; // 육성 › 성령 탭 안에 그릴 때의 자리 (없으면 성령 화면 전체)
 function renderFairy(){
- const D=fairyData,host=$('#dollView');host.replaceChildren();
- const head=el('div','doll-list-head');const t=el('div');t.append(el('div','eyebrow','DATABASE / SPRITES'),el('h2','','성령'));head.append(t);host.append(head);
+ const D=fairyData,host=fairyHost||$('#dollView');host.replaceChildren();
+ if(!fairyHost){const head=el('div','doll-list-head');const t=el('div');t.append(el('div','eyebrow','DATABASE / SPRITES'),el('h2','','성령'));head.append(t);host.append(head)}
  const bar=el('div','doll-controls wr-controls');const tabs=el('div','wr-tabs');
- for(const [k,n] of [['info','성령 정보'],['sim','강화 시뮬레이터']]){const b=el('button','cat-tab wr-tab'+(k===fairyTab?' selected':''),n);b.type='button';b.onclick=()=>{fairyTab=k;set('fairyTab',k);history.replaceState(history.state,'',location.pathname+location.search+routeHash({type:'fairy',cat:k}));renderFairy()};tabs.append(b)}
+ for(const [k,n] of [['info','성령 정보'],['sim','강화 시뮬레이터']]){const b=el('button','cat-tab wr-tab'+(k===fairyTab?' selected':''),n);b.type='button';b.onclick=()=>{fairyTab=k;set('fairyTab',k);history.replaceState(history.state,'',location.pathname+location.search+routeHash(fairyHost?{type:'grow',cat:'sprite/'+k}:{type:'fairy',cat:k}));renderFairy()};tabs.append(b)}
  bar.append(tabs);host.append(bar);
  const itemName=i=>D.items?.[i]?.[0]||i;
  const costChips=(obj,mult=1)=>{const w=el('span','fy-cost');for(const [i,n] of Object.entries(obj||{})){const c=el('span','item-chip');c.append(itemIcon(D.items?.[i]?.[1]||'','sm'),el('span','item-chip-name',itemName(i)),el('span','item-chip-n','×'+(n*mult).toLocaleString(window.UI_LOCALE||'ko-KR')));w.append(c)}return w};
@@ -1772,6 +1779,47 @@ function renderFairy(){
   const reset=el('button','fy-roll');reset.type='button';reset.textContent='처음부터';reset.onclick=()=>{fsim=null;renderFairy()};
   box.append(el('h3','','들어간 재료 (1★ Lv.1 부터)'),cs,reset,el('p','load-note','경험치 1 = 「'+itemName(D.expItem)+'」 1개로 계산했어요. 랭크업 재료는 랭크 표의 2★부터 지금 랭크까지 더한 값이에요. 재구성은 1회에 「'+itemName('1923')+'」 1개로 계산했어요. 뽑기는 게임 등급 확률(S '+(D.rarity.find(r=>r.level===4)?.rate)+'% …)로 하는 흉내예요.'));
  };
+ draw();
+}
+// ---------- v1.8.5 게임 (큰 분류): 육성(인형 · 성령), 나중에 오아시스 건축 등 ----------
+async function showGame({push=true}={}){
+ const tok=++routeToken;showOnly('dollView');bgmLeave();voiceStop();closeArchiveMenu();$('#crumb').textContent='게임';
+ if(push)saveRoute({type:'game'});
+ const host=$('#dollView');host.replaceChildren();window.scrollTo(0,0);
+ const head=el('div','doll-list-head');const t=el('div');t.append(el('div','eyebrow','DATABASE / GAME'),el('h2','','게임'));head.append(t);host.append(head);
+ const grid=el('div','arc-grid');host.append(grid);
+ const card=(eyebrow,name,desc,go,chips)=>{const c=el('section','arc-card');const b=el('button','arc-main');b.type='button';b.onclick=go;
+  const tx=el('span','arc-text');tx.append(el('span','eyebrow',eyebrow),el('strong','arc-name',name),el('span','arc-desc',desc));b.append(tx,el('span','arc-n'),ic('right','tri'));c.append(b);
+  if(chips){const sub=el('div','arc-sub');for(const [n,g] of chips){const x=el('button','arc-chip',n);x.type='button';x.onclick=g;sub.append(x)}c.append(sub)}grid.append(c);return c};
+ card('GROWTH','육성','인형 · 성령 육성 재료 계산',()=>showGrowth(),[['인형',()=>showGrowth({cat:'doll'})],['성령',()=>showGrowth({cat:'sprite'})]]);
+ const soon=card('OASIS','오아시스 건축','준비 중',()=>{});soon.classList.add('arc-soon');
+}
+let growTab=get('growTab','doll'),growDoll=get('growDoll','');
+async function showGrowth({push=true,cat=null}={}){
+ const tok=++routeToken;showOnly('dollView');bgmLeave();voiceStop();closeArchiveMenu();$('#crumb').textContent='육성';
+ let sub=null;if(cat){const [a,b]=cat.split('/');if(a==='doll'||a==='sprite'){growTab=a;set('growTab',a)}if(a==='doll'&&b){growDoll=b;set('growDoll',b)}if(a==='sprite'&&(b==='info'||b==='sim'))fairyTab=b}
+ if(push)saveRoute({type:'grow',cat:growTab==='doll'?('doll'+(growDoll?'/'+growDoll:'')):('sprite/'+fairyTab)});
+ const host=$('#dollView');host.replaceChildren(el('p','loading-note','불러오는 중…'));window.scrollTo(0,0);
+ try{await Promise.all([loadGrowth(),loadDollIndex(),loadFairy(),loadEffects().catch(()=>null),window.siteReady?.catch(()=>{})])}catch(e){if(tok===routeToken)host.replaceChildren(error('불러오지 못했어요. ('+e.message+')'));return}
+ if(tok!==routeToken)return;host.replaceChildren();
+ const head=el('div','doll-list-head');const t=el('div');t.append(el('div','eyebrow','GAME / GROWTH'),el('h2','','육성'));head.append(t);host.append(head);
+ const bar=el('div','doll-controls wr-controls');const tabs=el('div','wr-tabs');
+ for(const [k,n] of [['doll','인형'],['sprite','성령']]){const b=el('button','cat-tab wr-tab'+(k===growTab?' selected':''),n);b.type='button';b.onclick=()=>showGrowth({cat:k});tabs.append(b)}
+ bar.append(tabs);host.append(bar);
+ const body=el('div','grow-page');host.append(body);
+ if(growTab==='sprite'){fairyHost=body;renderFairy();return}  // 성령 화면 안 단추로 다시 그릴 때도 이 자리에
+ // 인형 고르기 (기업 순 · 이름) → 계산기
+ const dolls=(dollIndex?.dolls||[]).filter(d=>growthData.potential?.[String(d.heroId)]);
+ if(!dolls.some(d=>d.voiceKey===growDoll))growDoll=dolls[0]?.voiceKey||'';
+ const pickRow=el('div','grow-pick');const s=el('select','grow-sel grow-doll');
+ for(const d of dolls){const o=el('option','',d.name+(d.role?' · '+d.role:''));o.value=d.voiceKey;if(d.voiceKey===growDoll)o.selected=true;s.append(o)}
+ s.onchange=()=>{growDoll=s.value;set('growDoll',growDoll);history.replaceState(history.state,'',location.pathname+location.search+routeHash({type:'grow',cat:'doll/'+growDoll}));draw()};
+ const link=el('button','fy-link');link.type='button';link.append(document.createTextNode('인형 페이지 '),ic('right'));link.onclick=()=>showDoll(growDoll);
+ pickRow.append(el('span','fy-label','인형'),s,link);body.append(pickRow);
+ const box=el('div');body.append(box);
+ const draw=()=>{const d=dolls.find(x=>x.voiceKey===growDoll);box.replaceChildren();if(!d)return;
+  const hd=el('div','grow-who');const face=el('span','avatar');const url=dollFace(d);if(url){const im=el('img');im.src=url;im.alt='';face.append(im)}else face.classList.add('fallback');
+  hd.append(face,el('strong','',d.name));box.append(hd,growthPanel({heroId:d.heroId,name:d.name,stars:d.stars}))};
  draw();
 }
 // ---------- v1.7.9 지휘 스킬 (data/<언어>/commander.json ← tools/client_extract/commander.py) ----------
