@@ -1759,3 +1759,10 @@ body.dark .item-ic.empty::before,body.dim .item-ic.empty::before,body.entropics 
 .fx-side.neutral.on{border-color:#f0961f;color:#f0961f;background:color-mix(in srgb,#f0961f 12%,transparent)}
 .fx-side.bad.on{border-color:#e0453a;color:#e0453a;background:color-mix(in srgb,#e0453a 12%,transparent)}
 .fx-list .fx-grp{grid-column:1/-1;margin:14px 0 2px;font-size:15px}
+/* v1.8.3 인형 육성 계산기 */
+.grow-form{display:grid;grid-template-columns:auto auto auto;gap:8px 12px;align-items:center;justify-content:start;margin-bottom:6px}
+.grow-name{font-weight:700;font-size:13px}
+.grow-sel{height:34px;border:1px solid var(--line);border-radius:10px;background:var(--panel);color:var(--text);padding:0 8px;font:inherit;min-width:96px}
+.grow-h{font-size:15px;margin:16px 0 8px}
+.grow-out{display:flex;flex-direction:column;gap:8px}
+.grow-total{padding-top:10px;border-top:1px solid var(--line)}
