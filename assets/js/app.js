@@ -1522,7 +1522,7 @@ async function showArchive({push=true}={}){
  const tip=card('LOADING TIPS','로딩 팁','로딩 화면에 나오는 백과사전 · 섹터 팁',()=>showTips());
  const itm=card('ITEMS','아이템','창고 · 숙소 가구 · 이벤트 보상',()=>showItems());
  const alg=card('ALGORITHMS','알고리즘','세트 효과 · 구역 · 기본 능력치',()=>showAlgos());
- const efx=card('EFFECTS','효과 사전','초록 · 빨간 · 주황 효과 · 인형 고유 효과',()=>showEffects());
+ const efx=card('EFFECTS','효과 사전','초록 · 빨간 · 주황 · 인형 고유 · 필드 효과',()=>showEffects());
  loadEffects().then(d=>{if(tok!==routeToken)return;cnt(efx,(d.effects||[]).length);chipRow(efx,(d.cats||[]).map(([k,n])=>[n,()=>showEffects({cat:k})]))}).catch(()=>{});
  const cnt=(o,n)=>{if(tok===routeToken&&n)o.n.textContent=n.toLocaleString(window.UI_LOCALE||'ko-KR')+'개'};
  loadRecords().then(()=>{if(tok!==routeToken)return;cnt(rec,(wrData.records||[]).length);

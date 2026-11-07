@@ -18,10 +18,11 @@ import skills as S
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 REPO = os.environ.get('REPO') or os.path.join(HERE, '..', '..')
-CATS = [['green', '초록 효과'], ['red', '빨간 효과'], ['orange', '주황 효과'], ['unique', '인형 고유 효과']]
-CAT_NAMES = {'ko': ['초록 효과', '빨간 효과', '주황 효과', '인형 고유 효과'], 'ja': ['緑の効果', '赤の効果', 'オレンジの効果', '人形固有効果'],
-             'en': ['Green Effects', 'Red Effects', 'Orange Effects', 'Doll-Unique Effects'],
-             'tw': ['綠色效果', '紅色效果', '橙色效果', '人形固有效果'], 'zh': ['绿色效果', '红色效果', '橙色效果', '人形固有效果']}
+CATS = [['green', '초록 효과'], ['red', '빨간 효과'], ['orange', '주황 효과'], ['unique', '인형 고유 효과'], ['field', '필드 · 발판 효과']]
+CAT_NAMES = {'ko': ['초록 효과', '빨간 효과', '주황 효과', '인형 고유 효과', '필드 · 발판 효과'],
+             'ja': ['緑の効果', '赤の効果', 'オレンジの効果', '人形固有効果', 'フィールド · 足場効果'],
+             'en': ['Green Effects', 'Red Effects', 'Orange Effects', 'Doll-Unique Effects', 'Field · Tile Effects'],
+             'tw': ['綠色效果', '紅色效果', '橙色效果', '人形固有效果', '場地 · 地塊效果'], 'zh': ['绿色效果', '红色效果', '橙色效果', '人形固有效果', '场地 · 地块效果']}
 
 
 def load(p):
