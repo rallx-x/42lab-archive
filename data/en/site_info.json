@@ -26,6 +26,16 @@
    ]
   },
   {
+   "id": "2026-11-07-v1.8.8",
+   "date": "2026-11-07",
+   "kind": "update",
+   "title": "Update v1.8.8 · Oasis Construction",
+   "lines": [
+    "Added Oasis Construction under Game: upgrade materials, effects and requirements per level for Oasis and Sector buildings, plus the processing list (materials, time, unlocking story).",
+    "Effect cards now have borders, and doll chips only appear on effects unique to specific dolls."
+   ]
+  },
+  {
    "id": "2026-11-07-v1.8.7",
    "date": "2026-11-07",
    "kind": "update",
