@@ -105,3 +105,8 @@
 - 합치는 순서 코드: luascripts Game.PlayerData.Hero.HeroData (GetCacheFightPower · _InitFightPower) · Game.PlayerData.Arithmetic.ArithmeticData (GetAthFightPower) · GetBattleSkillFightPower — disasm.py 로 풀기
 - 화면: 게임 › 육성 › 인형 계산기 옆에 「스펙」: 레벨 · 성급 · 마인드 확장 · 스킬 레벨 · 친밀도 · 알고리즘(세트 · 주/부 옵션 · 효율) 고르기 → 최종 능력치 + 작전 능력
 - 확인: 게임 화면의 작전 능력 숫자 1~2개 (인형 · 레벨 · 알고리즘 구성과 함께) 받아서 맞는지 대조
+
+## 다음: 업적 · 클라우드 이정표 (2026-11-07 표 위치만 확인)
+- 업적: achievement (분류 5개 · 커리어 CAREER …, task_type) · achievement_level (레벨 1~30 · 필요 경험치 · 아이콘 icon_qingtong* · 보상) · sector_achievement (섹터 업적 조건 · 보상)
+- 클라우드 이정표: milestone_module (모듈 6개 · 「마인드맵」 Dolls …, 아이콘 Milestone_Icon*) · milestones_mile_task (모듈별 할 일 · 이동 jump_id) · milestones_module_reward (모듈 레벨별 점수 · 보상) · milestones_mile_band · milestone_mile_color · milestone_mile_profile
+- 화면: 게임 칸에 「업적」 · 「클라우드 이정표」 (레벨별 필요 점수 · 보상 아이템, 할 일 목록)
