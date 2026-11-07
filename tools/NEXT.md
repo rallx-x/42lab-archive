@@ -110,3 +110,10 @@
 - 업적: achievement (분류 5개 · 커리어 CAREER …, task_type) · achievement_level (레벨 1~30 · 필요 경험치 · 아이콘 icon_qingtong* · 보상) · sector_achievement (섹터 업적 조건 · 보상)
 - 클라우드 이정표: milestone_module (모듈 6개 · 「마인드맵」 Dolls …, 아이콘 Milestone_Icon*) · milestones_mile_task (모듈별 할 일 · 이동 jump_id) · milestones_module_reward (모듈 레벨별 점수 · 보상) · milestones_mile_band · milestone_mile_color · milestone_mile_profile
 - 화면: 게임 칸에 「업적」 · 「클라우드 이정표」 (레벨별 필요 점수 · 보상 아이템, 할 일 목록)
+
+## 다음: 오아시스 건축 · 가공소 (2026-11-07 데이터 확인)
+- oasis_building (106줄): 건물 이름 · 설명(intro · intro_long) · 기업 · 분류(category) · 크기 · 아이콘 icon_res(OasisBuliding_*) · small_icon
+- oasis_building_level (224줄): 레벨별 강화 재료 consumeIds/Nums · 효과(logic · para) · 열리는 조건(pre_condition) · 열리는 구역
+- oasis_building_tech_buff · building_buff: 건물 효과(버프) · oasis_area: 구역
+- 가공소: factory (가공소 7종 · 열리는 조건) · factory_order (64개: 만드는 물건 outPutItemId/Num · 시간 time_cost · 재료 raw_material · materialOrder · 열리는 조건 pre_condition 3 = 스테이지 클리어 → 메인 스토리 어디까지)
+- 필요한 그림: OasisBuliding_* (건물 그림) · small_icon — 사용자에게 받기
