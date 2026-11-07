@@ -1790,3 +1790,23 @@ body.dark .item-ic.empty::before,body.dim .item-ic.empty::before,body.entropics 
 .pg-task-top .fy-lock{position:static}
 .pg-desc{margin:0;font-size:13px;color:var(--sub);line-height:1.5}
 .pg-task.hidden-task{border-style:dashed}
+/* v1.8.8 오아시스 건축 */
+.oa-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:12px;align-items:start}
+.oa-card{border:1px solid var(--line);border-radius:14px;padding:12px;background:var(--panel);display:flex;flex-direction:column;gap:8px}
+.oa-top{display:flex;align-items:center;gap:10px}
+.oa-ic.item-ic{width:64px;height:64px;flex:none;border-radius:12px;background:#23262d}
+.oa-ic img{width:100%;height:100%;object-fit:contain}
+.oa-name{display:block;font-size:16px}
+.oa-en{font-size:11px;color:var(--sub);letter-spacing:.06em}
+.oa-levels summary{cursor:pointer;font-size:13px;font-weight:700;color:var(--accent-text,var(--accent))}
+.oa-table td{vertical-align:top;white-space:normal}
+.oa-eff{font-size:12px;margin-top:4px}
+.oa-need{display:inline-block;font-size:11.5px;color:var(--sub);border:1px solid var(--line);border-radius:999px;padding:1px 8px;margin:2px 4px 2px 0}
+.oa-fac-head{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.oa-fac-head h3{margin:14px 0 8px}
+.oa-order-top{display:flex;align-items:center;gap:8px}
+.oa-time{margin-left:auto;font-size:12px;color:var(--sub)}
+.oa-row{display:flex;flex-wrap:wrap;align-items:center;gap:6px}
+.oa-table .item-chip-n,.oa-table td:first-child,.oa-table .oa-need{white-space:nowrap}
+div.wr-card.fx-card,div.wr-card.algo-card{background:var(--panel);border:1px solid var(--line)}
+.fx-card .tip-doll{background:var(--bg);border:1px solid var(--line)}
