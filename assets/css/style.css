@@ -1766,3 +1766,4 @@ body.dark .item-ic.empty::before,body.dim .item-ic.empty::before,body.entropics 
 .grow-h{font-size:15px;margin:16px 0 8px}
 .grow-out{display:flex;flex-direction:column;gap:8px}
 .grow-total{padding-top:10px;border-top:1px solid var(--line)}
+.fn-games{margin-bottom:0;align-items:center}.fn-games .fy-label{margin-right:4px}
