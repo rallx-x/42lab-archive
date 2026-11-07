@@ -1774,3 +1774,12 @@ body.dark .item-ic.empty::before,body.dim .item-ic.empty::before,body.entropics 
 .grow-who .avatar{width:44px;height:44px}
 .grow-who strong{font-size:18px}
 .arc-soon{opacity:.55}.arc-soon .arc-main{cursor:default}
+/* v1.8.6 육성 · 인형 검색 고르기 */
+.grow-find{position:relative;display:flex;align-items:center;gap:6px;min-width:260px;height:38px;padding:0 12px;border:1px solid var(--line);border-radius:12px;background:var(--panel)}
+.grow-find-input{flex:1;min-width:0;border:0;background:none;color:var(--text);font:inherit;outline:none}
+.grow-sug{position:absolute;left:0;right:0;top:calc(100% + 4px);z-index:30;max-height:340px;overflow-y:auto;border:1px solid var(--line);border-radius:12px;background:var(--panel);box-shadow:0 10px 28px rgba(0,0,0,.28);padding:4px}
+.grow-sug-item{display:flex;align-items:center;gap:8px;width:100%;padding:6px 8px;border:0;border-radius:9px;background:none;color:var(--text);font:inherit;text-align:left;cursor:pointer}
+.grow-sug-item:hover,.grow-sug-item.on{background:color-mix(in srgb,var(--accent) 12%,transparent)}
+.grow-sug-item .avatar{width:30px;height:30px;flex:none}
+.grow-sug-name{font-weight:700}
+.grow-sug-role{margin-left:auto;font-size:12px;color:var(--sub)}
