@@ -1693,3 +1693,8 @@ body.dark .item-ic.empty::before,body.dim .item-ic.empty::before,body.entropics 
 .fn-step.on{background:var(--q);color:#fff}
 @media(max-width:640px){.fn-grid{grid-template-columns:1fr}}
 .fn-step{padding:0;line-height:1;display:inline-flex;align-items:center;justify-content:center}
+/* v1.7.9 「이름」 효과도 누르기 · 효과 사전으로 이동 */
+.skill-quote{color:inherit;font-weight:700;text-decoration:underline dotted;text-underline-offset:3px}
+.lore-fx{display:inline-flex;align-items:center;gap:4px}
+.fx-card.fx-focus{outline:2px solid var(--accent);outline-offset:4px;border-radius:12px;animation:fxFocus 1.6s ease-out}
+@keyframes fxFocus{0%{background:color-mix(in srgb,var(--accent) 22%,transparent)}100%{background:transparent}}
