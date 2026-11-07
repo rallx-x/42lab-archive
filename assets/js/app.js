@@ -1636,7 +1636,7 @@ function renderEffects(){
  si.oninput=()=>{fxQuery=si.value;draw()};sbox.append(el('span','doll-search-prompt','//:_'),si);sw.append(sbox);
  bar.append(tabs,sw);
  const legend=el('div','fx-legend');for(const c of [1,2,3]){const s=el('span','fx-leg');s.append(el('span','fx-dot c'+c),document.createTextNode(FX_COLOR[c]));legend.append(s)}
- const note=el('p','load-note','게임 속 스킬 설명에서 효과 이름을 누르면 나오는 설명이에요. 게임 안 색 그대로 나눴고, 「인형 고유 효과」는 인형 스킬 · 무장각인에 나오는 고유명사 효과예요. 고유 효과 · 필드 효과는 색 탭에도 같이 있어요.');
+ const note=el('p','load-note','게임 속 스킬 설명에서 효과 이름을 누르면 나오는 설명이에요. 게임 안 색 그대로 나눴고, 「인형 고유 효과」는 인형 스킬 · 무장각인에 나오는 고유명사 효과예요. 고유 효과 · 필드 효과는 색 탭에도 같이 있어요. 「필드 · 발판 효과」에는 전투 맵 발판의 지형 함수도 모았어요.');
  const list=el('div','wr-list fx-list');host.append(note,legend,bar,list);
  const byHero=new Map((dollIndex?.dolls||[]).map(d=>[+d.heroId,d]));
  const draw=()=>{
@@ -1646,7 +1646,7 @@ function renderEffects(){
   if(!rows.length){list.append(el('p','loading-note',q?'「'+fxQuery.trim()+'」에 맞는 효과가 없어요.':'효과가 없어요.'));return}
   for(const x of rows){
    const c=el('div','wr-card fx-card');c.id='fx-'+x.id;
-   const top=el('div','wr-card-top');top.append(el('span','fx-dot c'+x.color));if(x.icon){const ii=itemIcon('buff/'+x.icon,'sm fx-ic c'+x.color);top.append(ii)}
+   const top=el('div','wr-card-top');top.append(el('span','fx-dot c'+x.color));if(x.icon){const ii=itemIcon(x.icon.includes('/')?x.icon:'buff/'+x.icon,'sm fx-ic c'+x.color+(x.grid?' grid':''));top.append(ii)}if(x.grid)top.append(el('span','fx-src','지형 함수'))
    const body=el('div','wr-body');body.append(el('strong','wr-name',x.name),el('p','tip-text',cleanTags(x.desc)));
    if(x.dolls?.length||x.algo){const w=el('div','tip-dolls');
     for(const h of x.dolls||[]){const d=byHero.get(+h);if(!d)continue;const b=el('button','doll-chip link tip-doll');b.type='button';b.append(ic('user'),document.createTextNode(' '+d.name));b.onclick=()=>showDoll(d.voiceKey,{part:'skill'});w.append(b)}

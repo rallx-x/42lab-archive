@@ -7,6 +7,8 @@
   - unique 인형 고유 효과 탭에도: 인형 1명의 스킬 · 무장각인 글에 「이름」 (낫표로 감싼 고유명사) 으로 나오는 효과 (알고리즘에 나오면 제외)
     (기절 · 밀어냄 같은 일반 효과는 글에 색 글씨로만 나와서 여기 안 들어감, 트로이처럼 발판에서도 생기는 효과는 색 탭 · 고유 탭 둘 다)
   - 손 분류 tools/effects_override.json {"<id>": "field" | ["unique","field"] | "-unique"}: 색 이름이면 색 탭을 바꾸고, 그 밖은 탭을 더함, "-탭" 은 뺌
+지형 함수 (발판 효과): 게임 battle_grid (93개) → 「필드 · 발판 효과」 탭 + 색 탭
+  - type 1 【버프】 → 초록 · type 2 【디버프】 → 빨강, 아이콘 grid/ICON_Grid*, 이름 · 설명이 똑같은 것은 하나로 (번호 'g<id>')
 쓰이는 곳: 한국어 사이트 데이터(skills · arma · algorithms)에서 효과 이름이 글에 들어 있는지로 찾음 (게임도 글 속 단어로 찾음)
 사용: python effects.py   (skills.py 의 SERVERS 와 같은 곳에서)
 """
@@ -75,7 +77,26 @@ def main():
                 elif o not in cats:
                     cats.append(o)
             out.append({'id': i, 'name': t['name'], 'desc': t['desc'], 'color': c, 'cats': cats,
-                        'icon': icons.get(i, ''), 'dolls': dolls, 'algo': algo})
+                        'icon': ('buff/' + icons[i]) if icons.get(i) else '', 'dolls': dolls, 'algo': algo})
+        # 지형 함수
+        cfg._loc = None
+        os.environ['CFG'] = cdir
+        L = cfg.loc()
+        T = lambda v: (L.get(v, '') if isinstance(v, int) else (v or ''))
+        g, _ = root(cdir + '/LuaConfigs.battle_grid.lua')
+        seen = set()
+        for k in sorted(x for x in g if isinstance(x, int)):
+            v = g[k]
+            if not isinstance(v, dict):
+                continue
+            nm, inf = T(v.get('name')), T(v.get('info'))
+            key = (nm, inf)
+            if not nm or key in seen:
+                continue
+            seen.add(key)
+            c = 2 if v.get('type') == 2 else 1
+            out.append({'id': 'g%d' % k, 'name': nm, 'desc': inf, 'color': c, 'cats': ['red' if c == 2 else 'green', 'field'],
+                        'icon': ('grid/' + v['icon']) if v.get('icon') else '', 'dolls': [], 'algo': False, 'grid': True})
         doc = {'schema': '42lab-effects/0.2', 'lang': lang, 'source': 'configs skill_label_info + 사이트 데이터에서 쓰이는 곳',
                'cats': [[k, n] for (k, _), n in zip(CATS, CAT_NAMES[lang])], 'effects': out}
         with open(os.path.join(REPO, 'data', lang, 'effects.json'), 'w', encoding='utf-8') as f:

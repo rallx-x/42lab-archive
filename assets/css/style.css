@@ -1663,3 +1663,6 @@ body.dark .item-ic.empty::before,body.dim .item-ic.empty::before,body.entropics 
 .fx-ic.item-ic{width:26px;height:26px;border-radius:7px;background:#2c2f36}
 .fx-ic.c1.item-ic{background:#2f6b25}.fx-ic.c2.item-ic{background:#8a2a24}.fx-ic.c3.item-ic{background:#8a5612}
 .fx-ic img{width:80%;height:80%;object-fit:contain}
+.fx-ic.grid.item-ic{width:38px;height:38px;background:none!important;border-radius:0}
+.fx-ic.grid img{width:100%;height:100%}
+.fx-src{margin-left:auto;font-size:11px;color:var(--sub);border:1px solid var(--line);border-radius:999px;padding:1px 8px}
