@@ -1811,11 +1811,21 @@ async function showGrowth({push=true,cat=null}={}){
  // 인형 고르기 (기업 순 · 이름) → 계산기
  const dolls=(dollIndex?.dolls||[]).filter(d=>growthData.potential?.[String(d.heroId)]);
  if(!dolls.some(d=>d.voiceKey===growDoll))growDoll=dolls[0]?.voiceKey||'';
- const pickRow=el('div','grow-pick');const s=el('select','grow-sel grow-doll');
- for(const d of dolls){const o=el('option','',d.name+(d.role?' · '+d.role:''));o.value=d.voiceKey;if(d.voiceKey===growDoll)o.selected=true;s.append(o)}
- s.onchange=()=>{growDoll=s.value;set('growDoll',growDoll);history.replaceState(history.state,'',location.pathname+location.search+routeHash({type:'grow',cat:'doll/'+growDoll}));draw()};
+ // v1.8.6 인형 고르기 = 이름 · 별명 검색 (얼굴 후보 목록)
+ const pickRow=el('div','grow-pick');const pw=el('div','grow-find');
+ const inp=el('input','grow-find-input');inp.type='search';inp.placeholder='이름 · 별명으로 찾기';inp.autocomplete='off';inp.setAttribute('aria-label','인형 찾기');
+ const sug=el('div','grow-sug');sug.hidden=true;pw.append(inp,sug);
+ const pickDoll=k=>{growDoll=k;set('growDoll',k);inp.value='';sug.hidden=true;history.replaceState(history.state,'',location.pathname+location.search+routeHash({type:'grow',cat:'doll/'+k}));draw()};
+ const showSug=()=>{const q=dnorm(inp.value.trim());sug.replaceChildren();
+  const list=(q?dolls.filter(d=>dollMatches(d,q)):dolls).slice(0,q?40:200);
+  if(!list.length){sug.append(el('p','load-note','맞는 인형이 없어요.'))}
+  for(const d of list){const b=el('button','grow-sug-item'+(d.voiceKey===growDoll?' on':''));b.type='button';const f=el('span','avatar');const u=dollFace(d);if(u){const im=el('img');im.src=u;im.alt='';im.loading='lazy';f.append(im)}else f.classList.add('fallback');
+   b.append(f,el('span','grow-sug-name',d.name),el('span','grow-sug-role',d.role||''));b.onmousedown=e=>e.preventDefault();b.onclick=()=>pickDoll(d.voiceKey);sug.append(b)}
+  sug.hidden=false};
+ inp.oninput=showSug;inp.onfocus=showSug;inp.onblur=()=>setTimeout(()=>{sug.hidden=true},150);
+ inp.onkeydown=e=>{if(e.key==='Enter'){const first=sug.querySelector('.grow-sug-item');if(first){e.preventDefault();first.click()}}else if(e.key==='Escape'){sug.hidden=true;inp.blur()}};
  const link=el('button','fy-link');link.type='button';link.append(document.createTextNode('인형 페이지 '),ic('right'));link.onclick=()=>showDoll(growDoll);
- pickRow.append(el('span','fy-label','인형'),s,link);body.append(pickRow);
+ pickRow.append(el('span','fy-label','인형'),pw,link);body.append(pickRow);
  const box=el('div');body.append(box);
  const draw=()=>{const d=dolls.find(x=>x.voiceKey===growDoll);box.replaceChildren();if(!d)return;
   const hd=el('div','grow-who');const face=el('span','avatar');const url=dollFace(d);if(url){const im=el('img');im.src=url;im.alt='';face.append(im)}else face.classList.add('fallback');
