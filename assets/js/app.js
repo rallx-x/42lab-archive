@@ -1626,7 +1626,7 @@ function renderEffects(){
  const bar=el('div','doll-controls wr-controls');const tabs=el('div','wr-tabs');tabs.setAttribute('role','tablist');tabs.setAttribute('aria-label','효과 분류');
  const btns=[];
  for(const [g,name] of cats){
-  const n=g==='all'?all.length:all.filter(x=>x.cat===g).length;if(!n)continue;
+  const n=g==='all'?all.length:all.filter(x=>(x.cats||[x.cat]).includes(g)).length;if(!n)continue;
   const b=el('button','cat-tab wr-tab');b.type='button';b.setAttribute('role','tab');b.append(el('span','',name),el('span','wr-tab-n',String(n)));
   b.onclick=()=>{fxCat=g;set('fxCat',g);history.replaceState(history.state,'',location.pathname+location.search+routeHash({type:'effects',cat:g==='all'?null:g}));sync();draw()};
   btns.push([g,b]);tabs.append(b)}
@@ -1636,12 +1636,12 @@ function renderEffects(){
  si.oninput=()=>{fxQuery=si.value;draw()};sbox.append(el('span','doll-search-prompt','//:_'),si);sw.append(sbox);
  bar.append(tabs,sw);
  const legend=el('div','fx-legend');for(const c of [1,2,3]){const s=el('span','fx-leg');s.append(el('span','fx-dot c'+c),document.createTextNode(FX_COLOR[c]));legend.append(s)}
- const note=el('p','load-note','게임 속 스킬 설명에서 효과 이름을 누르면 나오는 설명이에요. 게임 안 색 그대로 나눴고, 「인형 고유 효과」는 인형 1명의 스킬 · 무장각인에만 나오는 고유명사 효과예요 (점 색은 게임 색).');
+ const note=el('p','load-note','게임 속 스킬 설명에서 효과 이름을 누르면 나오는 설명이에요. 게임 안 색 그대로 나눴고, 「인형 고유 효과」는 인형 스킬 · 무장각인에 나오는 고유명사 효과예요. 고유 효과 · 필드 효과는 색 탭에도 같이 있어요.');
  const list=el('div','wr-list fx-list');host.append(note,legend,bar,list);
  const byHero=new Map((dollIndex?.dolls||[]).map(d=>[+d.heroId,d]));
  const draw=()=>{
   const q=dnorm(fxQuery);
-  const rows=all.filter(x=>(fxCat==='all'||x.cat===fxCat)&&(!q||dnorm(x.name).includes(q)||dnorm(cleanTags(x.desc)).includes(q)||(x.dolls||[]).some(h=>dnorm(byHero.get(h)?.name||'').includes(q))));
+  const rows=all.filter(x=>(fxCat==='all'||(x.cats||[x.cat]).includes(fxCat))&&(!q||dnorm(x.name).includes(q)||dnorm(cleanTags(x.desc)).includes(q)||(x.dolls||[]).some(h=>dnorm(byHero.get(h)?.name||'').includes(q))));
   count.textContent=rows.length+'개';list.replaceChildren();sync();
   if(!rows.length){list.append(el('p','loading-note',q?'「'+fxQuery.trim()+'」에 맞는 효과가 없어요.':'효과가 없어요.'));return}
   for(const x of rows){

@@ -2,11 +2,11 @@
 
 원본: 게임 skill_label_info (스킬 설명의 효과 이름을 누르면 나오는 설명, 265개)
   - name · describe · icon(일부만) · icon_color (1 초록 · 2 빨강 · 3 주황 · 0 없음) — 게임 색은 그대로 color 로 둔다
-1차 분류 (cat) — 게임 색 그대로 + 인형 고유
-  - unique 인형 고유 효과 : 인형 1명의 스킬 · 무장각인 글에만 「이름」 (낫표로 감싼 고유명사) 으로 나오는 효과 (알고리즘에 나오면 제외)
-    (기절 · 밀어냄 같은 일반 효과는 글에 색 글씨로만 나와서 여기 안 들어감)
-  - 그 밖은 게임 색대로: 초록 → green · 빨강 → red · 주황 · 없음 → orange
-  - 손으로 옮긴 것은 tools/effects_override.json {"<id>": "green|red|orange|unique"} 이 이김
+분류 (cats, 한 효과가 여러 탭에 들어갈 수 있음)
+  - 모든 효과는 게임 색 탭: 초록 → green · 빨강 → red · 주황 · 없음 → orange
+  - unique 인형 고유 효과 탭에도: 인형 1명의 스킬 · 무장각인 글에 「이름」 (낫표로 감싼 고유명사) 으로 나오는 효과 (알고리즘에 나오면 제외)
+    (기절 · 밀어냄 같은 일반 효과는 글에 색 글씨로만 나와서 여기 안 들어감, 트로이처럼 발판에서도 생기는 효과는 색 탭 · 고유 탭 둘 다)
+  - 손 분류 tools/effects_override.json {"<id>": "field" | ["unique","field"] | "-unique"}: 색 이름이면 색 탭을 바꾸고, 그 밖은 탭을 더함, "-탭" 은 뺌
 쓰이는 곳: 한국어 사이트 데이터(skills · arma · algorithms)에서 효과 이름이 글에 들어 있는지로 찾음 (게임도 글 속 단어로 찾음)
 사용: python effects.py   (skills.py 의 SERVERS 와 같은 곳에서)
 """
@@ -63,19 +63,24 @@ def main():
             i = t['id']
             dolls, algo, quoted = use.get(i, ([], False, []))
             c = t.get('color', 0)
-            if str(i) in over:
-                cat = over[str(i)]
-            elif len(quoted) == 1 and len(dolls) == 1 and not algo:
-                cat = 'unique'
-            else:
-                cat = 'green' if c == 1 else 'red' if c == 2 else 'orange'
-            out.append({'id': i, 'name': t['name'], 'desc': t['desc'], 'color': c, 'cat': cat,
+            cats = ['green' if c == 1 else 'red' if c == 2 else 'orange']
+            if len(quoted) == 1 and not algo:
+                cats.append('unique')
+            ov = over.get(str(i))
+            for o in ([ov] if isinstance(ov, str) else ov or []):
+                if o.startswith('-'):
+                    cats = [x for x in cats if x != o[1:]]
+                elif o in ('green', 'red', 'orange'):
+                    cats[0] = o
+                elif o not in cats:
+                    cats.append(o)
+            out.append({'id': i, 'name': t['name'], 'desc': t['desc'], 'color': c, 'cats': cats,
                         'icon': icons.get(i, ''), 'dolls': dolls, 'algo': algo})
-        doc = {'schema': '42lab-effects/0.1', 'lang': lang, 'source': 'configs skill_label_info + 사이트 데이터에서 쓰이는 곳',
+        doc = {'schema': '42lab-effects/0.2', 'lang': lang, 'source': 'configs skill_label_info + 사이트 데이터에서 쓰이는 곳',
                'cats': [[k, n] for (k, _), n in zip(CATS, CAT_NAMES[lang])], 'effects': out}
         with open(os.path.join(REPO, 'data', lang, 'effects.json'), 'w', encoding='utf-8') as f:
             json.dump(doc, f, ensure_ascii=False, separators=(',', ':'))
-        stat[lang] = {k: sum(1 for e in out if e['cat'] == k) for k, _ in CATS}
+        stat[lang] = {k: sum(1 for e in out if k in e['cats']) for k, _ in CATS}
     print(stat)
 
 
