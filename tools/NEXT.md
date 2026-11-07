@@ -75,3 +75,13 @@
   - 로컬 렌더(운디네 · 무장각인 ON)는 흰 프레임 + 안쪽 주황 테두리로 정상 → 어느 인형 · 어느 화면인지 확인부터
   - 프레임 모양 자체는 건드리지 말 것 (사용자 요청)
 - ?v=1.7.5 캐시 버전 올림은 브랜치에만 있음 (사이트 미반영) → 다음 배포 때 같이
+
+## 다음: 인형 육성 재화 (2026-11-07 조사만, 아직 안 만듦)
+게임 configs 에 다 있음 (tools/client_extract/doll_stats.py 처럼 인형 「능력치」 탭 옆에 「육성」 칸으로)
+- 성급(0.5★ 단계 1~10): hero_rank — upgrade_star_frag_cost (마인드맵 조각 = 인형 조각 아이템 2xxx, 예 2040 드셰브니) · upgrade_star_extra_cost (디그코인 1003)
+  · repeat_frag_trans / repeat_extra_trans (중복 획득 시 조각 · 마인드맵 재료 1006 변환), skill_level_max · ultimateskill_level (성급별 스킬 상한)
+- 레벨 경험치: hero_level — exp (Lv.1~70)
+- 마인드 확장: hero_potential — 인형마다 단계별 cost (디그코인 + 재료 1822 · 1827 …) · level_max (그 단계가 여는 최대 레벨)
+- 스킬 레벨업: hero_skill_level — 레벨별 itemIdList · countList (스킬 샘플 1501 · 스킬 코어 1502 · 디그코인) · level_limit (필요 인형 레벨)
+- 무장각인 강화: 각인 강화 경험치 1503 (arma 쪽 데이터 확인 필요)
+화면 구상: 인형 페이지 「육성」 탭 = 성급 표 · 레벨 경험치 · 마인드 확장 · 스킬 레벨업 비용 + 「지금 → 목표」 합계 계산기
