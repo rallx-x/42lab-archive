@@ -817,11 +817,17 @@ function renderArchiveMenu(){
  const recFill=box=>{const put=()=>{box.replaceChildren();for(const t of (wrData?.types||[]).filter(t=>t.id)){const n=(wrData.records||[]).filter(r=>r.type===t.id).length;if(!n)continue;const link=el('button','archive-menu-chapter',t.name);link.type='button';link.onclick=()=>{closeArchiveMenu();$('#search').value='';showRecords({cat:String(t.id)})};box.append(link)}};
   if(wrData)put();else loadRecords().then(put).catch(()=>{})};
  host.append(foldRow('시계 기록',()=>{closeArchiveMenu();$('#search').value='';showRecords({cat:'0'})},recFill,'archive-menu-top'));
- const tipLink=el('button','archive-menu-link archive-menu-home archive-menu-dolls','로딩 팁');tipLink.type='button';tipLink.onclick=()=>{closeArchiveMenu();$('#search').value='';showTips()};host.append(tipLink);
- const itemLink=el('button','archive-menu-link archive-menu-home archive-menu-dolls','아이템');itemLink.type='button';itemLink.onclick=()=>{closeArchiveMenu();$('#search').value='';showItems()};host.append(itemLink);
- const algoLink=el('button','archive-menu-link archive-menu-home archive-menu-dolls','알고리즘');algoLink.type='button';algoLink.onclick=()=>{closeArchiveMenu();$('#search').value='';showAlgos()};host.append(algoLink);
- // v1.8.1 자료실 새 칸: 함수 · 효과 사전 · 지휘 스킬 · 성령
- for(const [name,go] of [['함수',()=>showFunctions()],['효과 사전',()=>showEffects()],['지휘 스킬',()=>showCommander()],['성령',()=>showFairy()]]){const b=el('button','archive-menu-link archive-menu-home archive-menu-dolls',name);b.type='button';b.onclick=()=>{closeArchiveMenu();$('#search').value='';go()};host.append(b)}
+ // v1.8.2 자료실 칸마다 ▶ 펼치기 (세부 분류 바로가기). 데이터가 필요한 칸은 펼칠 때 불러옴
+ const subLink=(box,name,go)=>{const link=el('button','archive-menu-chapter',name);link.type='button';link.onclick=()=>{closeArchiveMenu();$('#search').value='';go()};box.append(link)};
+ const lazyFill=(load,put)=>box=>{const run=d=>{box.replaceChildren();put(box,d)};load().then(run).catch(()=>{})};
+ const go=f=>()=>{closeArchiveMenu();$('#search').value='';f()};
+ host.append(foldRow('로딩 팁',go(()=>showTips()),box=>{for(const [g,n] of TIP_GROUPS.filter(([g])=>g!=='all'))subLink(box,n,()=>showTips({cat:g}))},'archive-menu-top'));
+ host.append(foldRow('아이템',go(()=>showItems()),box=>{for(const [pg,n] of ITEM_PAGES.filter(([pg])=>pg!==0))subLink(box,n,()=>showItems({cat:String(pg)}))},'archive-menu-top'));
+ host.append(foldRow('알고리즘',go(()=>showAlgos()),lazyFill(loadAlgos,(box,d)=>{for(const [k,a] of Object.entries(d.areas||{}))if((d.sets||[]).some(x=>String(x.area)===k))subLink(box,a.name,()=>showAlgos({cat:k}))}),'archive-menu-top'));
+ host.append(foldRow('함수',go(()=>showFunctions()),box=>{subLink(box,'대상별',()=>showFunctions({cat:'mark'}));subLink(box,'세트별',()=>showFunctions({cat:'tag'}))},'archive-menu-top'));
+ host.append(foldRow('효과 사전',go(()=>showEffects()),lazyFill(loadEffects,(box,d)=>{for(const [k,n] of d.cats||[])subLink(box,n,()=>showEffects({cat:k}))}),'archive-menu-top'));
+ host.append(foldRow('지휘 스킬',go(()=>showCommander()),lazyFill(loadCommander,(box,d)=>{for(const f of d.families||[])subLink(box,f.name,()=>{cmdFocus=f.key;showCommander()})}),'archive-menu-top'));
+ host.append(foldRow('성령',go(()=>showFairy()),box=>{subLink(box,'성령 정보',()=>showFairy({cat:'info'}));subLink(box,'강화 시뮬레이터',()=>showFairy({cat:'sim'}))},'archive-menu-top'));
 }
 $('#menuBtn').onclick=()=>{const menu=$('#archiveMenu');if(!menu.classList.contains('open')){renderArchiveMenu();menu.classList.add('open');menu.removeAttribute('aria-hidden');$('#menuBtn').setAttribute('aria-expanded','true');$('#menuBtn').classList.add('is-open')}else closeArchiveMenu()};
 $('#archiveMenuClose').onclick=closeArchiveMenu;
@@ -1769,7 +1775,7 @@ function renderFairy(){
  draw();
 }
 // ---------- v1.7.9 지휘 스킬 (data/<언어>/commander.json ← tools/client_extract/commander.py) ----------
-let cmdData=null,cmdLv=get('cmdLv','max');
+let cmdData=null,cmdLv=get('cmdLv','max'),cmdFocus=null;
 const loadCommander=()=>cmdData?Promise.resolve(cmdData):fetchJSON(dataPath('commander.json')).then(d=>cmdData=d);
 async function showCommander({push=true}={}){
  const tok=++routeToken;showOnly('dollView');bgmLeave();voiceStop();closeArchiveMenu();$('#crumb').textContent='지휘 스킬';
@@ -1786,11 +1792,12 @@ async function showCommander({push=true}={}){
  const list=el('div','cmd-list');host.append(list);
  const draw=()=>{lvBtns.forEach(([k,b])=>b.classList.toggle('selected',k===cmdLv));list.replaceChildren();
   for(const f of cmdData.families||[]){
-   const sec=el('section','cmd-fam');const h=el('div','cmd-fam-head');h.append(itemIcon(f.skills[0].icon,'cmd-ic big'),el('h3','',f.name),el('span','wr-tab-n',String(f.skills.length)));sec.append(h);
+   const sec=el('section','cmd-fam');sec.dataset.key=f.key;const h=el('div','cmd-fam-head');h.append(itemIcon(f.skills[0].icon,'cmd-ic big'),el('h3','',f.name),el('span','wr-tab-n',String(f.skills.length)));sec.append(h);
    for(const sk of f.skills){const row=el('div','cmd-skill'+(sk.fairy?' fairy':''));row.append(itemIcon(sk.icon,'cmd-ic'));
     const body=el('div','cmd-body');const nm=el('div','cmd-name');nm.append(el('strong','',sk.name));if(sk.fairy)nm.append(el('span','cmd-badge','성령'));body.append(nm);
     const det=el('p','skill-detail');skillText(det,skillDetail(sk,cmdLv==='max'?sk.maxLv:1));body.append(det);row.append(body);sec.append(row)}
-   list.append(sec)}};
+   list.append(sec)}
+  if(cmdFocus){const t=list.querySelector('.cmd-fam[data-key="'+CSS.escape(cmdFocus)+'"]');cmdFocus=null;if(t){t.classList.add('fx-focus');requestAnimationFrame(()=>t.scrollIntoView({block:'start'}))}}};
  draw();
 }
 // ---------- v1.7.8 함수 도감 (data/<언어>/functions.json ← tools/client_extract/functions.py) ----------
