@@ -1651,3 +1651,5 @@ body.dark .item-ic.empty::before,body.dim .item-ic.empty::before,body.entropics 
 .skill-hex.t3 .hex-arma{-webkit-mask-image:url(../img/skill/arma_3.png);mask-image:url(../img/skill/arma_3.png)}
 /* v1.7.6 흰 스킬 그림 크게 (회색 육각의 120%, 가운데) — 무장각인 주황 테두리가 위에 겹쳐도 됨 */
 .skill-hex .item-ic{left:calc(var(--gx) - (100% - 2*var(--gx))*.1);top:calc(var(--gy) - (100% - 2*var(--gy))*.1);width:calc((100% - 2*var(--gx))*1.2);height:calc((100% - 2*var(--gy))*1.2);clip-path:none}
+/* v1.7.6 궁극기 그림은 조금 더 크게 (프레임과 1~2px 틈) */
+.skill-hex.t3 .item-ic{left:calc(var(--gx) - (100% - 2*var(--gx))*.13);top:calc(var(--gy) - (100% - 2*var(--gy))*.13);width:calc((100% - 2*var(--gx))*1.26);height:calc((100% - 2*var(--gy))*1.26)}
