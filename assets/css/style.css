@@ -1638,3 +1638,5 @@ body.dark .item-ic.empty::before,body.dim .item-ic.empty::before,body.entropics 
 .skill-hex .hex-fill,.skill-hex.max .hex-fill{inset:var(--gy) var(--gx)}
 .skill-hex .hex-base{left:calc(var(--gx) + (100% - 2*var(--gx))*.0698);top:calc(var(--gy) + (100% - 2*var(--gy))*.0693);width:calc((100% - 2*var(--gx))*.86);height:calc((100% - 2*var(--gy))*.861)}
 .skill-hex .item-ic{left:calc(var(--gx) - (100% - 2*var(--gx))*.029);top:calc(var(--gy) - (100% - 2*var(--gy))*.029);width:calc((100% - 2*var(--gx))*1.058);height:calc((100% - 2*var(--gy))*1.058)}
+/* v1.7.6 무장각인 주황 테두리: 바깥면이 흰 프레임 안쪽 구멍에 꽉 맞게 (흰 프레임과 겹치지 않음, 회색 육각보다 선 두께 절반만큼 안쪽) */
+.skill-hex .hex-arma{left:calc(var(--gx) + 1.2%);top:calc(var(--gy) + 1.1%);width:calc(100% - 2*var(--gx) - 2.4%);height:calc(100% - 2*var(--gy) - 2.2%);-webkit-mask-size:100% 100%;mask-size:100% 100%;filter:none}
