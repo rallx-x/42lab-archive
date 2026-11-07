@@ -1619,6 +1619,9 @@ async function showAlgos({push=true,cat=null}={}){
 // 분류: 게임 색(초록 · 빨강 · 주황) + 인형 고유 효과 (인형 1명 글에만 「이름」으로 나옴), 점 색은 게임 색
 let fxData=null,fxCat=get('fxCat','all'),fxQuery='',fxFocus=null;
 const loadEffects=()=>fxData?Promise.resolve(fxData):fetchJSON(dataPath('effects.json')).then(d=>fxData=d);
+// v1.7.10 모드 효과 (탐색 · 던전 · 워체스)는 따로 — 그 탭을 열 때만 불러옴
+let fxModes=null;const FX_MODES=new Set(['explore','dungeon','warchess']);
+const loadFxModes=()=>fxModes?Promise.resolve(fxModes):fetchJSON(dataPath('effect_modes.json')).then(d=>fxModes=d);
 const FX_COLOR={1:'초록',2:'빨강',3:'주황',0:'색 없음'};
 async function showEffects({push=true,cat=null}={}){
  const tok=++routeToken;showOnly('dollView');bgmLeave();voiceStop();closeArchiveMenu();$('#crumb').textContent='효과 사전';
@@ -1637,8 +1640,8 @@ function renderEffects(){
  const bar=el('div','doll-controls wr-controls');const tabs=el('div','wr-tabs');tabs.setAttribute('role','tablist');tabs.setAttribute('aria-label','효과 분류');
  const btns=[];
  for(const [g,name] of cats){
-  const n=g==='all'?all.length:all.filter(x=>(x.cats||[x.cat]).includes(g)).length;if(!n)continue;
-  const b=el('button','cat-tab wr-tab');b.type='button';b.setAttribute('role','tab');b.append(el('span','',name),el('span','wr-tab-n',String(n)));
+  const n=g==='all'?all.length:FX_MODES.has(g)?(fxData.modeCounts?.[g]||0):all.filter(x=>(x.cats||[x.cat]).includes(g)).length;if(!n)continue;
+  const b=el('button','cat-tab wr-tab'+(FX_MODES.has(g)?' fx-mode-tab':''));b.type='button';b.setAttribute('role','tab');b.append(el('span','',name),el('span','wr-tab-n',String(n)));
   b.onclick=()=>{fxCat=g;set('fxCat',g);history.replaceState(history.state,'',location.pathname+location.search+routeHash({type:'effects',cat:g==='all'?null:g}));sync();draw()};
   btns.push([g,b]);tabs.append(b)}
  const sync=()=>btns.forEach(([g,b])=>{b.classList.toggle('selected',g===fxCat);b.setAttribute('aria-selected',String(g===fxCat))});
@@ -1652,18 +1655,21 @@ function renderEffects(){
  const byHero=new Map((dollIndex?.dolls||[]).map(d=>[+d.heroId,d]));
  const draw=()=>{
   const q=dnorm(fxQuery);
-  const rows=all.filter(x=>(fxCat==='all'||(x.cats||[x.cat]).includes(fxCat))&&(!q||dnorm(x.name).includes(q)||dnorm(cleanTags(x.desc)).includes(q)||(x.dolls||[]).some(h=>dnorm(byHero.get(h)?.name||'').includes(q))));
+  if(FX_MODES.has(fxCat)&&!fxModes){list.replaceChildren(el('p','loading-note','효과 사전을 불러오는 중…'));sync();loadFxModes().then(()=>draw()).catch(e=>list.replaceChildren(error(e.message)));return}
+  const src=FX_MODES.has(fxCat)?(fxModes.effects||[]):all;
+  const rows=src.filter(x=>(fxCat==='all'||(x.cats||[x.cat]).includes(fxCat))&&(!q||dnorm(x.name).includes(q)||dnorm(cleanTags(x.desc)).includes(q)||(x.dolls||[]).some(h=>dnorm(byHero.get(h)?.name||'').includes(q))));
   count.textContent=rows.length+'개';list.replaceChildren();sync();
   if(!rows.length){list.append(el('p','loading-note',q?'「'+fxQuery.trim()+'」에 맞는 효과가 없어요.':'효과가 없어요.'));return}
-  for(const x of rows){
+  for(const x of rows.slice(0,400)){
    const c=el('div','wr-card fx-card');c.id='fx-'+x.id;
-   const top=el('div','wr-card-top');top.append(el('span','fx-dot c'+x.color));if(x.icon){const ii=itemIcon(x.icon.includes('/')?x.icon:'buff/'+x.icon,'sm fx-ic c'+x.color+(x.grid?' grid':''));top.append(ii)}if(x.grid)top.append(el('span','fx-src','지형 함수'))
+   const top=el('div','wr-card-top');top.append(el('span','fx-dot c'+x.color));if(x.icon){const ii=itemIcon(x.icon.includes('/')?x.icon:'buff/'+x.icon,'sm fx-ic c'+x.color+(x.grid?' grid':'')+(x.mode?' xy':''));top.append(ii)}if(x.grid)top.append(el('span','fx-src','지형 함수'))
    const body=el('div','wr-body');body.append(el('strong','wr-name',x.name),el('p','tip-text',cleanTags(x.desc)));
    if(x.dolls?.length||x.algo){const w=el('div','tip-dolls');
     for(const h of x.dolls||[]){const d=byHero.get(+h);if(!d)continue;const b=el('button','doll-chip link tip-doll');b.type='button';b.append(ic('user'),document.createTextNode(' '+d.name));b.onclick=()=>showDoll(d.voiceKey,{part:'skill'});w.append(b)}
     if(x.algo){const b=el('button','doll-chip link tip-doll','알고리즘');b.type='button';b.onclick=()=>showAlgos();w.append(b)}
     body.append(w)}
    c.append(top,body);list.append(c)}
+  if(rows.length>400)list.append(el('p','load-note','처음 400개만 보여요. 기록 찾기로 좁혀 보세요.'));
   if(fxFocus!=null){const t=document.getElementById('fx-'+fxFocus);fxFocus=null;if(t){t.classList.add('fx-focus');requestAnimationFrame(()=>t.scrollIntoView({block:'center'}))}}
  };
  draw();
