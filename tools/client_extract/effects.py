@@ -9,6 +9,7 @@
   - 손 분류 tools/effects_override.json {"<id>": "field" | ["unique","field"] | "-unique"}: 색 이름이면 색 탭을 바꾸고, 그 밖은 탭을 더함, "-탭" 은 뺌
 지형 함수 (발판 효과): 게임 battle_grid (93개) → 「필드 · 발판 효과」 탭 + 색 탭
   - type 1 【버프】 → 초록 · type 2 【디버프】 → 빨강, 아이콘 grid/ICON_Grid*, 이름 · 설명이 똑같은 것은 하나로 (번호 'g<id>')
+프로토콜: exploration_buff 20000~29999번 → 「프로토콜」 탭 (buff_type 1 유리 · 0 중립 · 2 불리, 20001~20099 기본 · 그 뒤 100번 단위 묶음)
 모드 효과: 게임 exploration_buff · dungeon_buff · warchess_buff → 「탐색 · 던전 · 워체스 효과」 탭 (색 탭에는 안 넣음)
   - 색 = 아이콘 색 (초록 · 빨강 · 노랑 → 주황 점), 아이콘이 없으면 buff_type 1 초록 · 2 빨강 · 그 밖 주황
 쓰이는 곳: 한국어 사이트 데이터(skills · arma · algorithms)에서 효과 이름이 글에 들어 있는지로 찾음 (게임도 글 속 단어로 찾음)
@@ -23,12 +24,12 @@ import skills as S
 HERE = os.path.dirname(os.path.abspath(__file__))
 REPO = os.environ.get('REPO') or os.path.join(HERE, '..', '..')
 CATS = [['green', '초록 효과'], ['red', '빨간 효과'], ['orange', '주황 효과'], ['unique', '인형 고유 효과'], ['field', '필드 · 발판 효과'],
-        ['explore', '탐색 효과'], ['dungeon', '던전 효과'], ['warchess', '워체스 효과']]
-CAT_NAMES = {'ko': ['초록 효과', '빨간 효과', '주황 효과', '인형 고유 효과', '필드 · 발판 효과', '탐색 효과', '던전 효과', '워체스 효과'],
-             'ja': ['緑の効果', '赤の効果', 'オレンジの効果', '人形固有効果', 'フィールド · 足場効果', '探索効果', 'ダンジョン効果', 'ウォーチェス効果'],
-             'en': ['Green Effects', 'Red Effects', 'Orange Effects', 'Doll-Unique Effects', 'Field · Tile Effects', 'Exploration Effects', 'Dungeon Effects', 'Warchess Effects'],
-             'tw': ['綠色效果', '紅色效果', '橙色效果', '人形固有效果', '場地 · 地塊效果', '探索效果', '地城效果', '戰棋效果'],
-             'zh': ['绿色效果', '红色效果', '橙色效果', '人形固有效果', '场地 · 地块效果', '探索效果', '地城效果', '战棋效果']}
+        ['protocol', '프로토콜'], ['explore', '탐색 효과'], ['dungeon', '던전 효과'], ['warchess', '워체스 효과']]
+CAT_NAMES = {'ko': ['초록 효과', '빨간 효과', '주황 효과', '인형 고유 효과', '필드 · 발판 효과', '프로토콜', '탐색 효과', '던전 효과', '워체스 효과'],
+             'ja': ['緑の効果', '赤の効果', 'オレンジの効果', '人形固有効果', 'フィールド · 足場効果', 'プロトコル', '探索効果', 'ダンジョン効果', 'ウォーチェス効果'],
+             'en': ['Green Effects', 'Red Effects', 'Orange Effects', 'Doll-Unique Effects', 'Field · Tile Effects', 'Protocols', 'Exploration Effects', 'Dungeon Effects', 'Warchess Effects'],
+             'tw': ['綠色效果', '紅色效果', '橙色效果', '人形固有效果', '場地 · 地塊效果', '協議', '探索效果', '地城效果', '戰棋效果'],
+             'zh': ['绿色效果', '红色效果', '橙色效果', '人形固有效果', '场地 · 地块效果', '协议', '探索效果', '地城效果', '战棋效果']}
 # 모드 효과 (탐색 · 던전 · 워체스): (표, 설명 칸, 번호 앞글자, 탭)
 MODES = [('exploration_buff', 'describe', 'x', 'explore'), ('dungeon_buff', 'describe', 'd', 'dungeon'), ('warchess_buff', 'description', 'w', 'warchess')]
 ICON_DIR = os.environ.get('XY_ICONS', 'fx_out/xy')  # 아이콘 색(초록 · 노랑 · 빨강) 재기용 (pnc-item xy/ 와 같은 그림)
@@ -136,14 +137,20 @@ def main():
                 seen.add((nm, ds))
                 ic_ = v.get('icon') or ''
                 c = icon_color(ic_) or {1: 1, 2: 2}.get(v.get('buff_type'), 3)
-                out.append({'id': '%s%d' % (pre, k), 'name': nm, 'desc': ds, 'color': c, 'cats': [cat],
-                            'icon': ('xy/' + ic_) if ic_.startswith(('ICON_xy', 'ICON_g_')) else '', 'dolls': [], 'algo': False, 'mode': cat})
+                o = {'id': '%s%d' % (pre, k), 'name': nm, 'desc': ds, 'color': c, 'cats': [cat],
+                     'icon': ('xy/' + ic_) if ic_.startswith(('ICON_xy', 'ICON_g_')) else '', 'dolls': [], 'algo': False, 'mode': cat}
+                # 프로토콜 = 탐색 버프 20000~29999번: buff_type 1 유리 · 0 중립 · 2 불리 (점 색도 그대로), 20001~20099 기본, 그 뒤는 100번 단위 묶음
+                if tab == 'exploration_buff' and 20000 <= k < 30000:
+                    side = {1: 'good', 2: 'bad'}.get(v.get('buff_type'), 'neutral')
+                    o.update({'cats': ['protocol'], 'mode': 'protocol', 'side': side, 'color': {'good': 1, 'bad': 2}.get(side, 3),
+                              'grp': 'main' if k < 20100 else str(k // 100 * 100)})
+                out.append(o)
         # 모드 효과는 크기가 커서 따로 (effect_modes.json, 그 탭을 열 때만 불러옴). 탭 개수는 effects.json 에
         modes = [e for e in out if e.get('mode')]
         base = [e for e in out if not e.get('mode')]
         doc = {'schema': '42lab-effects/0.2', 'lang': lang, 'source': 'configs skill_label_info · battle_grid + 사이트 데이터에서 쓰이는 곳',
                'cats': [[k, n] for (k, _), n in zip(CATS, CAT_NAMES[lang])], 'effects': base,
-               'modeCounts': {m: sum(1 for e in modes if e['mode'] == m) for _, _, _, m in MODES}}
+               'modeCounts': {m: sum(1 for e in modes if e['mode'] == m) for m in ['protocol'] + [x[3] for x in MODES]}}
         with open(os.path.join(REPO, 'data', lang, 'effects.json'), 'w', encoding='utf-8') as f:
             json.dump(doc, f, ensure_ascii=False, separators=(',', ':'))
         with open(os.path.join(REPO, 'data', lang, 'effect_modes.json'), 'w', encoding='utf-8') as f:

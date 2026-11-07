@@ -820,6 +820,8 @@ function renderArchiveMenu(){
  const tipLink=el('button','archive-menu-link archive-menu-home archive-menu-dolls','로딩 팁');tipLink.type='button';tipLink.onclick=()=>{closeArchiveMenu();$('#search').value='';showTips()};host.append(tipLink);
  const itemLink=el('button','archive-menu-link archive-menu-home archive-menu-dolls','아이템');itemLink.type='button';itemLink.onclick=()=>{closeArchiveMenu();$('#search').value='';showItems()};host.append(itemLink);
  const algoLink=el('button','archive-menu-link archive-menu-home archive-menu-dolls','알고리즘');algoLink.type='button';algoLink.onclick=()=>{closeArchiveMenu();$('#search').value='';showAlgos()};host.append(algoLink);
+ // v1.8.1 자료실 새 칸: 함수 · 효과 사전 · 지휘 스킬 · 성령
+ for(const [name,go] of [['함수',()=>showFunctions()],['효과 사전',()=>showEffects()],['지휘 스킬',()=>showCommander()],['성령',()=>showFairy()]]){const b=el('button','archive-menu-link archive-menu-home archive-menu-dolls',name);b.type='button';b.onclick=()=>{closeArchiveMenu();$('#search').value='';go()};host.append(b)}
 }
 $('#menuBtn').onclick=()=>{const menu=$('#archiveMenu');if(!menu.classList.contains('open')){renderArchiveMenu();menu.classList.add('open');menu.removeAttribute('aria-hidden');$('#menuBtn').setAttribute('aria-expanded','true');$('#menuBtn').classList.add('is-open')}else closeArchiveMenu()};
 $('#archiveMenuClose').onclick=closeArchiveMenu;
@@ -1625,7 +1627,7 @@ async function showAlgos({push=true,cat=null}={}){
 let fxData=null,fxCat=get('fxCat','all'),fxQuery='',fxFocus=null;
 const loadEffects=()=>fxData?Promise.resolve(fxData):fetchJSON(dataPath('effects.json')).then(d=>fxData=d);
 // v1.7.10 모드 효과 (탐색 · 던전 · 워체스)는 따로 — 그 탭을 열 때만 불러옴
-let fxModes=null;const FX_MODES=new Set(['explore','dungeon','warchess']);
+let fxModes=null,fxSide=get('fxSide','all');const FX_MODES=new Set(['protocol','explore','dungeon','warchess']);
 const loadFxModes=()=>fxModes?Promise.resolve(fxModes):fetchJSON(dataPath('effect_modes.json')).then(d=>fxModes=d);
 const FX_COLOR={1:'초록',2:'빨강',3:'주황',0:'색 없음'};
 async function showEffects({push=true,cat=null}={}){
@@ -1656,16 +1658,22 @@ function renderEffects(){
  bar.append(tabs,sw);
  const legend=el('div','fx-legend');for(const c of [1,2,3]){const s=el('span','fx-leg');s.append(el('span','fx-dot c'+c),document.createTextNode(FX_COLOR[c]));legend.append(s)}
  const note=el('p','load-note','게임 속 스킬 설명에서 효과 이름을 누르면 나오는 설명이에요. 게임 안 색 그대로 나눴고, 「인형 고유 효과」는 인형 스킬 · 무장각인에 나오는 고유명사 효과예요. 고유 효과 · 필드 효과는 색 탭에도 같이 있어요. 「필드 · 발판 효과」에는 전투 맵 발판의 지형 함수도 모았어요.');
- const list=el('div','wr-list fx-list');host.append(note,legend,bar,list);
+ const sideBar=el('div','fn-subs fx-sides');sideBar.hidden=true;
+ const list=el('div','wr-list fx-list');host.append(note,legend,bar,sideBar,list);
  const byHero=new Map((dollIndex?.dolls||[]).map(d=>[+d.heroId,d]));
  const draw=()=>{
   const q=dnorm(fxQuery);
   if(FX_MODES.has(fxCat)&&!fxModes){list.replaceChildren(el('p','loading-note','효과 사전을 불러오는 중…'));sync();loadFxModes().then(()=>draw()).catch(e=>list.replaceChildren(error(e.message)));return}
   const src=FX_MODES.has(fxCat)?(fxModes.effects||[]):all;
-  const rows=src.filter(x=>(fxCat==='all'||(x.cats||[x.cat]).includes(fxCat))&&(!q||dnorm(x.name).includes(q)||dnorm(cleanTags(x.desc)).includes(q)||(x.dolls||[]).some(h=>dnorm(byHero.get(h)?.name||'').includes(q))));
+  // v1.8.1 프로토콜: 유리 · 중립 · 불리 단추 + 묶음(기본 · 100번 단위) 제목
+  sideBar.replaceChildren();sideBar.hidden=fxCat!=='protocol';
+  if(fxCat==='protocol'){for(const [k,n] of [['all','전체'],['good','유리'],['neutral','중립'],['bad','불리']]){const b=el('button','fn-sub fx-side '+k+(k===fxSide?' on':''),n);b.type='button';b.onclick=()=>{fxSide=k;set('fxSide',k);draw()};sideBar.append(b)}}
+  const rows=src.filter(x=>(fxCat!=='protocol'||fxSide==='all'||x.side===fxSide)&&(fxCat==='all'||(x.cats||[x.cat]).includes(fxCat))&&(!q||dnorm(x.name).includes(q)||dnorm(cleanTags(x.desc)).includes(q)||(x.dolls||[]).some(h=>dnorm(byHero.get(h)?.name||'').includes(q))));
   count.textContent=rows.length+'개';list.replaceChildren();sync();
   if(!rows.length){list.append(el('p','loading-note',q?'「'+fxQuery.trim()+'」에 맞는 효과가 없어요.':'효과가 없어요.'));return}
+  let lastGrp=null;
   for(const x of rows.slice(0,400)){
+   if(fxCat==='protocol'&&x.grp!==lastGrp){lastGrp=x.grp;list.append(el('h3','fx-grp',x.grp==='main'?'기본 프로토콜':'프로토콜 묶음 '+x.grp+'번대'))}
    const c=el('div','wr-card fx-card');c.id='fx-'+x.id;
    const top=el('div','wr-card-top');top.append(el('span','fx-dot c'+x.color));if(x.icon){const ii=itemIcon(x.icon.includes('/')?x.icon:'buff/'+x.icon,'sm fx-ic c'+x.color+(x.grid?' grid':'')+(x.mode?' xy':''));top.append(ii)}if(x.grid)top.append(el('span','fx-src','지형 함수'))
    const body=el('div','wr-body');body.append(el('strong','wr-name',x.name),el('p','tip-text',cleanTags(x.desc)));
