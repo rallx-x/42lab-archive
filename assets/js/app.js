@@ -1704,7 +1704,7 @@ function renderFairy(){
  const attrIds=Object.keys(D.attrs||{});
  const sprite=()=>D.sprites.find(x=>x.id===fairySel)||D.sprites[0];
  const pick=el('div','fy-pick');
- for(const sp of D.sprites){const b=el('button','fy-sprite'+(sp.id===sprite().id?' on':''));b.type='button';b.append(itemIcon(sp.icon,'fy-ic'),el('strong','',sp.name),el('span','fy-suit',sp.suit));if(sp.locked)b.append(el('span','fy-lock','미공개'));b.onclick=()=>{fairySel=sp.id;set('fairySel',sp.id);fsim=null;renderFairy()};pick.append(b)}
+ for(const sp of D.sprites){const b=el('button','fy-sprite'+(sp.id===sprite().id?' on':''));b.type='button';b.append(itemIcon(sp.icon?'fairy/'+sp.icon:'','fy-ic'),el('strong','',sp.name),el('span','fy-suit',sp.suit));if(sp.locked)b.append(el('span','fy-lock','미공개'));b.onclick=()=>{fairySel=sp.id;set('fairySel',sp.id);fsim=null;renderFairy()};pick.append(b)}
  host.append(pick);
  const skillCard=(sk,lvl,extra)=>{const c=el('div','fy-skill'+(sk.special?' special':''));const top=el('div','fy-skill-top');top.append(el('strong','',sk.name));if(sk.special)top.append(el('span','cmd-badge','고유'));if(extra)top.append(extra);c.append(top);
   const det=el('p','skill-detail');skillText(det,skillDetail(sk,lvl));c.append(det);
