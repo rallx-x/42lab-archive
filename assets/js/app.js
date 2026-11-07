@@ -1851,7 +1851,6 @@ async function showGrowth({push=true,cat=null}={}){
 // ---------- v1.8.8 오아시스 건축 (data/<언어>/oasis.json ← tools/client_extract/oasis.py): 건물 · 레벨별 재료 · 가공소 ----------
 let oasisData=null,oasisTab=get('oasisTab','oasis');
 const loadOasis=()=>oasisData?Promise.resolve(oasisData):fetchJSON(dataPath('oasis.json')).then(d=>oasisData=d);
-const OASIS_LOGIC={4:'생산',28:'보관 상한',3:'가공'};
 async function showOasis({push=true,cat=null}={}){
  const tok=++routeToken;showOnly('dollView');bgmLeave();voiceStop();closeArchiveMenu();$('#crumb').textContent='오아시스 건축';
  if(cat&&['oasis','sector','factory'].includes(cat)){oasisTab=cat;set('oasisTab',cat)}
@@ -1886,13 +1885,13 @@ async function showOasis({push=true,cat=null}={}){
   for(const b of bs){const c=el('div','oa-card');const top=el('div','oa-top');top.append(itemIcon((b.kind==='oasis'&&b.small)?'oasis/'+b.small:(b.icon?'oasis/'+b.icon:''),'oa-ic'));/* 오아시스 큰 그림(OasisBuliding_*)은 내보내기에 없어서 작은 그림 */const tx=el('div','');tx.append(el('strong','oa-name',b.name),el('span','oa-en',b.en||''));top.append(tx);c.append(top);
    if(b.intro)c.append(el('p','pg-desc',cleanTags(b.intro)));
    if(b.levels.length){const det=el('details','oa-levels');det.append(el('summary','','레벨 '+b.levels.length+'단계 · 재료 · 효과'));
-    const tb=el('table','algo-table fy-table oa-table');const hr=el('tr');['레벨','강화 재료','효과','조건'].forEach(x=>hr.append(el('th','',x)));tb.append(hr);
+    const tb=el('table','algo-table fy-table oa-table');const hr=el('tr');['레벨','강화 재료','효과 · 조건'].forEach(x=>hr.append(el('th','',x)));tb.append(hr);
     for(const l of b.levels){const tr=el('tr');tr.append(el('td','','Lv.'+l.lv));const c1=el('td','');c1.append(chips(l.cost));
-     const c2=el('td','');const w=el('span','fy-cost');for(const v of l.vals)w.append(chip(v.item,fmt(v.val),(OASIS_LOGIC[v.logic]?OASIS_LOGIC[v.logic]+' · ':'')));c2.append(w);for(const e of l.effect)c2.append(el('div','oa-eff',cleanTags(e)));
-     const c3=el('td','');for(const x of l.need)c3.append(el('div','oa-need',x));tr.append(c1,c2,c3);tb.append(tr)}
+     const c2=el('td','');if(l.fx?.length){const w=el('div','oa-fx');for(const [a,b] of l.fx){const r=el('div','oa-fx-row');r.append(el('span','',a),el('b','',b));w.append(r)}c2.append(w)}for(const e of l.effect)c2.append(el('div','oa-eff',cleanTags(e)));
+     if(l.need.length){const nw=el('div','oa-needs');for(const x of l.need)nw.append(el('span','oa-need',x));c2.append(nw)}tr.append(c1,c2);tb.append(tr)}
     const tw=el('div','algo-table-wrap');tw.append(tb);det.append(tw);c.append(det)}
    g.append(c)}
-  list.append(g,el('p','load-note','효과 칸의 「생산 · 보관 상한」은 게임 수치를 보고 붙인 이름이에요(추정).'));
+  list.append(g);
  };
  si.oninput=draw;draw();
 }

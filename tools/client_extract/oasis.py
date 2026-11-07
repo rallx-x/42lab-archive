@@ -29,6 +29,37 @@ def main():
         G = lambda t: root(cdir + '/LuaConfigs.%s.lua' % t)[0]
         item, bld, story, tip, sct = G('item'), G('oasis_building'), G('story_avg'), G('tip_language'), G('story_condition_text')
         used = set()
+        # 효과 글 틀: building_buff[logic] = buff_text_context (예 「%s 생산 속도」) · buff_value (예 「%s/시간」)
+        bb, bdef = run(cdir + '/LuaConfigs.building_buff.lua')
+        car = G('career')
+        att = G('attribute')
+        def fx_text(t, pa, pb, pc):
+            r = clean(bb.get(t)) if isinstance(bb.get(t), dict) else None
+            if r is None:
+                return None
+            ctx = T(r.get('buff_text_context')) if 'buff_text_context' in r else ''
+            if not ctx and t in (4, 25):   # 일본 서버는 4 · 25 줄에 글이 비어 있어서 기본 글(「%s生産速度」) 사용
+                ctx = T(clean(bdef).get('buff_text_context'))
+            bv = r.get('buff_value', '%s')
+            bv = T(bv) if isinstance(bv, int) else (bv or '%s')
+            bv = bv.replace('%%', '%')
+            iname = lambda i: T(item[i].get('name')) if isinstance(item.get(i), dict) else str(i)
+            if t in (4, 25):          # 초당 생산량 × 100000 → 시간당 (게임 화면: 공작소 579 → 20.8/시간)
+                v = int(pb * 36 / 100) / 10 if pb is not None else None
+                return [ctx.replace('%s', iname(pa), 1), bv.replace('%s', '%g' % v if v is not None else '')]
+            if t == 6:                # 직군 · 능력치 · 값 (퍼센트 능력치는 /10)
+                cn = T(car[pa].get('name')) if isinstance(car.get(pa), dict) else ('전체' if pa == 6 else str(pa))
+                a = att.get(pb) if isinstance(att.get(pb), dict) else {}
+                v = '%g%%' % (pc / 10) if a.get('num_type') == 2 else str(pc)
+                return [ctx.replace('%s', cn, 1).replace('%s', T(a.get('name')), 1), bv.replace('%s', v)]
+            if t == 11:               # 생산효율 ‰ → %
+                return [ctx.replace('%s', iname(pa), 1), '%.1f%%' % (pb / 10) if pb is not None else '']
+            if t == 3:
+                return [ctx.replace('%s', iname(pa), 1), '%s' % pb]
+            if t == 28:
+                return [ctx, str(pb)]
+            v = pb if pb is not None else pa
+            return [ctx.replace('%s', str(pa) if '%s' in ctx else '', 1), bv.replace('%s', str(v)) if v is not None else '']
         ctext = {k: T(v.get('condition_text')) for k, v in sct.items() if isinstance(v, dict)}
 
         def cond(pc, p1, p2):
@@ -66,10 +97,12 @@ def main():
                 eff = [T(tip[c].get('content')) for c in (clean(row['custom_logic']) if 'custom_logic' in row else {}).values() if isinstance(tip.get(c), dict)]
                 # 레벨 수치: logic(4 생산 · 28 보관 상한 · 3 그 밖, 추정) · para1 아이템 · para2 값
                 lg, pa, pb = g('logic') or {}, g('para1') or {}, g('para2') or {}
+                pc = g('para3') or {}
                 vals = [{'logic': lg[j], 'item': str(pa.get(j)), 'val': pb.get(j)} for j in sorted(lg) if pa.get(j) is not None]
+                fx = [x for x in (fx_text(lg[j], pa.get(j), pb.get(j), pc.get(j)) for j in sorted(lg)) if x and x[0] and '%s' not in x[0] + x[1] and 'None' not in x[0]]  # 틀이 다 안 채워지면 뺌
                 used.update(v['item'] for v in vals)
                 need = cond(g('pre_condition') or {}, g('pre_para1') or {}, g('pre_para2') or {})
-                levels.append({'lv': lv, 'cost': cost, 'effect': [e for e in eff if e], 'vals': vals, 'need': need})
+                levels.append({'lv': lv, 'cost': cost, 'effect': [e for e in eff if e], 'vals': vals, 'fx': fx, 'need': need})
             icon = b.get('icon_res') or ''
             buildings.append({'id': bid, 'name': T(b.get('name')), 'en': b.get('name_en') or '', 'intro': T(b.get('intro')), 'long': T(b.get('intro_long')),
                               'company': b.get('enterprise') or '', 'kind': 'oasis' if icon.startswith('OasisBul') else 'sector',
