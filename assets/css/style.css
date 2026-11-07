@@ -1808,3 +1808,5 @@ body.dark .item-ic.empty::before,body.dim .item-ic.empty::before,body.entropics 
 .oa-time{margin-left:auto;font-size:12px;color:var(--sub)}
 .oa-row{display:flex;flex-wrap:wrap;align-items:center;gap:6px}
 .oa-table .item-chip-n,.oa-table td:first-child,.oa-table .oa-need{white-space:nowrap}
+div.wr-card.fx-card,div.wr-card.algo-card{background:var(--panel);border:1px solid var(--line)}
+.fx-card .tip-doll{background:var(--bg);border:1px solid var(--line)}

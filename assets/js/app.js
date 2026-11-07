@@ -1701,8 +1701,9 @@ function renderEffects(){
    const c=el('div','wr-card fx-card');c.id='fx-'+x.id;
    const top=el('div','wr-card-top');top.append(el('span','fx-dot c'+x.color));if(x.icon){const ii=itemIcon(x.icon.includes('/')?x.icon:'buff/'+x.icon,'sm fx-ic c'+x.color+(x.grid?' grid':'')+(x.mode?' xy':''));top.append(ii)}if(x.grid)top.append(el('span','fx-src','지형 함수'))
    const body=el('div','wr-body');body.append(el('strong','wr-name',x.name),el('p','tip-text',cleanTags(x.desc)));
-   if(x.dolls?.length||x.algo){const w=el('div','tip-dolls');
-    for(const h of x.dolls||[]){const d=byHero.get(+h);if(!d)continue;const b=el('button','doll-chip link tip-doll');b.type='button';b.append(ic('user'),document.createTextNode(' '+d.name));b.onclick=()=>showDoll(d.voiceKey,{part:'skill'});w.append(b)}
+   const fxDolls=(x.dolls||[]).length<=FX_DOLL_MAX?(x.dolls||[]):[];/* 여러 인형이 같이 쓰는 공통 효과는 인형 칩 빼기 */
+   if(fxDolls.length||x.algo){const w=el('div','tip-dolls');
+    for(const h of fxDolls){const d=byHero.get(+h);if(!d)continue;const b=el('button','doll-chip link tip-doll');b.type='button';b.append(ic('user'),document.createTextNode(' '+d.name));b.onclick=()=>showDoll(d.voiceKey,{part:'skill'});w.append(b)}
     if(x.algo){const b=el('button','doll-chip link tip-doll','알고리즘');b.type='button';b.onclick=()=>showAlgos();w.append(b)}
     body.append(w)}
    c.append(top,body);list.append(c)}
@@ -1711,6 +1712,7 @@ function renderEffects(){
  };
  draw();
 }
+const FX_DOLL_MAX=3;
 // ---------- v1.8.0 성령 (data/<언어>/fairy.json ← tools/client_extract/fairy.py): 성령 정보(스펙표) · 강화 시뮬레이터 ----------
 let fairyData=null,fairyTab=get('fairyTab','info'),fairySel=+get('fairySel',1)||1,fairyRar=+get('fairyRar',4)||4;
 const loadFairy=()=>fairyData?Promise.resolve(fairyData):fetchJSON(dataPath('fairy.json')).then(d=>fairyData=d);
