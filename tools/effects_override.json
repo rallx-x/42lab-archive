@@ -1,0 +1,9 @@
+{
+ "_note": "효과 사전 손 분류: 효과 번호 → green · red · orange · unique · field (tools/client_extract/effects.py 가 읽음)",
+ "9": "field",
+ "33": "field",
+ "110": "field",
+ "_9": "페인트 발판 (뱅크시)",
+ "_33": "늪지",
+ "_110": "전격 필드"
+}

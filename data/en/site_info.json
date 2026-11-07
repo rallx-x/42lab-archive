@@ -26,6 +26,19 @@
    ]
   },
   {
+   "id": "2026-11-07-v1.7.8",
+   "date": "2026-11-07",
+   "kind": "update",
+   "title": "Update v1.7.8 · Effect Glossary · Functions",
+   "lines": [
+    "The Library now has an \"Effect Glossary\": the descriptions shown when you tap an effect name in in-game skill text, grouped by in-game color (green · red · orange), plus Doll-Unique and Field · Tile Effects (terrain functions) tabs.",
+    "The Library now has a \"Functions\" compendium: browse by target (Guard · Sniper · Warrior …) or by set; the card border shows the in-game card color. Functions that differ only in numbers can be switched with the step buttons under the text.",
+    "Home: the birthday card shows today's or the next birthday, with the calendar under \"Open calendar\". Added the global server pickup schedule.",
+    "All Records is split into Main · Exclusive · Event · Other tabs, and Items into Souvenirs · Major Events · Event Rewards.",
+    "Skill icon frames and Arma Inscripta borders now match the game, with larger icons. Doll profiles show the in-game Doll number (#0410 etc.)."
+   ]
+  },
+  {
    "id": "2026-11-06-v1.7",
    "date": "2026-11-06",
    "kind": "update",
