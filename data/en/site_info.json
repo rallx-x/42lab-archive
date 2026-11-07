@@ -26,6 +26,16 @@
    ]
   },
   {
+   "id": "2026-11-07-v1.8.7",
+   "date": "2026-11-07",
+   "kind": "update",
+   "title": "Update v1.8.7 · Achievements · Cloud Milestones",
+   "lines": [
+    "Game now has \"Achievements\" (by category, with level rewards) and \"Cloud Milestones\" (tasks by module, with stage rewards).",
+    "Growth › Doll can now be picked by searching a name or nickname."
+   ]
+  },
+  {
    "id": "2026-11-07-v1.8.5",
    "date": "2026-11-07",
    "kind": "update",
