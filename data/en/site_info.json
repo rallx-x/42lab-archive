@@ -26,6 +26,16 @@
    ]
   },
   {
+   "id": "2026-11-07-v1.8.1",
+   "date": "2026-11-07",
+   "kind": "update",
+   "title": "Update v1.8.1 · Protocols",
+   "lines": [
+    "The Effect Glossary now has a \"Protocols\" tab: filter by Favorable · Neutral · Unfavorable, split into base protocols and groups. (Group names and categories will be refined after review.)",
+    "The Library section of the left menu now lists Functions · Effect Glossary · Commander Skills · Sprites."
+   ]
+  },
+  {
    "id": "2026-11-07-v1.8.0",
    "date": "2026-11-07",
    "kind": "update",

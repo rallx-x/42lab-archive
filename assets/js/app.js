@@ -820,6 +820,8 @@ function renderArchiveMenu(){
  const tipLink=el('button','archive-menu-link archive-menu-home archive-menu-dolls','로딩 팁');tipLink.type='button';tipLink.onclick=()=>{closeArchiveMenu();$('#search').value='';showTips()};host.append(tipLink);
  const itemLink=el('button','archive-menu-link archive-menu-home archive-menu-dolls','아이템');itemLink.type='button';itemLink.onclick=()=>{closeArchiveMenu();$('#search').value='';showItems()};host.append(itemLink);
  const algoLink=el('button','archive-menu-link archive-menu-home archive-menu-dolls','알고리즘');algoLink.type='button';algoLink.onclick=()=>{closeArchiveMenu();$('#search').value='';showAlgos()};host.append(algoLink);
+ // v1.8.1 자료실 새 칸: 함수 · 효과 사전 · 지휘 스킬 · 성령
+ for(const [name,go] of [['함수',()=>showFunctions()],['효과 사전',()=>showEffects()],['지휘 스킬',()=>showCommander()],['성령',()=>showFairy()]]){const b=el('button','archive-menu-link archive-menu-home archive-menu-dolls',name);b.type='button';b.onclick=()=>{closeArchiveMenu();$('#search').value='';go()};host.append(b)}
 }
 $('#menuBtn').onclick=()=>{const menu=$('#archiveMenu');if(!menu.classList.contains('open')){renderArchiveMenu();menu.classList.add('open');menu.removeAttribute('aria-hidden');$('#menuBtn').setAttribute('aria-expanded','true');$('#menuBtn').classList.add('is-open')}else closeArchiveMenu()};
 $('#archiveMenuClose').onclick=closeArchiveMenu;
