@@ -26,6 +26,16 @@
    ]
   },
   {
+   "id": "2026-11-07-v1.8.9",
+   "date": "2026-11-07",
+   "kind": "update",
+   "title": "Update v1.8.9 · Banner search · Oasis effects",
+   "lines": [
+    "Search the full pickup schedule by Doll or banner name, with main / sub pickup and days left.",
+    "Oasis Construction effects now use the in-game wording (e.g. Prefab Unit Output 20.8/hr)."
+   ]
+  },
+  {
    "id": "2026-11-07-v1.8.8",
    "date": "2026-11-07",
    "kind": "update",

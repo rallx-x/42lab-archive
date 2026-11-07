@@ -117,3 +117,11 @@
 - oasis_building_tech_buff · building_buff: 건물 효과(버프) · oasis_area: 구역
 - 가공소: factory (가공소 7종 · 열리는 조건) · factory_order (64개: 만드는 물건 outPutItemId/Num · 시간 time_cost · 재료 raw_material · materialOrder · 열리는 조건 pre_condition 3 = 스테이지 클리어 → 메인 스토리 어디까지)
 - 필요한 그림: OasisBuliding_* (건물 그림) · small_icon — 사용자에게 받기
+
+## 남은 일 (2026-11-07 v1.8.8 뒤 정리 — 육성 · 함수 모드 · 업적 · 이정표 · 오아시스 건축은 끝남)
+1. 스펙 계산기 「작전 능력」 — HeroData 합치는 순서 풀기 + 게임 화면 숫자로 대조 (위 메모)
+2. 검수: 프로토콜 묶음 이름 · 던전/워체스 탭 이름 · 함수 모드 번호 범위 · 인형 고유 효과 · 성령 비용 규칙 · 스킬 Lv1→2 · 마인드 확장 기본 비용 · 오아시스 「생산 · 보관 상한」 이름(추정)
+3. 그림: SectorBuilding_3036 · 3056 · OasisBuliding_101~108(큰 그림) · ICON_blue/orange_random · 성령 카드 틀
+4. 무장각인 직군 색 · 단계 해금 레벨
+5. 중섭 픽업 일정 (내년 초 엑셀)
+6. 예전 목록: 궁극기 컷신 영상 · 스킬 화면 게임처럼 · 시계 기록 폴더 격자 · 능력치 탭 휴대폰 화면 · 메일 모음 · 숙소 3D 프리셋
