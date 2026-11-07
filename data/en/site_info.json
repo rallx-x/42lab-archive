@@ -26,6 +26,16 @@
    ]
   },
   {
+   "id": "2026-11-07-v1.8.0",
+   "date": "2026-11-07",
+   "kind": "update",
+   "title": "Update v1.8.0 · Sprites",
+   "lines": [
+    "The Library now has \"Sprites\": Sprite info (skill values by grade C · B · A · S, rank materials, stats by level) and an upgrade simulator (rank · level · skill rolls · materials used).",
+    "Commander skill Sprite variants now use the 4 Sprite skill grades (C · B · A · S)."
+   ]
+  },
+  {
    "id": "2026-11-07-v1.7.10",
    "date": "2026-11-07",
    "kind": "update",
