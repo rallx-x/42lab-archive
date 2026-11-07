@@ -2224,6 +2224,46 @@ function skillHex(icon,o={}){hexFilters();
 // ----- v1.7 인형 능력치 · 친밀도 보너스 (data/<언어>/stats.json) -----
 let statsData=null;
 const loadStats=()=>statsData?Promise.resolve(statsData):fetchJSON(dataPath('stats.json')).then(d=>statsData=d);
+// ----- v1.8.3 인형 육성 재화 (data/<언어>/growth.json ← tools/client_extract/growth.py): 지금 → 목표 계산기 -----
+let growthData=null,growArma=get('growArma','off');
+const loadGrowth=()=>growthData?Promise.resolve(growthData):fetchJSON(dataPath('growth.json')).then(d=>growthData=d);
+const growState=new Map();
+function growthPanel(p){
+ const G=growthData,hid=String(p.heroId),pot=G.potential?.[hid]||[],arma=G.arma?.[hid],frag=String(G.fragBase+(+p.heroId));
+ const d0=(dollIndex?.dolls||[]).find(d=>+d.heroId===+p.heroId);const rank0=Math.max(1,(d0?.stars||p.stars||1)*2);
+ const st=growState.get(hid)||{r:[rank0,10],lv:[1,70],s1:[1,10],s2:[1,10],al:[0,30]};growState.set(hid,st);
+ const wrap=el('div','grow-wrap');
+ const itemName=i=>i===frag?(p.name+' 조각'):(G.items?.[i]?.[0]||i);
+ const fmt=n=>n.toLocaleString(window.UI_LOCALE||'ko-KR');
+ const starTxt=r=>(r%2?Math.floor(r/2)+'.5':String(r/2))+'★';
+ const sel=(vals,label,v,on)=>{const s=el('select','grow-sel');for(const x of vals){const o=el('option','',label(x));o.value=x;if(+x===+v)o.selected=true;s.append(o)}s.onchange=()=>on(+s.value);return s};
+ const rows=[['성급',Array.from({length:10-rank0+1},(_,i)=>rank0+i),starTxt,'r'],['레벨',Array.from({length:70},(_,i)=>i+1),x=>'Lv.'+x,'lv'],['자동 스킬',Array.from({length:10},(_,i)=>i+1),x=>'Lv.'+x,'s1'],['패시브 스킬',Array.from({length:10},(_,i)=>i+1),x=>'Lv.'+x,'s2']];
+ if(arma)rows.push(['무장각인',Array.from({length:31},(_,i)=>i),x=>x?'Lv.'+x:'없음','al']);
+ const form=el('div','grow-form');const out=el('div','grow-out');
+ const draw=()=>{form.replaceChildren(el('span',''),el('span','fy-label','지금'),el('span','fy-label','목표'));
+  for(const [name,vals,lab,k] of rows){if(k==='al'&&growArma!=='on')continue;
+   form.append(el('span','grow-name',name),sel(vals,lab,st[k][0],v=>{st[k][0]=v;if(st[k][1]<v)st[k][1]=v;draw()}),sel(vals,lab,st[k][1],v=>{st[k][1]=v;if(st[k][0]>v)st[k][0]=v;draw()}))}
+  // 합계
+  const tot={},add=(c,m=1)=>{for(const [i,n] of Object.entries(c||{}))tot[i]=(tot[i]||0)+n*m};
+  const parts=[];const sect=(label,c)=>{const n=Object.keys(c).length;if(n)parts.push([label,c])};
+  {const c={};for(const r of G.ranks)if(r.rank>=st.r[0]&&r.rank<st.r[1]){if(r.frag)c[frag]=(c[frag]||0)+r.frag;for(const [i,n] of Object.entries(r.cost))c[i]=(c[i]||0)+n}sect('성급 '+starTxt(st.r[0])+' → '+starTxt(st.r[1]),c);add(c)}
+  {let e=0;for(const l of G.levels)if(l.lv>=st.lv[0]&&l.lv<st.lv[1])e+=l.exp;const c={};for(const sg of pot)if(sg.max>=st.lv[0]&&sg.max<st.lv[1])for(const [i,n] of Object.entries(sg.cost))c[i]=(c[i]||0)+n;
+   sect('마인드 확장 (Lv.'+st.lv[0]+' → '+st.lv[1]+')',c);add(c);if(e)parts.push(['레벨 경험치',{_exp:e}])}
+  for(const [k,name] of [['s1','자동 스킬'],['s2','패시브 스킬']]){const c={};for(const r of G.skills)if(r.lv>=st[k][0]&&r.lv<st[k][1])for(const [i,n] of Object.entries(r.cost))c[i]=(c[i]||0)+n;sect(name+' Lv.'+st[k][0]+' → '+st[k][1],c);add(c)}
+  if(arma&&growArma==='on'){const c={};let prev=0;for(const s of arma.steps){if(st.al[0]<=prev&&st.al[1]>prev)for(const [i,n] of Object.entries(s.cost))c[i]=(c[i]||0)+n;prev=s.maxLv}
+   for(const l of arma.levels)if(l.lv>=Math.max(1,st.al[0])&&l.lv<st.al[1])for(const [i,n] of Object.entries(l.cost))c[i]=(c[i]||0)+n;sect('무장각인 Lv.'+st.al[0]+' → '+st.al[1],c);add(c)}
+  out.replaceChildren();
+  const chips=c=>{const w=el('span','fy-cost');for(const [i,n] of Object.entries(c)){const x=el('span','item-chip');if(i==='_exp'){x.append(el('span','item-chip-n',fmt(n)))}else{x.append(itemIcon(G.items?.[i]?.[1]||'','sm'),el('span','item-chip-name',itemName(i)),el('span','item-chip-n','×'+fmt(n)))}w.append(x)}return w};
+  if(!parts.length){out.append(el('p','load-note','지금과 목표가 같아요.'));return}
+  for(const [label,c] of parts){const r=el('div','fy-cost-row');r.append(el('span','fy-label',label),chips(c));out.append(r)}
+  const t=el('div','fy-cost-row grow-total');t.append(el('span','fy-label','합계'),chips(tot));out.append(t);
+ };
+ const head=el('div','skill-arma-bar');
+ if(arma){const tg=el('button','skill-arma-toggle');tg.type='button';const paint=()=>{const on=growArma==='on';tg.classList.toggle('on',on);tg.setAttribute('aria-pressed',String(on));tg.replaceChildren(el('span','skill-arma-dot'),el('span','','무장각인 포함'),el('span','skill-arma-state',on?'ON':'OFF'))};
+  tg.onclick=()=>{growArma=growArma==='on'?'off':'on';set('growArma',growArma);paint();draw()};paint();head.append(tg)}
+ wrap.append(head,el('h3','grow-h','지금 → 목표'),form,el('h3','grow-h','필요한 재료'),out,
+  el('p','load-note','게임 데이터 그대로 계산했어요. 성급은 다음 단계로 올릴 때 드는 조각 · 디그코인, 마인드 확장은 목표 레벨까지 넘어야 하는 최대 레벨(10 · 20 · … · 60)마다 드는 재료예요. 스킬은 자동 · 패시브 두 개를 따로 계산해요(궁극기는 성급에 따라 올라요). 경험치는 숫자로만 보여요.'));
+ draw();return wrap}
 let friendLv=+get('friendLv',20)||20;
 const starLabel=n=>n%1?Math.floor(n)+'.5★':n+'★';
 function statsPanel(p){
@@ -2348,7 +2388,7 @@ async function showDoll(key,{push=true,part=null}={}){
  if(push)saveRoute({type:'doll',id:key,part});
  const host=$('#dollView');host.replaceChildren(el('p','loading-note','프로필을 불러오는 중…'));window.scrollTo(0,0);
  try{loadDollIndex().catch(()=>{});let p=dollCache.get(key);if(!p){p=await fetchJSON(dataPath('profiles/'+encodeURIComponent(key)+'.json'));dollCache.set(key,p)}
-  const [sk,am,stt]=await Promise.all([loadSkills().catch(()=>null),loadArma().catch(()=>null),loadStats().catch(()=>null),window.siteReady?.catch(()=>{}),loadDollIndex().catch(()=>null)]);if(stt&&!p.stats)p.stats=stt.heroes?.[String(p.heroId)]||null;if(sk&&!p.skills)p.skills=sk.heroes?.[String(p.heroId)]||null;if(am&&!p.arma)p.arma=am.heroes?.[String(p.heroId)]||null;
+  const [sk,am,stt]=await Promise.all([loadSkills().catch(()=>null),loadArma().catch(()=>null),loadStats().catch(()=>null),loadGrowth().catch(()=>null),window.siteReady?.catch(()=>{}),loadDollIndex().catch(()=>null)]);if(stt&&!p.stats)p.stats=stt.heroes?.[String(p.heroId)]||null;if(sk&&!p.skills)p.skills=sk.heroes?.[String(p.heroId)]||null;if(am&&!p.arma)p.arma=am.heroes?.[String(p.heroId)]||null;
   if(tok!==routeToken)return;renderDoll(p,part)}
  catch(e){if(tok===routeToken){host.replaceChildren(error('프로필을 불러오지 못했어요. ('+e.message+')'))}}
 }
@@ -2527,6 +2567,7 @@ function renderDoll(p,startPart){
  const parts=[];
  if(p.skills?.length&&typeof skillPanel==='function')parts.push(['skill','스킬',p.skills.length+'개',box=>box.append(skillPanel(p))]);
  if(p.arma?.steps?.length)parts.push(['arma','무장각인','',box=>box.append(armaPanel(p))]);
+ if(growthData&&p.heroId)parts.push(['growth','육성','',box=>box.append(growthPanel(p))]);
  parts.push(['affinity','친밀도','',box=>{if(affBox.childNodes.length)box.append(affBox);box.append(storyPanel(p))}]);
  if(vc)parts.push(['voice','보이스',vc+'개',box=>box.append(voicePanel(p))]);
  if(skins.length)parts.push(['skin','스킨',skins.length+'벌',box=>{box.append(el('p','load-note',LOAD_NOTE),gallery(p,skins,{label:'스킨',cls:'gal-skin'}))}]);
