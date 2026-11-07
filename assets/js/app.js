@@ -1803,7 +1803,7 @@ async function showCommander({push=true}={}){
 // ---------- v1.7.8 함수 도감 (data/<언어>/functions.json ← tools/client_extract/functions.py) ----------
 // 탭: 대상별(세부 탭 = 카드 모서리 표시) · 세트별(세부 탭 = 세트). 카드 테두리 색 = 게임 카드 색(파랑 · 보라 · 주황)
 // 수치만 다른 같은 함수는 설명 아래 색 단추로 단계 전환
-let fnData=null,fnMode=get('fnMode','mark'),fnSub=get('fnSub','all'),fnQuery='';
+let fnData=null,fnMode=get('fnMode','mark'),fnSub=get('fnSub','all'),fnQuery='',fnGame=get('fnGame','all');
 const loadFunctions=()=>fnData?Promise.resolve(fnData):fetchJSON(dataPath('functions.json')).then(d=>fnData=d);
 const fnStep=new Map();
 async function showFunctions({push=true,cat=null}={}){
@@ -1831,6 +1831,8 @@ function renderFunctions(){
  const sbox=el('span','doll-search');const si=el('input');si.type='search';si.placeholder='이름 · 내용';si.value=fnQuery;si.setAttribute('aria-label','함수 찾기');si.autocomplete='off';
  si.oninput=()=>{fnQuery=si.value;draw()};sbox.append(el('span','doll-search-prompt','//:_'),si);sw.append(sbox);
  bar.append(tabs,sw);host.append(bar);
+ // v1.8.4 모드 (일반 · 매트릭스 · 엔트로픽 서바이버 …, 1차 분류 — 함수 번호 범위)
+ const games=el('div','fn-subs fn-games');host.append(games);
  const subs=el('div','fn-subs');host.append(subs);
  const list=el('div','fn-list');host.append(list);
  const go=()=>{history.replaceState(history.state,'',location.pathname+location.search+routeHash({type:'functions',cat:fnMode+(fnSub!=='all'?'/'+fnSub:'')}));draw()};
@@ -1854,14 +1856,17 @@ function renderFunctions(){
   c.append(body);return c};
  const draw=()=>{
   modeBtns.forEach(([m,b])=>{b.classList.toggle('selected',m===fnMode);b.setAttribute('aria-selected',String(m===fnMode))});
+  games.replaceChildren(el('span','fy-label','모드'));
+  for(const [k,n] of [['all','모든 모드'],...(fnData.modes||[])]){const c=k==='all'?all.length:all.filter(o=>o.mode===k).length;const b=el('button','fn-sub'+(k===fnGame?' on':''));b.type='button';b.append(el('span','',n),el('span','wr-tab-n',String(c)));b.onclick=()=>{fnGame=k;set('fnGame',k);draw()};games.append(b)}
+  const A=fnGame==='all'?all:all.filter(o=>o.mode===fnGame);
   subs.replaceChildren();
   const opts=fnMode==='mark'?[['all','모든 함수',null],...marks.map(m=>[String(m[0]),m[1],m])]:[['all','모든 세트',null],...tags.map(t=>[String(t[0]),t[1],t])];
   if(!opts.some(([k])=>k===fnSub))fnSub='all';
-  for(const [k,name,ref] of opts){const n=all.filter(o=>k==='all'?(fnMode==='tag'?tagsOf(o).length>0:true):(fnMode==='mark'?String(o.mark)===k:tagsOf(o).map(String).includes(k))).length;if(!n)continue;
+  for(const [k,name,ref] of opts){const n=A.filter(o=>k==='all'?(fnMode==='tag'?tagsOf(o).length>0:true):(fnMode==='mark'?String(o.mark)===k:tagsOf(o).map(String).includes(k))).length;if(!n)continue;
    const b=el('button','fn-sub'+(k===fnSub?' on':''));b.type='button';if(ref)b.append(fnMode==='mark'?cornerIc(ref):tagIc(ref));b.append(el('span','',name),el('span','wr-tab-n',String(n)));
    b.onclick=()=>{fnSub=k;set('fnSub',k);go()};subs.append(b)}
   const q=dnorm(fnQuery);
-  const rows=all.filter(o=>inSub(o)&&(!q||dnorm(o.name).includes(q)||dnorm(cleanTags(o.detail||o.brief||'')).includes(q)));
+  const rows=A.filter(o=>inSub(o)&&(!q||dnorm(o.name).includes(q)||dnorm(cleanTags(o.detail||o.brief||'')).includes(q)));
   count.textContent=rows.length+'개';list.replaceChildren();
   if(!rows.length){list.append(el('p','loading-note',q?'「'+fnQuery.trim()+'」에 맞는 함수가 없어요.':'함수가 없어요.'));return}
   if(fnMode==='tag'&&fnSub==='all'){for(const tg of tags){const part=rows.filter(o=>tagsOf(o).includes(tg[0]));if(!part.length)continue;const h=el('h3','fn-group');h.append(tagIc(tg),el('span','',tg[1]+' · '+part.length));list.append(h);const g=el('div','fn-grid');part.forEach(o=>g.append(card(o)));list.append(g)}}

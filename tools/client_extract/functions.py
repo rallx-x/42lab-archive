@@ -17,6 +17,22 @@ from cfg import root
 import skills as S
 from skills import table_rows, row_dict, packed, evaluate, num
 
+# 모드 (1차, 함수 번호 범위로 — 검수하며 다듬기). 게임에 모드 ↔ 함수 연결 표가 따로 없어서 번호 묶음 + 이름 · 그림으로 판단
+MODES = [('normal', '일반', [(7000, 15999)]), ('matrix', '매트릭스', [(90000, 93999)]), ('es', '엔트로픽 서바이버', [(17000, 17999)]),
+         ('protocol', '프로토콜', [(20000, 28999), (40000, 40999)]), ('chain', '함수 연쇄', [(30000, 31999)]), ('warchess', '워체스', [(94000, 94999)]),
+         ('support', '지원', [(901000, 911999)])]
+MODE_NAMES = {'ko': [m[1] for m in MODES] + ['기타'], 'ja': ['通常', 'マトリックス', 'エントロピックサバイバー', 'プロトコル', '関数連鎖', 'ウォーチェス', '支援', 'その他'],
+              'en': ['Standard', 'Matrix', 'Entropic Survivor', 'Protocols', 'Function Chain', 'Warchess', 'Support', 'Other'],
+              'tw': ['一般', '矩陣', '熵增倖存者', '協議', '函數連鎖', '戰棋', '支援', '其他'], 'zh': ['一般', '矩阵', '熵增幸存者', '协议', '函数连锁', '战棋', '支援', '其他']}
+
+
+def mode_of(i):
+    for key, _, rngs in MODES:
+        if any(a <= i <= b for a, b in rngs):
+            return key
+    return 'etc'
+
+
 HERE = os.path.dirname(os.path.abspath(__file__))
 REPO = os.environ.get('REPO') or os.path.join(HERE, '..', '..')
 
@@ -148,11 +164,13 @@ def main():
                 o['steps'] = steps
             o['ids'] = ids
             o['tags'] = sorted({rows[i]['tag'] for i in ids if rows[i]['tag']})
+            o['mode'] = mode_of(head['id'])
             out.append(o)
         used_m = {o['mark'] for o in out}
         used_t = {t for o in out for t in o['tags']}
         doc = {'schema': '42lab-functions/0.1', 'lang': lang, 'source': 'configs chip · chip_mark · chip_tag · item + tables BattleSkillCfg (레벨 1 수치)',
-               'marks': [m for m in marks if m[0] in used_m], 'tags': [t for t in tags if t[0] in used_t], 'functions': out}
+               'marks': [m for m in marks if m[0] in used_m], 'tags': [t for t in tags if t[0] in used_t],
+               'modes': [[k, n] for k, n in zip([m[0] for m in MODES] + ['etc'], MODE_NAMES[lang]) if any(o['mode'] == k for o in out)], 'functions': out}
         with open(os.path.join(REPO, 'data', lang, 'functions.json'), 'w', encoding='utf-8') as f:
             json.dump(doc, f, ensure_ascii=False, separators=(',', ':'))
         print(lang, len(out), 'functions,', sum(1 for o in out if o.get('steps')), 'with steps,', len(doc['marks']), 'marks,', len(doc['tags']), 'tags')
