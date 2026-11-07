@@ -78,6 +78,7 @@ function routeHash(route){
  if(route.type==='effects')return '#effects'+(route.cat?'/'+encodeURIComponent(route.cat):'');
  if(route.type==='commander')return '#commander';
  if(route.type==='game')return '#game';
+ if(route.type==='oasis')return '#oasis'+(route.cat?'/'+route.cat:'');
  if(route.type==='achieve')return '#achievements'+(route.cat?'/'+route.cat:'');
  if(route.type==='mile')return '#milestones'+(route.cat?'/'+route.cat:'');
  if(route.type==='grow')return '#grow'+(route.cat?'/'+route.cat.split('/').map(encodeURIComponent).join('/'):'');
@@ -103,6 +104,7 @@ function parseRoute(){
   if(raw==='tips'||raw.startsWith('tips/'))return {type:'tips',cat:raw.startsWith('tips/')?decodeURIComponent(raw.slice(5)):null};
   if(raw==='commander')return {type:'commander'};
   if(raw==='game')return {type:'game'};
+  if(raw==='oasis'||raw.startsWith('oasis/'))return {type:'oasis',cat:raw.startsWith('oasis/')?raw.slice(6):null};
   if(raw==='achievements'||raw.startsWith('achievements/'))return {type:'achieve',cat:raw.startsWith('achievements/')?raw.slice(13):null};
   if(raw==='milestones'||raw.startsWith('milestones/'))return {type:'mile',cat:raw.startsWith('milestones/')?raw.slice(11):null};
   if(raw==='grow'||raw.startsWith('grow/'))return {type:'grow',cat:raw.startsWith('grow/')?raw.slice(5).split('/').map(decodeURIComponent).join('/'):null};
@@ -188,6 +190,7 @@ async function restoreRoute(){
  if(route.type==='functions'){await showFunctions({push:false,cat:route.cat});return}
  if(route.type==='commander'){await showCommander({push:false});return}
  if(route.type==='game'){await showGame({push:false});return}
+ if(route.type==='oasis'){await showOasis({push:false,cat:route.cat});return}
  if(route.type==='achieve'){await showProgress('achieve',{push:false,cat:route.cat});return}
  if(route.type==='mile'){await showProgress('mile',{push:false,cat:route.cat});return}
  if(route.type==='grow'){await showGrowth({push:false,cat:route.cat});return}
@@ -842,6 +845,7 @@ function renderArchiveMenu(){
  // v1.8.5 큰 분류 「게임」: 육성(인형 · 성령) — 나중에 오아시스 건축 등
  {const sec=el('button','archive-menu-section archive-menu-section-link','게임');sec.type='button';sec.onclick=go(()=>showGame());host.append(sec)}
  host.append(foldRow('육성',go(()=>showGrowth()),box=>{subLink(box,'인형',()=>showGrowth({cat:'doll'}));subLink(box,'성령',()=>showGrowth({cat:'sprite'}))},'archive-menu-top'));
+ host.append(foldRow('오아시스 건축',go(()=>showOasis()),box=>{subLink(box,'오아시스 건물',()=>showOasis({cat:'oasis'}));subLink(box,'섹터 건물',()=>showOasis({cat:'sector'}));subLink(box,'가공소',()=>showOasis({cat:'factory'}))},'archive-menu-top'));
  host.append(foldRow('업적',go(()=>showProgress('achieve')),lazyFill(loadProgress,(box,d)=>{for(const c of d.achievements||[])subLink(box,c.name,()=>showProgress('achieve',{cat:String(c.id)}));subLink(box,'업적 레벨',()=>showProgress('achieve',{cat:'level'}))}),'archive-menu-top'));
  host.append(foldRow('클라우드 이정표',go(()=>showProgress('mile')),lazyFill(loadProgress,(box,d)=>{for(const m of d.milestones||[])subLink(box,m.name,()=>showProgress('mile',{cat:String(m.id)}))}),'archive-menu-top'));
 }
@@ -1802,7 +1806,7 @@ async function showGame({push=true}={}){
  card('GROWTH','육성','인형 · 성령 육성 재료 계산',()=>showGrowth(),[['인형',()=>showGrowth({cat:'doll'})],['성령',()=>showGrowth({cat:'sprite'})]]);
  card('ACHIEVEMENTS','업적','분류별 업적 · 업적 레벨 보상',()=>showProgress('achieve'));
  card('CLOUD MILESTONES','클라우드 이정표','모듈별 할 일 · 단계 보상',()=>showProgress('mile'));
- const soon=card('OASIS','오아시스 건축','준비 중',()=>{});soon.classList.add('arc-soon');
+ card('OASIS','오아시스 건축','건물 · 레벨별 강화 재료 · 가공소',()=>showOasis(),[['오아시스 건물',()=>showOasis({cat:'oasis'})],['섹터 건물',()=>showOasis({cat:'sector'})],['가공소',()=>showOasis({cat:'factory'})]]);
 }
 let growTab=get('growTab','doll'),growDoll=get('growDoll','');
 async function showGrowth({push=true,cat=null}={}){
@@ -1841,6 +1845,54 @@ async function showGrowth({push=true,cat=null}={}){
   const hd=el('div','grow-who');const face=el('span','avatar');const url=dollFace(d);if(url){const im=el('img');im.src=url;im.alt='';face.append(im)}else face.classList.add('fallback');
   hd.append(face,el('strong','',d.name));box.append(hd,growthPanel({heroId:d.heroId,name:d.name,stars:d.stars}))};
  draw();
+}
+// ---------- v1.8.8 오아시스 건축 (data/<언어>/oasis.json ← tools/client_extract/oasis.py): 건물 · 레벨별 재료 · 가공소 ----------
+let oasisData=null,oasisTab=get('oasisTab','oasis');
+const loadOasis=()=>oasisData?Promise.resolve(oasisData):fetchJSON(dataPath('oasis.json')).then(d=>oasisData=d);
+const OASIS_LOGIC={4:'생산',28:'보관 상한',3:'가공'};
+async function showOasis({push=true,cat=null}={}){
+ const tok=++routeToken;showOnly('dollView');bgmLeave();voiceStop();closeArchiveMenu();$('#crumb').textContent='오아시스 건축';
+ if(cat&&['oasis','sector','factory'].includes(cat)){oasisTab=cat;set('oasisTab',cat)}
+ if(push)saveRoute({type:'oasis',cat:oasisTab});
+ const host=$('#dollView');host.replaceChildren(el('p','loading-note','불러오는 중…'));window.scrollTo(0,0);
+ try{await loadOasis()}catch(e){if(tok===routeToken)host.replaceChildren(error('불러오지 못했어요. ('+e.message+')'));return}
+ if(tok!==routeToken)return;const D=oasisData;host.replaceChildren();
+ const head=el('div','doll-list-head');const t=el('div');t.append(el('div','eyebrow','GAME / OASIS'),el('h2','','오아시스 건축'));head.append(t);const count=el('span','section-sub');head.append(count);host.append(head);
+ const bar=el('div','doll-controls wr-controls');const tabs=el('div','wr-tabs');
+ const nB=k=>D.buildings.filter(b=>b.kind===k).length;
+ for(const [k,n,c] of [['oasis','오아시스 건물',nB('oasis')],['sector','섹터 건물',nB('sector')],['factory','가공소',D.orders.length]]){const b=el('button','cat-tab wr-tab'+(k===oasisTab?' selected':''));b.type='button';b.append(el('span','',n),el('span','wr-tab-n',String(c)));b.onclick=()=>showOasis({cat:k});tabs.append(b)}
+ const sw=el('label','doll-ctl doll-search-wrap');sw.append(el('span','doll-ctl-label','기록 찾기'));const sbox=el('span','doll-search');const si=el('input');si.type='search';si.placeholder='이름 · 재료';si.autocomplete='off';sbox.append(el('span','doll-search-prompt','//:_'),si);sw.append(sbox);
+ bar.append(tabs,sw);host.append(bar);
+ const fmt=n=>(+n).toLocaleString(window.UI_LOCALE||'ko-KR');
+ const iname=i=>D.items?.[i]?.[0]||i;
+ const chip=(i,n,pre)=>{const c=el('span','item-chip');c.append(itemIcon(D.items?.[i]?.[1]||'','sm'),el('span','item-chip-name',(pre||'')+iname(i)));if(n!=null)c.append(el('span','item-chip-n',(typeof n==='number'?'×'+fmt(n):n)));return c};
+ const chips=obj=>{const w=el('span','fy-cost');for(const [i,n] of Object.entries(obj||{}))w.append(chip(i,n));return w};
+ const hm=sec=>{const h=Math.floor(sec/3600),m=Math.round(sec%3600/60);return (h?h+'시간 ':'')+(m?m+'분':'')||'0분'};
+ const list=el('div','oa-list');host.append(list);
+ const draw=()=>{const q=dnorm(si.value.trim());list.replaceChildren();
+  if(oasisTab==='factory'){let n=0;
+   for(const f of D.factories){const os=D.orders.filter(o=>o.type===f.id&&(!q||dnorm(o.name).includes(q)||Object.keys(o.mats).some(i=>dnorm(iname(i)).includes(q))));if(!os.length)continue;n+=os.length;
+    const sec=el('section','fy-sec');const h=el('div','oa-fac-head');h.append(el('h3','',f.name+' · '+os.length));for(const x of f.need)h.append(el('span','oa-need',x));sec.append(h);
+    const g=el('div','pg-grid');for(const o of os){const c=el('div','pg-task oa-order');const top=el('div','oa-order-top');top.append(chip(o.out,o.num),el('span','oa-time',hm(o.time)));c.append(top);
+     if(Object.keys(o.mats).length){const m=el('div','oa-row');m.append(el('span','fy-label','재료'),chips(o.mats));c.append(m)}
+     if(o.need.length){const m=el('div','oa-row');m.append(el('span','fy-label','열림'));for(const x of o.need)m.append(el('span','oa-need',x));c.append(m)}
+     g.append(c)}
+    sec.append(g);list.append(sec)}
+   count.textContent=n+'개';return}
+  const bs=D.buildings.filter(b=>b.kind===oasisTab&&(!q||dnorm(b.name).includes(q)||dnorm(b.intro).includes(q)));count.textContent=bs.length+'개';
+  const g=el('div','oa-grid');
+  for(const b of bs){const c=el('div','oa-card');const top=el('div','oa-top');top.append(itemIcon(b.icon?'oasis/'+b.icon:'','oa-ic'));const tx=el('div','');tx.append(el('strong','oa-name',b.name),el('span','oa-en',b.en||''));top.append(tx);c.append(top);
+   if(b.intro)c.append(el('p','pg-desc',cleanTags(b.intro)));
+   if(b.levels.length){const det=el('details','oa-levels');det.append(el('summary','','레벨 '+b.levels.length+'단계 · 재료 · 효과'));
+    const tb=el('table','algo-table fy-table oa-table');const hr=el('tr');['레벨','강화 재료','효과','조건'].forEach(x=>hr.append(el('th','',x)));tb.append(hr);
+    for(const l of b.levels){const tr=el('tr');tr.append(el('td','','Lv.'+l.lv));const c1=el('td','');c1.append(chips(l.cost));
+     const c2=el('td','');const w=el('span','fy-cost');for(const v of l.vals)w.append(chip(v.item,fmt(v.val),(OASIS_LOGIC[v.logic]?OASIS_LOGIC[v.logic]+' · ':'')));c2.append(w);for(const e of l.effect)c2.append(el('div','oa-eff',cleanTags(e)));
+     const c3=el('td','');for(const x of l.need)c3.append(el('div','oa-need',x));tr.append(c1,c2,c3);tb.append(tr)}
+    const tw=el('div','algo-table-wrap');tw.append(tb);det.append(tw);c.append(det)}
+   g.append(c)}
+  list.append(g,el('p','load-note','효과 칸의 「생산 · 보관 상한」은 게임 수치를 보고 붙인 이름이에요(추정).'));
+ };
+ si.oninput=draw;draw();
 }
 // ---------- v1.8.7 업적 · 클라우드 이정표 (data/<언어>/progress.json ← tools/client_extract/progress.py) ----------
 let progData=null,achCat=get('achCat',''),mileCat=get('mileCat','');
