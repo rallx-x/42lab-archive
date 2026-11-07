@@ -75,6 +75,7 @@ function routeHash(route){
  if(route.type==='dorm')return '#dorm/'+encodeURIComponent(route.id);
  if(route.type==='items')return '#items'+(route.cat?'/'+encodeURIComponent(route.cat):'');
  if(route.type==='tips')return '#tips'+(route.cat?'/'+encodeURIComponent(route.cat):'');
+ if(route.type==='effects')return '#effects'+(route.cat?'/'+encodeURIComponent(route.cat):'');
  if(route.type==='records')return '#records'+(route.cat?'/'+encodeURIComponent(route.cat):'');
  if(route.type==='doll')return '#doll/'+encodeURIComponent(route.id)+(route.part&&route.part!=='profile'?'/'+encodeURIComponent(route.part):'');
  if(route.type==='chapter')return '#chapter/'+encodeURIComponent(route.category)+':'+encodeURIComponent(route.id);
@@ -93,6 +94,7 @@ function parseRoute(){
   if(raw.startsWith('dorm/'))return {type:'dorm',id:decodeURIComponent(raw.slice(5))};
   if(raw==='items'||raw.startsWith('items/'))return {type:'items',cat:raw.startsWith('items/')?decodeURIComponent(raw.slice(6)):null};
   if(raw==='tips'||raw.startsWith('tips/'))return {type:'tips',cat:raw.startsWith('tips/')?decodeURIComponent(raw.slice(5)):null};
+  if(raw==='effects'||raw.startsWith('effects/'))return {type:'effects',cat:raw.startsWith('effects/')?decodeURIComponent(raw.slice(8)):null};
   if(raw==='records'||raw.startsWith('records/'))return {type:'records',cat:raw.startsWith('records/')?decodeURIComponent(raw.slice(8)):null};
   if(raw.startsWith('doll/')){const [k,pt]=raw.slice(5).split('/');return {type:'doll',id:decodeURIComponent(k),part:pt?decodeURIComponent(pt):null}}
   if(raw.startsWith('chapter/')){
@@ -168,6 +170,7 @@ async function restoreRoute(){
  if(route.type==='dorm'){await showDormTheme(route.id,{push:false});return}
  if(route.type==='records'){await showRecords({push:false,cat:route.cat});return}
  if(route.type==='tips'){await showTips({push:false,cat:route.cat});return}
+ if(route.type==='effects'){await showEffects({push:false,cat:route.cat});return}
  if(route.type==='items'){await showItems({push:false,cat:route.cat});return}
  if(route.type==='doll'){await showDoll(route.id,{push:false,part:route.part});return}
  if(route.type==='chapter'&&showChapter(route.id,route.category,{push:false}))return;
@@ -1519,6 +1522,8 @@ async function showArchive({push=true}={}){
  const tip=card('LOADING TIPS','로딩 팁','로딩 화면에 나오는 백과사전 · 섹터 팁',()=>showTips());
  const itm=card('ITEMS','아이템','창고 · 숙소 가구 · 이벤트 보상',()=>showItems());
  const alg=card('ALGORITHMS','알고리즘','세트 효과 · 구역 · 기본 능력치',()=>showAlgos());
+ const efx=card('EFFECTS','효과 사전','버프 · 디버프 · 고유 효과',()=>showEffects());
+ loadEffects().then(d=>{if(tok!==routeToken)return;cnt(efx,(d.effects||[]).length);chipRow(efx,(d.cats||[]).map(([k,n])=>[n,()=>showEffects({cat:k})]))}).catch(()=>{});
  const cnt=(o,n)=>{if(tok===routeToken&&n)o.n.textContent=n.toLocaleString(window.UI_LOCALE||'ko-KR')+'개'};
  loadRecords().then(()=>{if(tok!==routeToken)return;cnt(rec,(wrData.records||[]).length);
   const sub=el('div','arc-sub');for(const ty of (wrData.types||[]).filter(x=>x.id)){const k=(wrData.records||[]).filter(r=>r.type===ty.id).length;if(!k)continue;const b=el('button','arc-chip rec',ty.name);b.type='button';b.onclick=()=>showRecords({cat:String(ty.id)});sub.append(b)}
@@ -1598,6 +1603,58 @@ async function showAlgos({push=true,cat=null}={}){
     box.append(table(['','회색','파랑','보라','주황'],d.sub[k].map(x=>[attrLbl(x.icon,pctIn(d.sub[k])(x)),...x.v])));bd.append(box)}})}
  };
  sync();draw();
+}
+// ---------- v1.7.7 효과 사전 (data/<언어>/effects.json ← tools/client_extract/effects.py) ----------
+// 분류: 버프 · 디버프 · 고유 효과 (인형 1명만 쓰는 효과 + 주황), 점 색은 게임 색 (1 초록 · 2 빨강 · 3 주황)
+let fxData=null,fxCat=get('fxCat','all'),fxQuery='';
+const loadEffects=()=>fxData?Promise.resolve(fxData):fetchJSON(dataPath('effects.json')).then(d=>fxData=d);
+const FX_COLOR={1:'버프 (초록)',2:'디버프 (빨강)',3:'주황',0:'색 없음'};
+async function showEffects({push=true,cat=null}={}){
+ const tok=++routeToken;showOnly('dollView');bgmLeave();voiceStop();closeArchiveMenu();$('#crumb').textContent='효과 사전';
+ if(cat)fxCat=cat;
+ if(push)saveRoute({type:'effects',cat:fxCat==='all'?null:fxCat});
+ const host=$('#dollView');host.replaceChildren(el('p','loading-note','효과 사전을 불러오는 중…'));window.scrollTo(0,0);
+ try{await Promise.all([loadEffects(),loadDollIndex().catch(()=>null)])}catch(e){if(tok===routeToken)host.replaceChildren(error('효과 사전을 불러오지 못했어요. ('+e.message+')'));return}
+ if(tok===routeToken)renderEffects();
+}
+function renderEffects(){
+ const host=$('#dollView');host.replaceChildren();
+ const all=fxData.effects||[],cats=[['all','전체'],...(fxData.cats||[])];
+ if(!cats.some(([k])=>k===fxCat))fxCat='all';
+ const head=el('div','doll-list-head');const t=el('div');t.append(el('div','eyebrow','DATABASE / EFFECTS'),el('h2','','효과 사전'));head.append(t);
+ const count=el('span','section-sub');head.append(count);host.append(head);
+ const bar=el('div','doll-controls wr-controls');const tabs=el('div','wr-tabs');tabs.setAttribute('role','tablist');tabs.setAttribute('aria-label','효과 분류');
+ const btns=[];
+ for(const [g,name] of cats){
+  const n=g==='all'?all.length:all.filter(x=>x.cat===g).length;if(!n)continue;
+  const b=el('button','cat-tab wr-tab');b.type='button';b.setAttribute('role','tab');b.append(el('span','',name),el('span','wr-tab-n',String(n)));
+  b.onclick=()=>{fxCat=g;set('fxCat',g);history.replaceState(history.state,'',location.pathname+location.search+routeHash({type:'effects',cat:g==='all'?null:g}));sync();draw()};
+  btns.push([g,b]);tabs.append(b)}
+ const sync=()=>btns.forEach(([g,b])=>{b.classList.toggle('selected',g===fxCat);b.setAttribute('aria-selected',String(g===fxCat))});
+ const sw=el('label','doll-ctl doll-search-wrap');sw.append(el('span','doll-ctl-label','기록 찾기'));
+ const sbox=el('span','doll-search');const si=el('input');si.type='search';si.placeholder='이름 · 내용 · 인형';si.value=fxQuery;si.setAttribute('aria-label','효과 찾기');si.autocomplete='off';
+ si.oninput=()=>{fxQuery=si.value;draw()};sbox.append(el('span','doll-search-prompt','//:_'),si);sw.append(sbox);
+ bar.append(tabs,sw);
+ const legend=el('div','fx-legend');for(const c of [1,2,3]){const s=el('span','fx-leg');s.append(el('span','fx-dot c'+c),document.createTextNode(FX_COLOR[c]));legend.append(s)}
+ const note=el('p','load-note','게임 속 스킬 설명에서 효과 이름을 누르면 나오는 설명이에요. 점 색은 게임 안 색 그대로예요. 「고유 효과」는 인형 1명의 스킬 · 무장각인에만 나오는 효과와 주황 효과예요.');
+ const list=el('div','wr-list fx-list');host.append(note,legend,bar,list);
+ const byHero=new Map((dollIndex?.dolls||[]).map(d=>[+d.heroId,d]));
+ const draw=()=>{
+  const q=dnorm(fxQuery);
+  const rows=all.filter(x=>(fxCat==='all'||x.cat===fxCat)&&(!q||dnorm(x.name).includes(q)||dnorm(cleanTags(x.desc)).includes(q)||(x.dolls||[]).some(h=>dnorm(byHero.get(h)?.name||'').includes(q))));
+  count.textContent=rows.length+'개';list.replaceChildren();sync();
+  if(!rows.length){list.append(el('p','loading-note',q?'「'+fxQuery.trim()+'」에 맞는 효과가 없어요.':'효과가 없어요.'));return}
+  for(const x of rows){
+   const c=el('div','wr-card fx-card');c.id='fx-'+x.id;
+   const top=el('div','wr-card-top');top.append(el('span','fx-dot c'+x.color));
+   const body=el('div','wr-body');body.append(el('strong','wr-name',x.name),el('p','tip-text',cleanTags(x.desc)));
+   if(x.dolls?.length||x.algo){const w=el('div','tip-dolls');
+    for(const h of x.dolls||[]){const d=byHero.get(+h);if(!d)continue;const b=el('button','doll-chip link tip-doll');b.type='button';b.append(ic('user'),document.createTextNode(' '+d.name));b.onclick=()=>showDoll(d.voiceKey,{part:'skill'});w.append(b)}
+    if(x.algo){const b=el('button','doll-chip link tip-doll','알고리즘');b.type='button';b.onclick=()=>showAlgos();w.append(b)}
+    body.append(w)}
+   c.append(top,body);list.append(c)}
+ };
+ draw();
 }
 async function showTips({push=true,cat=null}={}){
  const tok=++routeToken;showOnly('dollView');bgmLeave();voiceStop();closeArchiveMenu();$('#crumb').textContent='로딩 팁';

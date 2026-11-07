@@ -1653,3 +1653,9 @@ body.dark .item-ic.empty::before,body.dim .item-ic.empty::before,body.entropics 
 .skill-hex .item-ic{left:calc(var(--gx) - (100% - 2*var(--gx))*.1);top:calc(var(--gy) - (100% - 2*var(--gy))*.1);width:calc((100% - 2*var(--gx))*1.2);height:calc((100% - 2*var(--gy))*1.2);clip-path:none}
 /* v1.7.6 궁극기 그림은 조금 더 크게 (프레임과 1~2px 틈) */
 .skill-hex.t3 .item-ic{left:calc(var(--gx) - (100% - 2*var(--gx))*.13);top:calc(var(--gy) - (100% - 2*var(--gy))*.13);width:calc((100% - 2*var(--gx))*1.26);height:calc((100% - 2*var(--gy))*1.26)}
+/* v1.7.7 효과 사전 — 게임 색 점 (초록 · 빨강 · 주황) */
+.fx-dot{display:inline-block;width:12px;height:12px;border-radius:50%;flex:none;background:#8a8f99;box-shadow:0 0 0 2px color-mix(in srgb,currentColor 12%,transparent)}
+.fx-dot.c1{background:#5bbf3a}.fx-dot.c2{background:#e0453a}.fx-dot.c3{background:#f0961f}
+.fx-card .wr-card-top{padding-top:4px}
+.fx-legend{display:flex;flex-wrap:wrap;gap:14px;margin:0 0 10px;font-size:12px;color:var(--sub)}
+.fx-leg{display:inline-flex;align-items:center;gap:6px}
