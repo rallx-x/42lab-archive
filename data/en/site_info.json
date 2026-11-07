@@ -26,6 +26,15 @@
    ]
   },
   {
+   "id": "2026-11-07-v1.7.10",
+   "date": "2026-11-07",
+   "kind": "update",
+   "title": "Update v1.7.10 · Exploration · Dungeon · Warchess Effects",
+   "lines": [
+    "The Effect Glossary now has \"Exploration Effects\" · \"Dungeon Effects\" · \"Warchess Effects\" tabs (game mode buffs and debuffs, dots follow the icon color)."
+   ]
+  },
+  {
    "id": "2026-11-07-v1.7.9",
    "date": "2026-11-07",
    "kind": "update",
