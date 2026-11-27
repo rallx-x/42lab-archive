@@ -2081,6 +2081,224 @@
    }
   }
  },
+ "lpic_aki": {
+  "bundle": "aki/lpic_aki.ab",
+  "texture": [
+   2048,
+   2048
+  ],
+  "posData": {
+   "HeroList": {
+    "anchoredPos": [
+     -28.0,
+     -546.0
+    ],
+    "sizeDelta": [
+     1948.801513671875,
+     1948.801513671875
+    ],
+    "scale": 1.0082999467849731,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   },
+   "BattleInfo": {
+    "anchoredPos": [
+     124.87994384765625,
+     34.279972076416016
+    ],
+    "sizeDelta": [
+     768.0,
+     768.0
+    ],
+    "scale": 1.0,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   },
+   "HeroStarUp": {
+    "anchoredPos": [
+     -130.0,
+     -11.0
+    ],
+    "sizeDelta": [
+     1024.0,
+     1024.0
+    ],
+    "scale": 1.0,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   },
+   "Guide1": {
+    "anchoredPos": [
+     373.9999694824219,
+     -142.54998779296875
+    ],
+    "sizeDelta": [
+     734.2000122070312,
+     734.2000122070312
+    ],
+    "scale": 1.8499999046325684,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     1.0,
+     0.5
+    ]
+   },
+   "HeroDungeon": {
+    "anchoredPos": [
+     122.0999984741211,
+     -373.1000061035156
+    ],
+    "sizeDelta": [
+     1587.98828125,
+     1587.98828125
+    ],
+    "scale": 1.0,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   },
+   "Home": {
+    "anchoredPos": [
+     -225.0,
+     -535.0
+    ],
+    "sizeDelta": [
+     785.1456298828125,
+     785.1456298828125
+    ],
+    "scale": 3.0,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   },
+   "UserInfo": {
+    "anchoredPos": [
+     -198.0,
+     -294.0
+    ],
+    "sizeDelta": [
+     1549.96337890625,
+     1549.96337890625
+    ],
+    "scale": 1.0,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   },
+   "GetHero": {
+    "anchoredPos": [
+     -28.0,
+     -531.0
+    ],
+    "sizeDelta": [
+     1948.801513671875,
+     1948.801513671875
+    ],
+    "scale": 1.0,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   },
+   "HeroSkin": {
+    "anchoredPos": [
+     -28.0,
+     -546.0
+    ],
+    "sizeDelta": [
+     1948.801513671875,
+     1948.801513671875
+    ],
+    "scale": 1.0082999467849731,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   },
+   "UltrSkillShowHeroSmall": {
+    "anchoredPos": [
+     331.3625183105469,
+     22.6605224609375
+    ],
+    "sizeDelta": [
+     1779.2239990234375,
+     1779.2239990234375
+    ],
+    "scale": 1.0,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   },
+   "UltrSkillShowHeroBig": {
+    "anchoredPos": [
+     -543.24365234375,
+     266.3131408691406
+    ],
+    "sizeDelta": [
+     1312.132568359375,
+     1321.7672119140625
+    ],
+    "scale": 1.0,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   }
+  }
+ },
  "lpic_aki2_avg": {
   "bundle": "aki2_avg/lpic_aki2_avg.ab",
   "texture": [
@@ -2430,224 +2648,6 @@
      1024.0
     ],
     "scale": -1.0,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     0.5,
-     0.5
-    ]
-   }
-  }
- },
- "lpic_aki": {
-  "bundle": "aki/lpic_aki.ab",
-  "texture": [
-   2048,
-   2048
-  ],
-  "posData": {
-   "HeroList": {
-    "anchoredPos": [
-     -28.0,
-     -546.0
-    ],
-    "sizeDelta": [
-     1948.801513671875,
-     1948.801513671875
-    ],
-    "scale": 1.0082999467849731,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     0.5,
-     0.5
-    ]
-   },
-   "BattleInfo": {
-    "anchoredPos": [
-     124.87994384765625,
-     34.279972076416016
-    ],
-    "sizeDelta": [
-     768.0,
-     768.0
-    ],
-    "scale": 1.0,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     0.5,
-     0.5
-    ]
-   },
-   "HeroStarUp": {
-    "anchoredPos": [
-     -130.0,
-     -11.0
-    ],
-    "sizeDelta": [
-     1024.0,
-     1024.0
-    ],
-    "scale": 1.0,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     0.5,
-     0.5
-    ]
-   },
-   "Guide1": {
-    "anchoredPos": [
-     373.9999694824219,
-     -142.54998779296875
-    ],
-    "sizeDelta": [
-     734.2000122070312,
-     734.2000122070312
-    ],
-    "scale": 1.8499999046325684,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     1.0,
-     0.5
-    ]
-   },
-   "HeroDungeon": {
-    "anchoredPos": [
-     122.0999984741211,
-     -373.1000061035156
-    ],
-    "sizeDelta": [
-     1587.98828125,
-     1587.98828125
-    ],
-    "scale": 1.0,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     0.5,
-     0.5
-    ]
-   },
-   "Home": {
-    "anchoredPos": [
-     -225.0,
-     -535.0
-    ],
-    "sizeDelta": [
-     785.1456298828125,
-     785.1456298828125
-    ],
-    "scale": 3.0,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     0.5,
-     0.5
-    ]
-   },
-   "UserInfo": {
-    "anchoredPos": [
-     -198.0,
-     -294.0
-    ],
-    "sizeDelta": [
-     1549.96337890625,
-     1549.96337890625
-    ],
-    "scale": 1.0,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     0.5,
-     0.5
-    ]
-   },
-   "GetHero": {
-    "anchoredPos": [
-     -28.0,
-     -531.0
-    ],
-    "sizeDelta": [
-     1948.801513671875,
-     1948.801513671875
-    ],
-    "scale": 1.0,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     0.5,
-     0.5
-    ]
-   },
-   "HeroSkin": {
-    "anchoredPos": [
-     -28.0,
-     -546.0
-    ],
-    "sizeDelta": [
-     1948.801513671875,
-     1948.801513671875
-    ],
-    "scale": 1.0082999467849731,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     0.5,
-     0.5
-    ]
-   },
-   "UltrSkillShowHeroSmall": {
-    "anchoredPos": [
-     331.3625183105469,
-     22.6605224609375
-    ],
-    "sizeDelta": [
-     1779.2239990234375,
-     1779.2239990234375
-    ],
-    "scale": 1.0,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     0.5,
-     0.5
-    ]
-   },
-   "UltrSkillShowHeroBig": {
-    "anchoredPos": [
-     -543.24365234375,
-     266.3131408691406
-    ],
-    "sizeDelta": [
-     1312.132568359375,
-     1321.7672119140625
-    ],
-    "scale": 1.0,
     "pivot": [
      0.5,
      0.5
@@ -37071,243 +37071,6 @@
    }
   }
  },
- "lpic_clotho2_avg": {
-  "bundle": "clotho2_avg/lpic_clotho2_avg.ab",
-  "texture": [
-   2048,
-   2048
-  ],
-  "posData": {
-   "HeroList": {
-    "anchoredPos": [
-     165.0,
-     -426.0
-    ],
-    "sizeDelta": [
-     1742.614013671875,
-     1742.614013671875
-    ],
-    "scale": 1.0,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     0.5,
-     0.5
-    ]
-   },
-   "BattleInfo": {
-    "anchoredPos": [
-     101.0,
-     -17.0
-    ],
-    "sizeDelta": [
-     768.0,
-     768.0
-    ],
-    "scale": 1.0,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     0.5,
-     0.5
-    ]
-   },
-   "HeroStarUp": {
-    "anchoredPos": [
-     -130.0,
-     -11.0
-    ],
-    "sizeDelta": [
-     1024.0,
-     1024.0
-    ],
-    "scale": 1.0,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     0.5,
-     0.5
-    ]
-   },
-   "HeroDungeon": {
-    "anchoredPos": [
-     254.8000030517578,
-     -582.7000122070312
-    ],
-    "sizeDelta": [
-     2048.0,
-     2048.0
-    ],
-    "scale": 1.0,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     0.5,
-     0.5
-    ]
-   },
-   "Home": {
-    "anchoredPos": [
-     78.69999694824219,
-     -531.0
-    ],
-    "sizeDelta": [
-     1024.0,
-     1024.0
-    ],
-    "scale": 2.200000047683716,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     0.5,
-     0.5
-    ]
-   },
-   "AvgHero3": {
-    "anchoredPos": [
-     0.0,
-     -430.0
-    ],
-    "sizeDelta": [
-     1024.0,
-     1024.0
-    ],
-    "scale": 1.0,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     0.5,
-     0.5
-    ]
-   },
-   "AvgHero1": {
-    "anchoredPos": [
-     -520.0,
-     -430.0
-    ],
-    "sizeDelta": [
-     1024.0,
-     1024.0
-    ],
-    "scale": 1.0,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     0.5,
-     0.5
-    ]
-   },
-   "AvgHero2": {
-    "anchoredPos": [
-     -450.0,
-     -430.0
-    ],
-    "sizeDelta": [
-     1024.0,
-     1024.0
-    ],
-    "scale": 1.0,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     0.5,
-     0.5
-    ]
-   },
-   "AvgHero4": {
-    "anchoredPos": [
-     450.0,
-     -430.0
-    ],
-    "sizeDelta": [
-     1024.0,
-     1024.0
-    ],
-    "scale": 1.0,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     0.5,
-     0.5
-    ]
-   },
-   "AvgHero5": {
-    "anchoredPos": [
-     500.0,
-     -430.0
-    ],
-    "sizeDelta": [
-     1024.0,
-     1024.0
-    ],
-    "scale": 1.0,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     0.5,
-     0.5
-    ]
-   },
-   "UltrSkillShowHeroSmall": {
-    "anchoredPos": [
-     560.0,
-     49.0
-    ],
-    "sizeDelta": [
-     1800.0,
-     1800.0
-    ],
-    "scale": 1.0,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     0.5,
-     0.5
-    ]
-   },
-   "UltrSkillShowHeroBig": {
-    "anchoredPos": [
-     -260.0,
-     -100.760009765625
-    ],
-    "sizeDelta": [
-     2233.131591796875,
-     2249.52880859375
-    ],
-    "scale": 1.0,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     0.5,
-     0.5
-    ]
-   }
-  }
- },
  "lpic_clotho": {
   "bundle": "clotho/lpic_clotho.ab",
   "texture": [
@@ -37534,6 +37297,243 @@
      1638.5
     ],
     "scale": 0.9491093754768372,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   }
+  }
+ },
+ "lpic_clotho2_avg": {
+  "bundle": "clotho2_avg/lpic_clotho2_avg.ab",
+  "texture": [
+   2048,
+   2048
+  ],
+  "posData": {
+   "HeroList": {
+    "anchoredPos": [
+     165.0,
+     -426.0
+    ],
+    "sizeDelta": [
+     1742.614013671875,
+     1742.614013671875
+    ],
+    "scale": 1.0,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   },
+   "BattleInfo": {
+    "anchoredPos": [
+     101.0,
+     -17.0
+    ],
+    "sizeDelta": [
+     768.0,
+     768.0
+    ],
+    "scale": 1.0,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   },
+   "HeroStarUp": {
+    "anchoredPos": [
+     -130.0,
+     -11.0
+    ],
+    "sizeDelta": [
+     1024.0,
+     1024.0
+    ],
+    "scale": 1.0,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   },
+   "HeroDungeon": {
+    "anchoredPos": [
+     254.8000030517578,
+     -582.7000122070312
+    ],
+    "sizeDelta": [
+     2048.0,
+     2048.0
+    ],
+    "scale": 1.0,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   },
+   "Home": {
+    "anchoredPos": [
+     78.69999694824219,
+     -531.0
+    ],
+    "sizeDelta": [
+     1024.0,
+     1024.0
+    ],
+    "scale": 2.200000047683716,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   },
+   "AvgHero3": {
+    "anchoredPos": [
+     0.0,
+     -430.0
+    ],
+    "sizeDelta": [
+     1024.0,
+     1024.0
+    ],
+    "scale": 1.0,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   },
+   "AvgHero1": {
+    "anchoredPos": [
+     -520.0,
+     -430.0
+    ],
+    "sizeDelta": [
+     1024.0,
+     1024.0
+    ],
+    "scale": 1.0,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   },
+   "AvgHero2": {
+    "anchoredPos": [
+     -450.0,
+     -430.0
+    ],
+    "sizeDelta": [
+     1024.0,
+     1024.0
+    ],
+    "scale": 1.0,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   },
+   "AvgHero4": {
+    "anchoredPos": [
+     450.0,
+     -430.0
+    ],
+    "sizeDelta": [
+     1024.0,
+     1024.0
+    ],
+    "scale": 1.0,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   },
+   "AvgHero5": {
+    "anchoredPos": [
+     500.0,
+     -430.0
+    ],
+    "sizeDelta": [
+     1024.0,
+     1024.0
+    ],
+    "scale": 1.0,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   },
+   "UltrSkillShowHeroSmall": {
+    "anchoredPos": [
+     560.0,
+     49.0
+    ],
+    "sizeDelta": [
+     1800.0,
+     1800.0
+    ],
+    "scale": 1.0,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   },
+   "UltrSkillShowHeroBig": {
+    "anchoredPos": [
+     -260.0,
+     -100.760009765625
+    ],
+    "sizeDelta": [
+     2233.131591796875,
+     2249.52880859375
+    ],
+    "scale": 1.0,
     "pivot": [
      0.5,
      0.5
@@ -42133,6 +42133,205 @@
    }
   }
  },
+ "lpic_croque": {
+  "bundle": "croque/lpic_croque.ab",
+  "texture": [
+   2048,
+   2048
+  ],
+  "posData": {
+   "HeroList": {
+    "anchoredPos": [
+     -383.0,
+     -304.0
+    ],
+    "sizeDelta": [
+     2171.3369140625,
+     2171.3369140625
+    ],
+    "scale": 1.1265000104904175,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   },
+   "BattleInfo": {
+    "anchoredPos": [
+     66.0,
+     21.0
+    ],
+    "sizeDelta": [
+     768.0,
+     768.0
+    ],
+    "scale": 1.0,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   },
+   "HeroStarUp": {
+    "anchoredPos": [
+     -130.0,
+     -11.0
+    ],
+    "sizeDelta": [
+     1024.0,
+     1024.0
+    ],
+    "scale": 1.0,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   },
+   "HeroDungeon": {
+    "anchoredPos": [
+     -119.0,
+     -132.0
+    ],
+    "sizeDelta": [
+     1738.1376953125,
+     1738.1376953125
+    ],
+    "scale": 1.0,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   },
+   "Home": {
+    "anchoredPos": [
+     -341.0,
+     -138.0
+    ],
+    "sizeDelta": [
+     1700.0,
+     1700.0
+    ],
+    "scale": 1.0,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   },
+   "UserInfo": {
+    "anchoredPos": [
+     -549.0,
+     -124.0
+    ],
+    "sizeDelta": [
+     1829.7705078125,
+     1829.7705078125
+    ],
+    "scale": 1.0,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   },
+   "GetHero": {
+    "anchoredPos": [
+     -329.0,
+     -235.0
+    ],
+    "sizeDelta": [
+     2171.3369140625,
+     2171.3369140625
+    ],
+    "scale": 1.0,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   },
+   "HeroSkin": {
+    "anchoredPos": [
+     -383.0,
+     -304.0
+    ],
+    "sizeDelta": [
+     2171.3369140625,
+     2171.3369140625
+    ],
+    "scale": 1.1265000104904175,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   },
+   "UltrSkillShowHeroSmall": {
+    "anchoredPos": [
+     55.10504150390625,
+     277.03826904296875
+    ],
+    "sizeDelta": [
+     2048.528076171875,
+     2048.528076171875
+    ],
+    "scale": 1.0,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   },
+   "UltrSkillShowHeroBig": {
+    "anchoredPos": [
+     -746.9765014648438,
+     455.2878112792969
+    ],
+    "sizeDelta": [
+     1510.7373046875,
+     1521.830322265625
+    ],
+    "scale": 1.0,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   }
+  }
+ },
  "lpic_croque2_avg": {
   "bundle": "croque2_avg/lpic_croque2_avg.ab",
   "texture": [
@@ -42359,205 +42558,6 @@
      3295.208251953125
     ],
     "scale": 0.45454543828964233,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     0.5,
-     0.5
-    ]
-   }
-  }
- },
- "lpic_croque": {
-  "bundle": "croque/lpic_croque.ab",
-  "texture": [
-   2048,
-   2048
-  ],
-  "posData": {
-   "HeroList": {
-    "anchoredPos": [
-     -383.0,
-     -304.0
-    ],
-    "sizeDelta": [
-     2171.3369140625,
-     2171.3369140625
-    ],
-    "scale": 1.1265000104904175,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     0.5,
-     0.5
-    ]
-   },
-   "BattleInfo": {
-    "anchoredPos": [
-     66.0,
-     21.0
-    ],
-    "sizeDelta": [
-     768.0,
-     768.0
-    ],
-    "scale": 1.0,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     0.5,
-     0.5
-    ]
-   },
-   "HeroStarUp": {
-    "anchoredPos": [
-     -130.0,
-     -11.0
-    ],
-    "sizeDelta": [
-     1024.0,
-     1024.0
-    ],
-    "scale": 1.0,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     0.5,
-     0.5
-    ]
-   },
-   "HeroDungeon": {
-    "anchoredPos": [
-     -119.0,
-     -132.0
-    ],
-    "sizeDelta": [
-     1738.1376953125,
-     1738.1376953125
-    ],
-    "scale": 1.0,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     0.5,
-     0.5
-    ]
-   },
-   "Home": {
-    "anchoredPos": [
-     -341.0,
-     -138.0
-    ],
-    "sizeDelta": [
-     1700.0,
-     1700.0
-    ],
-    "scale": 1.0,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     0.5,
-     0.5
-    ]
-   },
-   "UserInfo": {
-    "anchoredPos": [
-     -549.0,
-     -124.0
-    ],
-    "sizeDelta": [
-     1829.7705078125,
-     1829.7705078125
-    ],
-    "scale": 1.0,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     0.5,
-     0.5
-    ]
-   },
-   "GetHero": {
-    "anchoredPos": [
-     -329.0,
-     -235.0
-    ],
-    "sizeDelta": [
-     2171.3369140625,
-     2171.3369140625
-    ],
-    "scale": 1.0,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     0.5,
-     0.5
-    ]
-   },
-   "HeroSkin": {
-    "anchoredPos": [
-     -383.0,
-     -304.0
-    ],
-    "sizeDelta": [
-     2171.3369140625,
-     2171.3369140625
-    ],
-    "scale": 1.1265000104904175,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     0.5,
-     0.5
-    ]
-   },
-   "UltrSkillShowHeroSmall": {
-    "anchoredPos": [
-     55.10504150390625,
-     277.03826904296875
-    ],
-    "sizeDelta": [
-     2048.528076171875,
-     2048.528076171875
-    ],
-    "scale": 1.0,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     0.5,
-     0.5
-    ]
-   },
-   "UltrSkillShowHeroBig": {
-    "anchoredPos": [
-     -746.9765014648438,
-     455.2878112792969
-    ],
-    "sizeDelta": [
-     1510.7373046875,
-     1521.830322265625
-    ],
-    "scale": 1.0,
     "pivot": [
      0.5,
      0.5
@@ -56819,186 +56819,6 @@
    }
   }
  },
- "lpic_eniac2_avg": {
-  "bundle": "eniac2_avg/lpic_eniac2_avg.ab",
-  "texture": [
-   2048,
-   2048
-  ],
-  "posData": {
-   "HeroList": {
-    "anchoredPos": [
-     19.0,
-     -340.0
-    ],
-    "sizeDelta": [
-     1553.1103515625,
-     1553.1103515625
-    ],
-    "scale": 1.0,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     0.5,
-     0.5
-    ]
-   },
-   "BattleInfo": {
-    "anchoredPos": [
-     124.87994384765625,
-     34.279972076416016
-    ],
-    "sizeDelta": [
-     768.0,
-     768.0
-    ],
-    "scale": 1.0,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     0.5,
-     0.5
-    ]
-   },
-   "HeroStarUp": {
-    "anchoredPos": [
-     -130.0,
-     -11.0
-    ],
-    "sizeDelta": [
-     1024.0,
-     1024.0
-    ],
-    "scale": 1.0,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     0.5,
-     0.5
-    ]
-   },
-   "Guide1": {
-    "anchoredPos": [
-     373.9999694824219,
-     -142.54998779296875
-    ],
-    "sizeDelta": [
-     734.2000122070312,
-     734.2000122070312
-    ],
-    "scale": 1.8499999046325684,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     1.0,
-     0.5
-    ]
-   },
-   "AvgHero4": {
-    "anchoredPos": [
-     450.0,
-     -300.0
-    ],
-    "sizeDelta": [
-     1024.0,
-     1024.0
-    ],
-    "scale": 1.0,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     0.5,
-     0.5
-    ]
-   },
-   "AvgHero5": {
-    "anchoredPos": [
-     470.0,
-     -300.0
-    ],
-    "sizeDelta": [
-     1024.0,
-     1024.0
-    ],
-    "scale": 1.0,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     0.5,
-     0.5
-    ]
-   },
-   "AvgHero3": {
-    "anchoredPos": [
-     0.0,
-     -300.0
-    ],
-    "sizeDelta": [
-     1024.0,
-     1024.0
-    ],
-    "scale": 1.0,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     0.5,
-     0.5
-    ]
-   },
-   "AvgHero2": {
-    "anchoredPos": [
-     -400.0,
-     -300.0
-    ],
-    "sizeDelta": [
-     1024.0,
-     1024.0
-    ],
-    "scale": 1.0,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     0.5,
-     0.5
-    ]
-   },
-   "AvgHero1": {
-    "anchoredPos": [
-     -470.0,
-     -300.0
-    ],
-    "sizeDelta": [
-     1024.0,
-     1024.0
-    ],
-    "scale": 1.0,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     0.5,
-     0.5
-    ]
-   }
-  }
- },
  "lpic_eniac": {
   "bundle": "eniac/lpic_eniac.ab",
   "texture": [
@@ -57282,6 +57102,186 @@
      1024.0
     ],
     "scale": 1.7933588027954102,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   }
+  }
+ },
+ "lpic_eniac2_avg": {
+  "bundle": "eniac2_avg/lpic_eniac2_avg.ab",
+  "texture": [
+   2048,
+   2048
+  ],
+  "posData": {
+   "HeroList": {
+    "anchoredPos": [
+     19.0,
+     -340.0
+    ],
+    "sizeDelta": [
+     1553.1103515625,
+     1553.1103515625
+    ],
+    "scale": 1.0,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   },
+   "BattleInfo": {
+    "anchoredPos": [
+     124.87994384765625,
+     34.279972076416016
+    ],
+    "sizeDelta": [
+     768.0,
+     768.0
+    ],
+    "scale": 1.0,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   },
+   "HeroStarUp": {
+    "anchoredPos": [
+     -130.0,
+     -11.0
+    ],
+    "sizeDelta": [
+     1024.0,
+     1024.0
+    ],
+    "scale": 1.0,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   },
+   "Guide1": {
+    "anchoredPos": [
+     373.9999694824219,
+     -142.54998779296875
+    ],
+    "sizeDelta": [
+     734.2000122070312,
+     734.2000122070312
+    ],
+    "scale": 1.8499999046325684,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     1.0,
+     0.5
+    ]
+   },
+   "AvgHero4": {
+    "anchoredPos": [
+     450.0,
+     -300.0
+    ],
+    "sizeDelta": [
+     1024.0,
+     1024.0
+    ],
+    "scale": 1.0,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   },
+   "AvgHero5": {
+    "anchoredPos": [
+     470.0,
+     -300.0
+    ],
+    "sizeDelta": [
+     1024.0,
+     1024.0
+    ],
+    "scale": 1.0,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   },
+   "AvgHero3": {
+    "anchoredPos": [
+     0.0,
+     -300.0
+    ],
+    "sizeDelta": [
+     1024.0,
+     1024.0
+    ],
+    "scale": 1.0,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   },
+   "AvgHero2": {
+    "anchoredPos": [
+     -400.0,
+     -300.0
+    ],
+    "sizeDelta": [
+     1024.0,
+     1024.0
+    ],
+    "scale": 1.0,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   },
+   "AvgHero1": {
+    "anchoredPos": [
+     -470.0,
+     -300.0
+    ],
+    "sizeDelta": [
+     1024.0,
+     1024.0
+    ],
+    "scale": 1.0,
     "pivot": [
      0.5,
      0.5
@@ -59056,6 +59056,243 @@
    }
   }
  },
+ "lpic_eos": {
+  "bundle": "eos/lpic_eos.ab",
+  "texture": [
+   2048,
+   2048
+  ],
+  "posData": {
+   "BattleInfo": {
+    "anchoredPos": [
+     104.0,
+     19.0
+    ],
+    "sizeDelta": [
+     768.0,
+     768.0
+    ],
+    "scale": 1.0,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   },
+   "HeroStarUp": {
+    "anchoredPos": [
+     -130.0,
+     -11.0
+    ],
+    "sizeDelta": [
+     1024.0,
+     1024.0
+    ],
+    "scale": 1.0,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   },
+   "UserInfo": {
+    "anchoredPos": [
+     230.0,
+     -288.0
+    ],
+    "sizeDelta": [
+     2054.41748046875,
+     2054.41748046875
+    ],
+    "scale": 1.0,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   },
+   "ChipGift": {
+    "anchoredPos": [
+     -489.0,
+     -304.0
+    ],
+    "sizeDelta": [
+     1024.0,
+     1024.0
+    ],
+    "scale": 1.3568683862686157,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   },
+   "HeroDungeon": {
+    "anchoredPos": [
+     151.7670135498047,
+     -265.5428161621094
+    ],
+    "sizeDelta": [
+     1275.634521484375,
+     1275.634521484375
+    ],
+    "scale": 1.0,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   },
+   "Home": {
+    "anchoredPos": [
+     -345.0,
+     -373.0
+    ],
+    "sizeDelta": [
+     894.9453125,
+     894.9453125
+    ],
+    "scale": 2.200000047683716,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   },
+   "HeroList": {
+    "anchoredPos": [
+     -187.0,
+     -376.0
+    ],
+    "sizeDelta": [
+     1588.771484375,
+     1588.771484375
+    ],
+    "scale": 1.0745404958724976,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   },
+   "GetHero": {
+    "anchoredPos": [
+     -113.51995849609375,
+     -345.97967529296875
+    ],
+    "sizeDelta": [
+     1588.771484375,
+     1588.771484375
+    ],
+    "scale": 1.0,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   },
+   "SkinPreview": {
+    "anchoredPos": [
+     -160.81045532226562,
+     -205.1956787109375
+    ],
+    "sizeDelta": [
+     1024.0,
+     1024.0
+    ],
+    "scale": 1.316499948501587,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   },
+   "UltrSkillShowHeroSmall": {
+    "anchoredPos": [
+     214.94540405273438,
+     184.92694091796875
+    ],
+    "sizeDelta": [
+     1467.50634765625,
+     1467.50634765625
+    ],
+    "scale": 1.0,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   },
+   "UltrSkillShowHeroBig": {
+    "anchoredPos": [
+     -629.0983276367188,
+     386.8592224121094
+    ],
+    "sizeDelta": [
+     1082.2486572265625,
+     1090.1953125
+    ],
+    "scale": 1.0,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   },
+   "HeroSkin": {
+    "anchoredPos": [
+     -136.10073852539062,
+     -318.0
+    ],
+    "sizeDelta": [
+     1588.771484375,
+     1588.771484375
+    ],
+    "scale": 0.9420943856239319,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   }
+  }
+ },
  "lpic_eos2_avg": {
   "bundle": "eos2_avg/lpic_eos2_avg.ab",
   "texture": [
@@ -59642,243 +59879,6 @@
      768.0
     ],
     "scale": 1.0,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     0.5,
-     0.5
-    ]
-   }
-  }
- },
- "lpic_eos": {
-  "bundle": "eos/lpic_eos.ab",
-  "texture": [
-   2048,
-   2048
-  ],
-  "posData": {
-   "BattleInfo": {
-    "anchoredPos": [
-     104.0,
-     19.0
-    ],
-    "sizeDelta": [
-     768.0,
-     768.0
-    ],
-    "scale": 1.0,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     0.5,
-     0.5
-    ]
-   },
-   "HeroStarUp": {
-    "anchoredPos": [
-     -130.0,
-     -11.0
-    ],
-    "sizeDelta": [
-     1024.0,
-     1024.0
-    ],
-    "scale": 1.0,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     0.5,
-     0.5
-    ]
-   },
-   "UserInfo": {
-    "anchoredPos": [
-     230.0,
-     -288.0
-    ],
-    "sizeDelta": [
-     2054.41748046875,
-     2054.41748046875
-    ],
-    "scale": 1.0,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     0.5,
-     0.5
-    ]
-   },
-   "ChipGift": {
-    "anchoredPos": [
-     -489.0,
-     -304.0
-    ],
-    "sizeDelta": [
-     1024.0,
-     1024.0
-    ],
-    "scale": 1.3568683862686157,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     0.5,
-     0.5
-    ]
-   },
-   "HeroDungeon": {
-    "anchoredPos": [
-     151.7670135498047,
-     -265.5428161621094
-    ],
-    "sizeDelta": [
-     1275.634521484375,
-     1275.634521484375
-    ],
-    "scale": 1.0,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     0.5,
-     0.5
-    ]
-   },
-   "Home": {
-    "anchoredPos": [
-     -345.0,
-     -373.0
-    ],
-    "sizeDelta": [
-     894.9453125,
-     894.9453125
-    ],
-    "scale": 2.200000047683716,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     0.5,
-     0.5
-    ]
-   },
-   "HeroList": {
-    "anchoredPos": [
-     -187.0,
-     -376.0
-    ],
-    "sizeDelta": [
-     1588.771484375,
-     1588.771484375
-    ],
-    "scale": 1.0745404958724976,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     0.5,
-     0.5
-    ]
-   },
-   "GetHero": {
-    "anchoredPos": [
-     -113.51995849609375,
-     -345.97967529296875
-    ],
-    "sizeDelta": [
-     1588.771484375,
-     1588.771484375
-    ],
-    "scale": 1.0,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     0.5,
-     0.5
-    ]
-   },
-   "SkinPreview": {
-    "anchoredPos": [
-     -160.81045532226562,
-     -205.1956787109375
-    ],
-    "sizeDelta": [
-     1024.0,
-     1024.0
-    ],
-    "scale": 1.316499948501587,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     0.5,
-     0.5
-    ]
-   },
-   "UltrSkillShowHeroSmall": {
-    "anchoredPos": [
-     214.94540405273438,
-     184.92694091796875
-    ],
-    "sizeDelta": [
-     1467.50634765625,
-     1467.50634765625
-    ],
-    "scale": 1.0,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     0.5,
-     0.5
-    ]
-   },
-   "UltrSkillShowHeroBig": {
-    "anchoredPos": [
-     -629.0983276367188,
-     386.8592224121094
-    ],
-    "sizeDelta": [
-     1082.2486572265625,
-     1090.1953125
-    ],
-    "scale": 1.0,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     0.5,
-     0.5
-    ]
-   },
-   "HeroSkin": {
-    "anchoredPos": [
-     -136.10073852539062,
-     -318.0
-    ],
-    "sizeDelta": [
-     1588.771484375,
-     1588.771484375
-    ],
-    "scale": 0.9420943856239319,
     "pivot": [
      0.5,
      0.5
@@ -90667,243 +90667,6 @@
    }
   }
  },
- "lpic_havoc2_avg": {
-  "bundle": "havoc2_avg/lpic_havoc2_avg.ab",
-  "texture": [
-   2048,
-   2048
-  ],
-  "posData": {
-   "HeroList": {
-    "anchoredPos": [
-     165.0,
-     -426.0
-    ],
-    "sizeDelta": [
-     1742.614013671875,
-     1742.614013671875
-    ],
-    "scale": 1.0,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     0.5,
-     0.5
-    ]
-   },
-   "BattleInfo": {
-    "anchoredPos": [
-     101.0,
-     -17.0
-    ],
-    "sizeDelta": [
-     768.0,
-     768.0
-    ],
-    "scale": 1.0,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     0.5,
-     0.5
-    ]
-   },
-   "HeroStarUp": {
-    "anchoredPos": [
-     -130.0,
-     -11.0
-    ],
-    "sizeDelta": [
-     1024.0,
-     1024.0
-    ],
-    "scale": 1.0,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     0.5,
-     0.5
-    ]
-   },
-   "HeroDungeon": {
-    "anchoredPos": [
-     254.8000030517578,
-     -582.7000122070312
-    ],
-    "sizeDelta": [
-     2048.0,
-     2048.0
-    ],
-    "scale": 1.0,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     0.5,
-     0.5
-    ]
-   },
-   "Home": {
-    "anchoredPos": [
-     78.69999694824219,
-     -531.0
-    ],
-    "sizeDelta": [
-     1024.0,
-     1024.0
-    ],
-    "scale": 2.200000047683716,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     0.5,
-     0.5
-    ]
-   },
-   "AvgHero3": {
-    "anchoredPos": [
-     0.0,
-     -300.0
-    ],
-    "sizeDelta": [
-     1024.0,
-     1024.0
-    ],
-    "scale": 1.0,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     0.5,
-     0.5
-    ]
-   },
-   "AvgHero1": {
-    "anchoredPos": [
-     -345.0,
-     -300.0
-    ],
-    "sizeDelta": [
-     1024.0,
-     1024.0
-    ],
-    "scale": 1.0,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     0.5,
-     0.5
-    ]
-   },
-   "AvgHero2": {
-    "anchoredPos": [
-     -270.0,
-     -300.0
-    ],
-    "sizeDelta": [
-     1024.0,
-     1024.0
-    ],
-    "scale": 1.0,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     0.5,
-     0.5
-    ]
-   },
-   "AvgHero4": {
-    "anchoredPos": [
-     500.0,
-     -300.0
-    ],
-    "sizeDelta": [
-     1024.0,
-     1024.0
-    ],
-    "scale": 1.0,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     0.5,
-     0.5
-    ]
-   },
-   "AvgHero5": {
-    "anchoredPos": [
-     575.0,
-     -300.0
-    ],
-    "sizeDelta": [
-     1024.0,
-     1024.0
-    ],
-    "scale": 1.0,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     0.5,
-     0.5
-    ]
-   },
-   "UltrSkillShowHeroSmall": {
-    "anchoredPos": [
-     560.0,
-     49.0
-    ],
-    "sizeDelta": [
-     1800.0,
-     1800.0
-    ],
-    "scale": 1.0,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     0.5,
-     0.5
-    ]
-   },
-   "UltrSkillShowHeroBig": {
-    "anchoredPos": [
-     -260.0,
-     -100.760009765625
-    ],
-    "sizeDelta": [
-     2233.131591796875,
-     2249.52880859375
-    ],
-    "scale": 1.0,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     0.5,
-     0.5
-    ]
-   }
-  }
- },
  "lpic_havoc": {
   "bundle": "havoc/lpic_havoc.ab",
   "texture": [
@@ -91168,6 +90931,243 @@
      1024.0
     ],
     "scale": 1.4950000047683716,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   }
+  }
+ },
+ "lpic_havoc2_avg": {
+  "bundle": "havoc2_avg/lpic_havoc2_avg.ab",
+  "texture": [
+   2048,
+   2048
+  ],
+  "posData": {
+   "HeroList": {
+    "anchoredPos": [
+     165.0,
+     -426.0
+    ],
+    "sizeDelta": [
+     1742.614013671875,
+     1742.614013671875
+    ],
+    "scale": 1.0,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   },
+   "BattleInfo": {
+    "anchoredPos": [
+     101.0,
+     -17.0
+    ],
+    "sizeDelta": [
+     768.0,
+     768.0
+    ],
+    "scale": 1.0,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   },
+   "HeroStarUp": {
+    "anchoredPos": [
+     -130.0,
+     -11.0
+    ],
+    "sizeDelta": [
+     1024.0,
+     1024.0
+    ],
+    "scale": 1.0,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   },
+   "HeroDungeon": {
+    "anchoredPos": [
+     254.8000030517578,
+     -582.7000122070312
+    ],
+    "sizeDelta": [
+     2048.0,
+     2048.0
+    ],
+    "scale": 1.0,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   },
+   "Home": {
+    "anchoredPos": [
+     78.69999694824219,
+     -531.0
+    ],
+    "sizeDelta": [
+     1024.0,
+     1024.0
+    ],
+    "scale": 2.200000047683716,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   },
+   "AvgHero3": {
+    "anchoredPos": [
+     0.0,
+     -300.0
+    ],
+    "sizeDelta": [
+     1024.0,
+     1024.0
+    ],
+    "scale": 1.0,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   },
+   "AvgHero1": {
+    "anchoredPos": [
+     -345.0,
+     -300.0
+    ],
+    "sizeDelta": [
+     1024.0,
+     1024.0
+    ],
+    "scale": 1.0,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   },
+   "AvgHero2": {
+    "anchoredPos": [
+     -270.0,
+     -300.0
+    ],
+    "sizeDelta": [
+     1024.0,
+     1024.0
+    ],
+    "scale": 1.0,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   },
+   "AvgHero4": {
+    "anchoredPos": [
+     500.0,
+     -300.0
+    ],
+    "sizeDelta": [
+     1024.0,
+     1024.0
+    ],
+    "scale": 1.0,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   },
+   "AvgHero5": {
+    "anchoredPos": [
+     575.0,
+     -300.0
+    ],
+    "sizeDelta": [
+     1024.0,
+     1024.0
+    ],
+    "scale": 1.0,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   },
+   "UltrSkillShowHeroSmall": {
+    "anchoredPos": [
+     560.0,
+     49.0
+    ],
+    "sizeDelta": [
+     1800.0,
+     1800.0
+    ],
+    "scale": 1.0,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   },
+   "UltrSkillShowHeroBig": {
+    "anchoredPos": [
+     -260.0,
+     -100.760009765625
+    ],
+    "sizeDelta": [
+     2233.131591796875,
+     2249.52880859375
+    ],
+    "scale": 1.0,
     "pivot": [
      0.5,
      0.5
@@ -103452,6 +103452,205 @@
    }
   }
  },
+ "lpic_hubble": {
+  "bundle": "hubble/lpic_hubble.ab",
+  "texture": [
+   2048,
+   2048
+  ],
+  "posData": {
+   "HeroList": {
+    "anchoredPos": [
+     -33.0,
+     -352.0
+    ],
+    "sizeDelta": [
+     1874.094482421875,
+     1874.094482421875
+    ],
+    "scale": 1.0175151824951172,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   },
+   "BattleInfo": {
+    "anchoredPos": [
+     104.0,
+     19.0
+    ],
+    "sizeDelta": [
+     768.0,
+     768.0
+    ],
+    "scale": 1.0,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   },
+   "HeroStarUp": {
+    "anchoredPos": [
+     -130.0,
+     -11.0
+    ],
+    "sizeDelta": [
+     1024.0,
+     1024.0
+    ],
+    "scale": 1.0,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   },
+   "HeroDungeon": {
+    "anchoredPos": [
+     109.0,
+     -191.0
+    ],
+    "sizeDelta": [
+     1463.7744140625,
+     1463.7744140625
+    ],
+    "scale": 1.0,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   },
+   "Home": {
+    "anchoredPos": [
+     -279.0,
+     -429.0
+    ],
+    "sizeDelta": [
+     1119.751953125,
+     1119.751953125
+    ],
+    "scale": 2.5,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   },
+   "UserInfo": {
+    "anchoredPos": [
+     -190.0,
+     -256.0
+    ],
+    "sizeDelta": [
+     1699.079345703125,
+     1699.079345703125
+    ],
+    "scale": 1.0,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   },
+   "GetHero": {
+    "anchoredPos": [
+     -33.0,
+     -346.0
+    ],
+    "sizeDelta": [
+     1874.094482421875,
+     1874.094482421875
+    ],
+    "scale": 1.0,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   },
+   "HeroSkin": {
+    "anchoredPos": [
+     -33.0,
+     -352.0
+    ],
+    "sizeDelta": [
+     1874.094482421875,
+     1874.094482421875
+    ],
+    "scale": 1.0175151824951172,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   },
+   "UltrSkillShowHeroSmall": {
+    "anchoredPos": [
+     335.4446105957031,
+     213.20037841796875
+    ],
+    "sizeDelta": [
+     1665.7613525390625,
+     1665.7613525390625
+    ],
+    "scale": 1.0,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   },
+   "UltrSkillShowHeroBig": {
+    "anchoredPos": [
+     -540.2332153320312,
+     407.86328125
+    ],
+    "sizeDelta": [
+     1228.4566650390625,
+     1237.4769287109375
+    ],
+    "scale": 1.0,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   }
+  }
+ },
  "lpic_hubble_april": {
   "bundle": "hubble_april/lpic_hubble_april.ab",
   "texture": [
@@ -115115,186 +115314,6 @@
    }
   }
  },
- "lpic_jiangyu2_avg": {
-  "bundle": "jiangyu2_avg/lpic_jiangyu2_avg.ab",
-  "texture": [
-   2048,
-   2048
-  ],
-  "posData": {
-   "HeroList": {
-    "anchoredPos": [
-     89.0,
-     -290.0
-    ],
-    "sizeDelta": [
-     1389.87451171875,
-     1389.87451171875
-    ],
-    "scale": 1.0,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     0.5,
-     0.5
-    ]
-   },
-   "BattleInfo": {
-    "anchoredPos": [
-     167.0,
-     0.0
-    ],
-    "sizeDelta": [
-     768.0,
-     768.0
-    ],
-    "scale": 1.0,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     0.5,
-     0.5
-    ]
-   },
-   "HeroStarUp": {
-    "anchoredPos": [
-     -130.0,
-     -11.0
-    ],
-    "sizeDelta": [
-     1024.0,
-     1024.0
-    ],
-    "scale": 1.0,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     0.5,
-     0.5
-    ]
-   },
-   "HeroDungeon": {
-    "anchoredPos": [
-     196.5,
-     -486.1000061035156
-    ],
-    "sizeDelta": [
-     1800.0,
-     1800.0
-    ],
-    "scale": 1.0,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     0.5,
-     0.5
-    ]
-   },
-   "AvgHero3": {
-    "anchoredPos": [
-     0.0,
-     -350.0
-    ],
-    "sizeDelta": [
-     1024.0,
-     1024.0
-    ],
-    "scale": 1.0,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     0.5,
-     0.5
-    ]
-   },
-   "AvgHero1": {
-    "anchoredPos": [
-     -500.0,
-     -350.0
-    ],
-    "sizeDelta": [
-     1024.0,
-     1024.0
-    ],
-    "scale": 1.0,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     0.5,
-     0.5
-    ]
-   },
-   "AvgHero5": {
-    "anchoredPos": [
-     500.0,
-     -350.0
-    ],
-    "sizeDelta": [
-     1024.0,
-     1024.0
-    ],
-    "scale": 1.0,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     0.5,
-     0.5
-    ]
-   },
-   "AvgHero4": {
-    "anchoredPos": [
-     470.0,
-     -350.0
-    ],
-    "sizeDelta": [
-     1024.0,
-     1024.0
-    ],
-    "scale": 1.0,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     0.5,
-     0.5
-    ]
-   },
-   "AvgHero2": {
-    "anchoredPos": [
-     -450.0,
-     -350.0
-    ],
-    "sizeDelta": [
-     1024.0,
-     1024.0
-    ],
-    "scale": 1.0,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     0.5,
-     0.5
-    ]
-   }
-  }
- },
  "lpic_jiangyu": {
   "bundle": "jiangyu/lpic_jiangyu.ab",
   "texture": [
@@ -115521,6 +115540,186 @@
      1024.0
     ],
     "scale": 1.0499999523162842,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   }
+  }
+ },
+ "lpic_jiangyu2_avg": {
+  "bundle": "jiangyu2_avg/lpic_jiangyu2_avg.ab",
+  "texture": [
+   2048,
+   2048
+  ],
+  "posData": {
+   "HeroList": {
+    "anchoredPos": [
+     89.0,
+     -290.0
+    ],
+    "sizeDelta": [
+     1389.87451171875,
+     1389.87451171875
+    ],
+    "scale": 1.0,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   },
+   "BattleInfo": {
+    "anchoredPos": [
+     167.0,
+     0.0
+    ],
+    "sizeDelta": [
+     768.0,
+     768.0
+    ],
+    "scale": 1.0,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   },
+   "HeroStarUp": {
+    "anchoredPos": [
+     -130.0,
+     -11.0
+    ],
+    "sizeDelta": [
+     1024.0,
+     1024.0
+    ],
+    "scale": 1.0,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   },
+   "HeroDungeon": {
+    "anchoredPos": [
+     196.5,
+     -486.1000061035156
+    ],
+    "sizeDelta": [
+     1800.0,
+     1800.0
+    ],
+    "scale": 1.0,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   },
+   "AvgHero3": {
+    "anchoredPos": [
+     0.0,
+     -350.0
+    ],
+    "sizeDelta": [
+     1024.0,
+     1024.0
+    ],
+    "scale": 1.0,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   },
+   "AvgHero1": {
+    "anchoredPos": [
+     -500.0,
+     -350.0
+    ],
+    "sizeDelta": [
+     1024.0,
+     1024.0
+    ],
+    "scale": 1.0,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   },
+   "AvgHero5": {
+    "anchoredPos": [
+     500.0,
+     -350.0
+    ],
+    "sizeDelta": [
+     1024.0,
+     1024.0
+    ],
+    "scale": 1.0,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   },
+   "AvgHero4": {
+    "anchoredPos": [
+     470.0,
+     -350.0
+    ],
+    "sizeDelta": [
+     1024.0,
+     1024.0
+    ],
+    "scale": 1.0,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   },
+   "AvgHero2": {
+    "anchoredPos": [
+     -450.0,
+     -350.0
+    ],
+    "sizeDelta": [
+     1024.0,
+     1024.0
+    ],
+    "scale": 1.0,
     "pivot": [
      0.5,
      0.5
@@ -137906,202 +138105,6 @@
    }
   }
  },
- "lpic_max2_avg": {
-  "bundle": "max2_avg/lpic_max2_avg.ab",
-  "texture": null,
-  "posData": {
-   "HeroList": {
-    "anchoredPos": [
-     19.0,
-     -340.0
-    ],
-    "sizeDelta": [
-     1553.1103515625,
-     1553.1103515625
-    ],
-    "scale": 1.0,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     0.5,
-     0.5
-    ]
-   },
-   "BattleInfo": {
-    "anchoredPos": [
-     124.87994384765625,
-     34.279972076416016
-    ],
-    "sizeDelta": [
-     768.0,
-     768.0
-    ],
-    "scale": 1.0,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     0.5,
-     0.5
-    ]
-   },
-   "HeroStarUp": {
-    "anchoredPos": [
-     -130.0,
-     -11.0
-    ],
-    "sizeDelta": [
-     1024.0,
-     1024.0
-    ],
-    "scale": 1.0,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     0.5,
-     0.5
-    ]
-   },
-   "Guide1": {
-    "anchoredPos": [
-     373.9999694824219,
-     -142.54998779296875
-    ],
-    "sizeDelta": [
-     734.2000122070312,
-     734.2000122070312
-    ],
-    "scale": 1.8499999046325684,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     1.0,
-     0.5
-    ]
-   },
-   "HeroDungeon": {
-    "anchoredPos": [
-     -78.0199966430664,
-     -499.5
-    ],
-    "sizeDelta": [
-     2048.0,
-     2048.0
-    ],
-    "scale": 1.0,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     0.5,
-     0.5
-    ]
-   },
-   "AvgHero1": {
-    "anchoredPos": [
-     -475.0,
-     -180.0
-    ],
-    "sizeDelta": [
-     768.0,
-     768.0
-    ],
-    "scale": 1.0,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     0.5,
-     0.5
-    ]
-   },
-   "AvgHero2": {
-    "anchoredPos": [
-     -400.0,
-     -180.0
-    ],
-    "sizeDelta": [
-     768.0,
-     768.0
-    ],
-    "scale": 1.0,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     0.5,
-     0.5
-    ]
-   },
-   "AvgHero3": {
-    "anchoredPos": [
-     0.0,
-     -180.0
-    ],
-    "sizeDelta": [
-     768.0,
-     768.0
-    ],
-    "scale": 1.0,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     0.5,
-     0.5
-    ]
-   },
-   "AvgHero5": {
-    "anchoredPos": [
-     475.0,
-     -180.0
-    ],
-    "sizeDelta": [
-     768.0,
-     768.0
-    ],
-    "scale": 1.0,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     0.5,
-     0.5
-    ]
-   },
-   "AvgHero4": {
-    "anchoredPos": [
-     400.0,
-     -180.0
-    ],
-    "sizeDelta": [
-     768.0,
-     768.0
-    ],
-    "scale": 1.0,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     0.5,
-     0.5
-    ]
-   }
-  }
- },
  "lpic_max": {
   "bundle": "max/lpic_max.ab",
   "texture": [
@@ -138307,6 +138310,202 @@
     "sizeDelta": [
      1082.2486572265625,
      1090.1953125
+    ],
+    "scale": 1.0,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   }
+  }
+ },
+ "lpic_max2_avg": {
+  "bundle": "max2_avg/lpic_max2_avg.ab",
+  "texture": null,
+  "posData": {
+   "HeroList": {
+    "anchoredPos": [
+     19.0,
+     -340.0
+    ],
+    "sizeDelta": [
+     1553.1103515625,
+     1553.1103515625
+    ],
+    "scale": 1.0,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   },
+   "BattleInfo": {
+    "anchoredPos": [
+     124.87994384765625,
+     34.279972076416016
+    ],
+    "sizeDelta": [
+     768.0,
+     768.0
+    ],
+    "scale": 1.0,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   },
+   "HeroStarUp": {
+    "anchoredPos": [
+     -130.0,
+     -11.0
+    ],
+    "sizeDelta": [
+     1024.0,
+     1024.0
+    ],
+    "scale": 1.0,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   },
+   "Guide1": {
+    "anchoredPos": [
+     373.9999694824219,
+     -142.54998779296875
+    ],
+    "sizeDelta": [
+     734.2000122070312,
+     734.2000122070312
+    ],
+    "scale": 1.8499999046325684,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     1.0,
+     0.5
+    ]
+   },
+   "HeroDungeon": {
+    "anchoredPos": [
+     -78.0199966430664,
+     -499.5
+    ],
+    "sizeDelta": [
+     2048.0,
+     2048.0
+    ],
+    "scale": 1.0,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   },
+   "AvgHero1": {
+    "anchoredPos": [
+     -475.0,
+     -180.0
+    ],
+    "sizeDelta": [
+     768.0,
+     768.0
+    ],
+    "scale": 1.0,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   },
+   "AvgHero2": {
+    "anchoredPos": [
+     -400.0,
+     -180.0
+    ],
+    "sizeDelta": [
+     768.0,
+     768.0
+    ],
+    "scale": 1.0,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   },
+   "AvgHero3": {
+    "anchoredPos": [
+     0.0,
+     -180.0
+    ],
+    "sizeDelta": [
+     768.0,
+     768.0
+    ],
+    "scale": 1.0,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   },
+   "AvgHero5": {
+    "anchoredPos": [
+     475.0,
+     -180.0
+    ],
+    "sizeDelta": [
+     768.0,
+     768.0
+    ],
+    "scale": 1.0,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   },
+   "AvgHero4": {
+    "anchoredPos": [
+     400.0,
+     -180.0
+    ],
+    "sizeDelta": [
+     768.0,
+     768.0
     ],
     "scale": 1.0,
     "pivot": [
@@ -147366,6 +147565,243 @@
    }
   }
  },
+ "lpic_nascita": {
+  "bundle": "nascita/lpic_nascita.ab",
+  "texture": [
+   2048,
+   2048
+  ],
+  "posData": {
+   "BattleInfo": {
+    "anchoredPos": [
+     104.0,
+     19.0
+    ],
+    "sizeDelta": [
+     768.0,
+     768.0
+    ],
+    "scale": 1.0,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   },
+   "HeroStarUp": {
+    "anchoredPos": [
+     -130.0,
+     -11.0
+    ],
+    "sizeDelta": [
+     1024.0,
+     1024.0
+    ],
+    "scale": 1.0,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   },
+   "UserInfo": {
+    "anchoredPos": [
+     -190.0,
+     -256.0
+    ],
+    "sizeDelta": [
+     1699.079345703125,
+     1699.079345703125
+    ],
+    "scale": 1.0,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   },
+   "UltrSkillShowHeroSmall": {
+    "anchoredPos": [
+     364.6601257324219,
+     262.4104919433594
+    ],
+    "sizeDelta": [
+     1313.5987548828125,
+     1313.5987548828125
+    ],
+    "scale": 1.0,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   },
+   "UltrSkillShowHeroBig": {
+    "anchoredPos": [
+     -518.6875,
+     444.42095947265625
+    ],
+    "sizeDelta": [
+     968.7457275390625,
+     975.8589477539062
+    ],
+    "scale": 1.0,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   },
+   "ChipGift": {
+    "anchoredPos": [
+     -129.0,
+     -391.0
+    ],
+    "sizeDelta": [
+     1509.439453125,
+     1509.439453125
+    ],
+    "scale": 1.0399999618530273,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   },
+   "Home": {
+    "anchoredPos": [
+     164.53517150878906,
+     -350.0
+    ],
+    "sizeDelta": [
+     672.015625,
+     672.015625
+    ],
+    "scale": 2.81358003616333,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   },
+   "HeroList": {
+    "anchoredPos": [
+     191.0,
+     -188.394287109375
+    ],
+    "sizeDelta": [
+     1193.0106201171875,
+     1193.0106201171875
+    ],
+    "scale": 1.0399999618530273,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   },
+   "HeroSkin": {
+    "anchoredPos": [
+     171.0,
+     -226.0
+    ],
+    "sizeDelta": [
+     1193.0106201171875,
+     1193.0106201171875
+    ],
+    "scale": 1.0399999618530273,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   },
+   "GetHero": {
+    "anchoredPos": [
+     276.5534362792969,
+     -153.10986328125
+    ],
+    "sizeDelta": [
+     1193.0106201171875,
+     1193.0106201171875
+    ],
+    "scale": 1.0,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   },
+   "SkinPreview": {
+    "anchoredPos": [
+     170.1725616455078,
+     -41.54278564453125
+    ],
+    "sizeDelta": [
+     768.9229736328125,
+     768.9229736328125
+    ],
+    "scale": 1.316499948501587,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   },
+   "HeroDungeon": {
+    "anchoredPos": [
+     270.0,
+     -103.0
+    ],
+    "sizeDelta": [
+     957.8756713867188,
+     957.8756713867188
+    ],
+    "scale": 1.0,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   }
+  }
+ },
  "lpic_nascita1_avg": {
   "bundle": "nascita1_avg/lpic_nascita1_avg.ab",
   "texture": [
@@ -147713,243 +148149,6 @@
     "sizeDelta": [
      1024.0,
      1024.0
-    ],
-    "scale": 1.0,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     0.5,
-     0.5
-    ]
-   }
-  }
- },
- "lpic_nascita": {
-  "bundle": "nascita/lpic_nascita.ab",
-  "texture": [
-   2048,
-   2048
-  ],
-  "posData": {
-   "BattleInfo": {
-    "anchoredPos": [
-     104.0,
-     19.0
-    ],
-    "sizeDelta": [
-     768.0,
-     768.0
-    ],
-    "scale": 1.0,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     0.5,
-     0.5
-    ]
-   },
-   "HeroStarUp": {
-    "anchoredPos": [
-     -130.0,
-     -11.0
-    ],
-    "sizeDelta": [
-     1024.0,
-     1024.0
-    ],
-    "scale": 1.0,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     0.5,
-     0.5
-    ]
-   },
-   "UserInfo": {
-    "anchoredPos": [
-     -190.0,
-     -256.0
-    ],
-    "sizeDelta": [
-     1699.079345703125,
-     1699.079345703125
-    ],
-    "scale": 1.0,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     0.5,
-     0.5
-    ]
-   },
-   "UltrSkillShowHeroSmall": {
-    "anchoredPos": [
-     364.6601257324219,
-     262.4104919433594
-    ],
-    "sizeDelta": [
-     1313.5987548828125,
-     1313.5987548828125
-    ],
-    "scale": 1.0,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     0.5,
-     0.5
-    ]
-   },
-   "UltrSkillShowHeroBig": {
-    "anchoredPos": [
-     -518.6875,
-     444.42095947265625
-    ],
-    "sizeDelta": [
-     968.7457275390625,
-     975.8589477539062
-    ],
-    "scale": 1.0,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     0.5,
-     0.5
-    ]
-   },
-   "ChipGift": {
-    "anchoredPos": [
-     -129.0,
-     -391.0
-    ],
-    "sizeDelta": [
-     1509.439453125,
-     1509.439453125
-    ],
-    "scale": 1.0399999618530273,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     0.5,
-     0.5
-    ]
-   },
-   "Home": {
-    "anchoredPos": [
-     164.53517150878906,
-     -350.0
-    ],
-    "sizeDelta": [
-     672.015625,
-     672.015625
-    ],
-    "scale": 2.81358003616333,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     0.5,
-     0.5
-    ]
-   },
-   "HeroList": {
-    "anchoredPos": [
-     191.0,
-     -188.394287109375
-    ],
-    "sizeDelta": [
-     1193.0106201171875,
-     1193.0106201171875
-    ],
-    "scale": 1.0399999618530273,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     0.5,
-     0.5
-    ]
-   },
-   "HeroSkin": {
-    "anchoredPos": [
-     171.0,
-     -226.0
-    ],
-    "sizeDelta": [
-     1193.0106201171875,
-     1193.0106201171875
-    ],
-    "scale": 1.0399999618530273,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     0.5,
-     0.5
-    ]
-   },
-   "GetHero": {
-    "anchoredPos": [
-     276.5534362792969,
-     -153.10986328125
-    ],
-    "sizeDelta": [
-     1193.0106201171875,
-     1193.0106201171875
-    ],
-    "scale": 1.0,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     0.5,
-     0.5
-    ]
-   },
-   "SkinPreview": {
-    "anchoredPos": [
-     170.1725616455078,
-     -41.54278564453125
-    ],
-    "sizeDelta": [
-     768.9229736328125,
-     768.9229736328125
-    ],
-    "scale": 1.316499948501587,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     0.5,
-     0.5
-    ]
-   },
-   "HeroDungeon": {
-    "anchoredPos": [
-     270.0,
-     -103.0
-    ],
-    "sizeDelta": [
-     957.8756713867188,
-     957.8756713867188
     ],
     "scale": 1.0,
     "pivot": [
@@ -158193,205 +158392,6 @@
    }
   }
  },
- "lpic_olivia2_avg": {
-  "bundle": "olivia2_avg/lpic_olivia2_avg.ab",
-  "texture": [
-   2048,
-   2048
-  ],
-  "posData": {
-   "HeroList": {
-    "anchoredPos": [
-     19.0,
-     -340.0
-    ],
-    "sizeDelta": [
-     1553.1103515625,
-     1553.1103515625
-    ],
-    "scale": 1.0,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     0.5,
-     0.5
-    ]
-   },
-   "BattleInfo": {
-    "anchoredPos": [
-     124.87994384765625,
-     34.279972076416016
-    ],
-    "sizeDelta": [
-     768.0,
-     768.0
-    ],
-    "scale": 1.0,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     0.5,
-     0.5
-    ]
-   },
-   "HeroStarUp": {
-    "anchoredPos": [
-     -130.0,
-     -11.0
-    ],
-    "sizeDelta": [
-     1024.0,
-     1024.0
-    ],
-    "scale": 1.0,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     0.5,
-     0.5
-    ]
-   },
-   "Guide1": {
-    "anchoredPos": [
-     373.9999694824219,
-     -142.54998779296875
-    ],
-    "sizeDelta": [
-     734.2000122070312,
-     734.2000122070312
-    ],
-    "scale": 1.8499999046325684,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     1.0,
-     0.5
-    ]
-   },
-   "HeroDungeon": {
-    "anchoredPos": [
-     -78.0199966430664,
-     -499.5
-    ],
-    "sizeDelta": [
-     2048.0,
-     2048.0
-    ],
-    "scale": 1.0,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     0.5,
-     0.5
-    ]
-   },
-   "AvgHero3": {
-    "anchoredPos": [
-     0.0,
-     -380.0
-    ],
-    "sizeDelta": [
-     768.0,
-     768.0
-    ],
-    "scale": 1.0,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     0.5,
-     0.5
-    ]
-   },
-   "AvgHero1": {
-    "anchoredPos": [
-     -470.0,
-     -380.0
-    ],
-    "sizeDelta": [
-     768.0,
-     768.0
-    ],
-    "scale": 1.0,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     0.5,
-     0.5
-    ]
-   },
-   "AvgHero2": {
-    "anchoredPos": [
-     -400.0,
-     -380.0
-    ],
-    "sizeDelta": [
-     768.0,
-     768.0
-    ],
-    "scale": 1.0,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     0.5,
-     0.5
-    ]
-   },
-   "AvgHero4": {
-    "anchoredPos": [
-     500.0,
-     -380.0
-    ],
-    "sizeDelta": [
-     768.0,
-     768.0
-    ],
-    "scale": 1.0,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     0.5,
-     0.5
-    ]
-   },
-   "AvgHero5": {
-    "anchoredPos": [
-     550.0,
-     -380.0
-    ],
-    "sizeDelta": [
-     768.0,
-     768.0
-    ],
-    "scale": 1.0,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     0.5,
-     0.5
-    ]
-   }
-  }
- },
  "lpic_olivia": {
   "bundle": "olivia/lpic_olivia.ab",
   "texture": [
@@ -158675,6 +158675,205 @@
      1024.0
     ],
     "scale": 1.3812990188598633,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   }
+  }
+ },
+ "lpic_olivia2_avg": {
+  "bundle": "olivia2_avg/lpic_olivia2_avg.ab",
+  "texture": [
+   2048,
+   2048
+  ],
+  "posData": {
+   "HeroList": {
+    "anchoredPos": [
+     19.0,
+     -340.0
+    ],
+    "sizeDelta": [
+     1553.1103515625,
+     1553.1103515625
+    ],
+    "scale": 1.0,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   },
+   "BattleInfo": {
+    "anchoredPos": [
+     124.87994384765625,
+     34.279972076416016
+    ],
+    "sizeDelta": [
+     768.0,
+     768.0
+    ],
+    "scale": 1.0,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   },
+   "HeroStarUp": {
+    "anchoredPos": [
+     -130.0,
+     -11.0
+    ],
+    "sizeDelta": [
+     1024.0,
+     1024.0
+    ],
+    "scale": 1.0,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   },
+   "Guide1": {
+    "anchoredPos": [
+     373.9999694824219,
+     -142.54998779296875
+    ],
+    "sizeDelta": [
+     734.2000122070312,
+     734.2000122070312
+    ],
+    "scale": 1.8499999046325684,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     1.0,
+     0.5
+    ]
+   },
+   "HeroDungeon": {
+    "anchoredPos": [
+     -78.0199966430664,
+     -499.5
+    ],
+    "sizeDelta": [
+     2048.0,
+     2048.0
+    ],
+    "scale": 1.0,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   },
+   "AvgHero3": {
+    "anchoredPos": [
+     0.0,
+     -380.0
+    ],
+    "sizeDelta": [
+     768.0,
+     768.0
+    ],
+    "scale": 1.0,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   },
+   "AvgHero1": {
+    "anchoredPos": [
+     -470.0,
+     -380.0
+    ],
+    "sizeDelta": [
+     768.0,
+     768.0
+    ],
+    "scale": 1.0,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   },
+   "AvgHero2": {
+    "anchoredPos": [
+     -400.0,
+     -380.0
+    ],
+    "sizeDelta": [
+     768.0,
+     768.0
+    ],
+    "scale": 1.0,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   },
+   "AvgHero4": {
+    "anchoredPos": [
+     500.0,
+     -380.0
+    ],
+    "sizeDelta": [
+     768.0,
+     768.0
+    ],
+    "scale": 1.0,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   },
+   "AvgHero5": {
+    "anchoredPos": [
+     550.0,
+     -380.0
+    ],
+    "sizeDelta": [
+     768.0,
+     768.0
+    ],
+    "scale": 1.0,
     "pivot": [
      0.5,
      0.5
@@ -166968,6 +167167,243 @@
    }
   }
  },
+ "lpic_persicaria_sp": {
+  "bundle": "persicaria_sp/lpic_persicaria_sp.ab",
+  "texture": [
+   2048,
+   2048
+  ],
+  "posData": {
+   "BattleInfo": {
+    "anchoredPos": [
+     92.0,
+     -22.0
+    ],
+    "sizeDelta": [
+     768.0,
+     768.0
+    ],
+    "scale": 1.0,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   },
+   "HeroStarUp": {
+    "anchoredPos": [
+     -130.0,
+     -11.0
+    ],
+    "sizeDelta": [
+     1024.0,
+     1024.0
+    ],
+    "scale": 1.0,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   },
+   "HeroDungeon": {
+    "anchoredPos": [
+     132.0,
+     -170.0
+    ],
+    "sizeDelta": [
+     775.706787109375,
+     775.706787109375
+    ],
+    "scale": 1.5,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   },
+   "UserInfo": {
+    "anchoredPos": [
+     -240.0,
+     -194.0
+    ],
+    "sizeDelta": [
+     1449.604248046875,
+     1475.021484375
+    ],
+    "scale": 1.636299967765808,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   },
+   "HeroTask": {
+    "anchoredPos": [
+     161.0,
+     -469.0
+    ],
+    "sizeDelta": [
+     1580.139892578125,
+     1580.139892578125
+    ],
+    "scale": 1.0,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   },
+   "HeroList": {
+    "anchoredPos": [
+     64.0,
+     -164.0
+    ],
+    "sizeDelta": [
+     1411.327392578125,
+     1411.327392578125
+    ],
+    "scale": 1.0399999618530273,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   },
+   "SkinPreview": {
+    "anchoredPos": [
+     139.96282958984375,
+     -25.22320556640625
+    ],
+    "sizeDelta": [
+     935.569580078125,
+     935.569580078125
+    ],
+    "scale": 1.316499948501587,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   },
+   "GetHero": {
+    "anchoredPos": [
+     240.9503936767578,
+     -133.8768310546875
+    ],
+    "sizeDelta": [
+     1451.568603515625,
+     1451.568603515625
+    ],
+    "scale": 1.0,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   },
+   "HeroSkin": {
+    "anchoredPos": [
+     232.54840087890625,
+     -168.391845703125
+    ],
+    "sizeDelta": [
+     1451.568603515625,
+     1451.568603515625
+    ],
+    "scale": 1.0399999618530273,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   },
+   "UltrSkillShowHeroSmall": {
+    "anchoredPos": [
+     542.3602905273438,
+     380.8407897949219
+    ],
+    "sizeDelta": [
+     1340.775634765625,
+     1340.775634765625
+    ],
+    "scale": 1.0,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   },
+   "UltrSkillShowHeroBig": {
+    "anchoredPos": [
+     -387.6381530761719,
+     532.401611328125
+    ],
+    "sizeDelta": [
+     988.7880249023438,
+     996.0484008789062
+    ],
+    "scale": 1.0,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   },
+   "Home": {
+    "anchoredPos": [
+     -13.0,
+     -222.0
+    ],
+    "sizeDelta": [
+     817.6597900390625,
+     817.6597900390625
+    ],
+    "scale": 2.309999942779541,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   }
+  }
+ },
  "lpic_persicaria_sp2_avg": {
   "bundle": "persicaria_sp2_avg/lpic_persicaria_sp2_avg.ab",
   "texture": [
@@ -167905,243 +168341,6 @@
      768.0
     ],
     "scale": 2.0999999046325684,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     0.5,
-     0.5
-    ]
-   }
-  }
- },
- "lpic_persicaria_sp": {
-  "bundle": "persicaria_sp/lpic_persicaria_sp.ab",
-  "texture": [
-   2048,
-   2048
-  ],
-  "posData": {
-   "BattleInfo": {
-    "anchoredPos": [
-     92.0,
-     -22.0
-    ],
-    "sizeDelta": [
-     768.0,
-     768.0
-    ],
-    "scale": 1.0,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     0.5,
-     0.5
-    ]
-   },
-   "HeroStarUp": {
-    "anchoredPos": [
-     -130.0,
-     -11.0
-    ],
-    "sizeDelta": [
-     1024.0,
-     1024.0
-    ],
-    "scale": 1.0,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     0.5,
-     0.5
-    ]
-   },
-   "HeroDungeon": {
-    "anchoredPos": [
-     132.0,
-     -170.0
-    ],
-    "sizeDelta": [
-     775.706787109375,
-     775.706787109375
-    ],
-    "scale": 1.5,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     0.5,
-     0.5
-    ]
-   },
-   "UserInfo": {
-    "anchoredPos": [
-     -240.0,
-     -194.0
-    ],
-    "sizeDelta": [
-     1449.604248046875,
-     1475.021484375
-    ],
-    "scale": 1.636299967765808,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     0.5,
-     0.5
-    ]
-   },
-   "HeroTask": {
-    "anchoredPos": [
-     161.0,
-     -469.0
-    ],
-    "sizeDelta": [
-     1580.139892578125,
-     1580.139892578125
-    ],
-    "scale": 1.0,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     0.5,
-     0.5
-    ]
-   },
-   "HeroList": {
-    "anchoredPos": [
-     64.0,
-     -164.0
-    ],
-    "sizeDelta": [
-     1411.327392578125,
-     1411.327392578125
-    ],
-    "scale": 1.0399999618530273,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     0.5,
-     0.5
-    ]
-   },
-   "SkinPreview": {
-    "anchoredPos": [
-     139.96282958984375,
-     -25.22320556640625
-    ],
-    "sizeDelta": [
-     935.569580078125,
-     935.569580078125
-    ],
-    "scale": 1.316499948501587,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     0.5,
-     0.5
-    ]
-   },
-   "GetHero": {
-    "anchoredPos": [
-     240.9503936767578,
-     -133.8768310546875
-    ],
-    "sizeDelta": [
-     1451.568603515625,
-     1451.568603515625
-    ],
-    "scale": 1.0,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     0.5,
-     0.5
-    ]
-   },
-   "HeroSkin": {
-    "anchoredPos": [
-     232.54840087890625,
-     -168.391845703125
-    ],
-    "sizeDelta": [
-     1451.568603515625,
-     1451.568603515625
-    ],
-    "scale": 1.0399999618530273,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     0.5,
-     0.5
-    ]
-   },
-   "UltrSkillShowHeroSmall": {
-    "anchoredPos": [
-     542.3602905273438,
-     380.8407897949219
-    ],
-    "sizeDelta": [
-     1340.775634765625,
-     1340.775634765625
-    ],
-    "scale": 1.0,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     0.5,
-     0.5
-    ]
-   },
-   "UltrSkillShowHeroBig": {
-    "anchoredPos": [
-     -387.6381530761719,
-     532.401611328125
-    ],
-    "sizeDelta": [
-     988.7880249023438,
-     996.0484008789062
-    ],
-    "scale": 1.0,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     0.5,
-     0.5
-    ]
-   },
-   "Home": {
-    "anchoredPos": [
-     -13.0,
-     -222.0
-    ],
-    "sizeDelta": [
-     817.6597900390625,
-     817.6597900390625
-    ],
-    "scale": 2.309999942779541,
     "pivot": [
      0.5,
      0.5
@@ -210767,224 +210966,6 @@
    }
   }
  },
- "lpic_turing2_avg": {
-  "bundle": "turing2_avg/lpic_turing2_avg.ab",
-  "texture": [
-   2048,
-   2048
-  ],
-  "posData": {
-   "HeroList": {
-    "anchoredPos": [
-     19.0,
-     -340.0
-    ],
-    "sizeDelta": [
-     1553.1103515625,
-     1553.1103515625
-    ],
-    "scale": 1.0,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     0.5,
-     0.5
-    ]
-   },
-   "BattleInfo": {
-    "anchoredPos": [
-     124.87994384765625,
-     34.279972076416016
-    ],
-    "sizeDelta": [
-     768.0,
-     768.0
-    ],
-    "scale": 1.0,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     0.5,
-     0.5
-    ]
-   },
-   "HeroStarUp": {
-    "anchoredPos": [
-     -130.0,
-     -11.0
-    ],
-    "sizeDelta": [
-     1024.0,
-     1024.0
-    ],
-    "scale": 1.0,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     0.5,
-     0.5
-    ]
-   },
-   "Guide1": {
-    "anchoredPos": [
-     373.9999694824219,
-     -142.54998779296875
-    ],
-    "sizeDelta": [
-     734.2000122070312,
-     734.2000122070312
-    ],
-    "scale": 1.8499999046325684,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     1.0,
-     0.5
-    ]
-   },
-   "HeroDungeon": {
-    "anchoredPos": [
-     -78.0199966430664,
-     -499.5
-    ],
-    "sizeDelta": [
-     2048.0,
-     2048.0
-    ],
-    "scale": 1.0,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     0.5,
-     0.5
-    ]
-   },
-   "AvgHero3": {
-    "anchoredPos": [
-     0.0,
-     -350.0
-    ],
-    "sizeDelta": [
-     768.0,
-     768.0
-    ],
-    "scale": 1.0,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     0.5,
-     0.5
-    ]
-   },
-   "AvgHero1": {
-    "anchoredPos": [
-     -450.0,
-     -350.0
-    ],
-    "sizeDelta": [
-     768.0,
-     768.0
-    ],
-    "scale": 1.0,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     0.5,
-     0.5
-    ]
-   },
-   "AvgHero2": {
-    "anchoredPos": [
-     -400.0,
-     -350.0
-    ],
-    "sizeDelta": [
-     768.0,
-     768.0
-    ],
-    "scale": 1.0,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     0.5,
-     0.5
-    ]
-   },
-   "AvgHero4": {
-    "anchoredPos": [
-     450.0,
-     -350.0
-    ],
-    "sizeDelta": [
-     768.0,
-     768.0
-    ],
-    "scale": 1.0,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     0.5,
-     0.5
-    ]
-   },
-   "AvgHero5": {
-    "anchoredPos": [
-     500.0,
-     -350.0
-    ],
-    "sizeDelta": [
-     768.0,
-     768.0
-    ],
-    "scale": 1.0,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     0.5,
-     0.5
-    ]
-   },
-   "GetHero": {
-    "anchoredPos": [
-     19.0,
-     -340.0
-    ],
-    "sizeDelta": [
-     1553.1103515625,
-     1553.1103515625
-    ],
-    "scale": 1.0,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     0.5,
-     0.5
-    ]
-   }
-  }
- },
  "lpic_turing": {
   "bundle": "turing/lpic_turing.ab",
   "texture": [
@@ -211209,6 +211190,224 @@
     "sizeDelta": [
      1140.6783447265625,
      1140.6783447265625
+    ],
+    "scale": 1.0,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   }
+  }
+ },
+ "lpic_turing2_avg": {
+  "bundle": "turing2_avg/lpic_turing2_avg.ab",
+  "texture": [
+   2048,
+   2048
+  ],
+  "posData": {
+   "HeroList": {
+    "anchoredPos": [
+     19.0,
+     -340.0
+    ],
+    "sizeDelta": [
+     1553.1103515625,
+     1553.1103515625
+    ],
+    "scale": 1.0,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   },
+   "BattleInfo": {
+    "anchoredPos": [
+     124.87994384765625,
+     34.279972076416016
+    ],
+    "sizeDelta": [
+     768.0,
+     768.0
+    ],
+    "scale": 1.0,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   },
+   "HeroStarUp": {
+    "anchoredPos": [
+     -130.0,
+     -11.0
+    ],
+    "sizeDelta": [
+     1024.0,
+     1024.0
+    ],
+    "scale": 1.0,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   },
+   "Guide1": {
+    "anchoredPos": [
+     373.9999694824219,
+     -142.54998779296875
+    ],
+    "sizeDelta": [
+     734.2000122070312,
+     734.2000122070312
+    ],
+    "scale": 1.8499999046325684,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     1.0,
+     0.5
+    ]
+   },
+   "HeroDungeon": {
+    "anchoredPos": [
+     -78.0199966430664,
+     -499.5
+    ],
+    "sizeDelta": [
+     2048.0,
+     2048.0
+    ],
+    "scale": 1.0,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   },
+   "AvgHero3": {
+    "anchoredPos": [
+     0.0,
+     -350.0
+    ],
+    "sizeDelta": [
+     768.0,
+     768.0
+    ],
+    "scale": 1.0,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   },
+   "AvgHero1": {
+    "anchoredPos": [
+     -450.0,
+     -350.0
+    ],
+    "sizeDelta": [
+     768.0,
+     768.0
+    ],
+    "scale": 1.0,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   },
+   "AvgHero2": {
+    "anchoredPos": [
+     -400.0,
+     -350.0
+    ],
+    "sizeDelta": [
+     768.0,
+     768.0
+    ],
+    "scale": 1.0,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   },
+   "AvgHero4": {
+    "anchoredPos": [
+     450.0,
+     -350.0
+    ],
+    "sizeDelta": [
+     768.0,
+     768.0
+    ],
+    "scale": 1.0,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   },
+   "AvgHero5": {
+    "anchoredPos": [
+     500.0,
+     -350.0
+    ],
+    "sizeDelta": [
+     768.0,
+     768.0
+    ],
+    "scale": 1.0,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   },
+   "GetHero": {
+    "anchoredPos": [
+     19.0,
+     -340.0
+    ],
+    "sizeDelta": [
+     1553.1103515625,
+     1553.1103515625
     ],
     "scale": 1.0,
     "pivot": [
@@ -215601,205 +215800,6 @@
    }
   }
  },
- "lpic_undline2_avg": {
-  "bundle": "undline2_avg/lpic_undline2_avg.ab",
-  "texture": [
-   2048,
-   2048
-  ],
-  "posData": {
-   "HeroList": {
-    "anchoredPos": [
-     19.0,
-     -340.0
-    ],
-    "sizeDelta": [
-     1553.1103515625,
-     1553.1103515625
-    ],
-    "scale": 1.0,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     0.5,
-     0.5
-    ]
-   },
-   "BattleInfo": {
-    "anchoredPos": [
-     124.87994384765625,
-     34.279972076416016
-    ],
-    "sizeDelta": [
-     768.0,
-     768.0
-    ],
-    "scale": 1.0,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     0.5,
-     0.5
-    ]
-   },
-   "HeroStarUp": {
-    "anchoredPos": [
-     -130.0,
-     -11.0
-    ],
-    "sizeDelta": [
-     1024.0,
-     1024.0
-    ],
-    "scale": 1.0,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     0.5,
-     0.5
-    ]
-   },
-   "Guide1": {
-    "anchoredPos": [
-     373.9999694824219,
-     -142.54998779296875
-    ],
-    "sizeDelta": [
-     734.2000122070312,
-     734.2000122070312
-    ],
-    "scale": 1.8499999046325684,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     1.0,
-     0.5
-    ]
-   },
-   "HeroDungeon": {
-    "anchoredPos": [
-     -78.0199966430664,
-     -499.5
-    ],
-    "sizeDelta": [
-     2048.0,
-     2048.0
-    ],
-    "scale": 1.0,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     0.5,
-     0.5
-    ]
-   },
-   "AvgHero1": {
-    "anchoredPos": [
-     -470.0,
-     -320.0
-    ],
-    "sizeDelta": [
-     768.0,
-     768.0
-    ],
-    "scale": 1.0,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     0.5,
-     0.5
-    ]
-   },
-   "AvgHero2": {
-    "anchoredPos": [
-     -400.0,
-     -320.0
-    ],
-    "sizeDelta": [
-     768.0,
-     768.0
-    ],
-    "scale": 1.0,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     0.5,
-     0.5
-    ]
-   },
-   "AvgHero3": {
-    "anchoredPos": [
-     0.0,
-     -320.0
-    ],
-    "sizeDelta": [
-     768.0,
-     768.0
-    ],
-    "scale": 1.0,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     0.5,
-     0.5
-    ]
-   },
-   "AvgHero4": {
-    "anchoredPos": [
-     400.0,
-     -320.0
-    ],
-    "sizeDelta": [
-     768.0,
-     768.0
-    ],
-    "scale": 1.0,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     0.5,
-     0.5
-    ]
-   },
-   "AvgHero5": {
-    "anchoredPos": [
-     475.0,
-     -320.0
-    ],
-    "sizeDelta": [
-     768.0,
-     768.0
-    ],
-    "scale": 1.0,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     0.5,
-     0.5
-    ]
-   }
-  }
- },
  "lpic_undline": {
   "bundle": "undline/lpic_undline.ab",
   "texture": [
@@ -216026,6 +216026,205 @@
      1450.51708984375
     ],
     "scale": 1.0399999618530273,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   }
+  }
+ },
+ "lpic_undline2_avg": {
+  "bundle": "undline2_avg/lpic_undline2_avg.ab",
+  "texture": [
+   2048,
+   2048
+  ],
+  "posData": {
+   "HeroList": {
+    "anchoredPos": [
+     19.0,
+     -340.0
+    ],
+    "sizeDelta": [
+     1553.1103515625,
+     1553.1103515625
+    ],
+    "scale": 1.0,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   },
+   "BattleInfo": {
+    "anchoredPos": [
+     124.87994384765625,
+     34.279972076416016
+    ],
+    "sizeDelta": [
+     768.0,
+     768.0
+    ],
+    "scale": 1.0,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   },
+   "HeroStarUp": {
+    "anchoredPos": [
+     -130.0,
+     -11.0
+    ],
+    "sizeDelta": [
+     1024.0,
+     1024.0
+    ],
+    "scale": 1.0,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   },
+   "Guide1": {
+    "anchoredPos": [
+     373.9999694824219,
+     -142.54998779296875
+    ],
+    "sizeDelta": [
+     734.2000122070312,
+     734.2000122070312
+    ],
+    "scale": 1.8499999046325684,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     1.0,
+     0.5
+    ]
+   },
+   "HeroDungeon": {
+    "anchoredPos": [
+     -78.0199966430664,
+     -499.5
+    ],
+    "sizeDelta": [
+     2048.0,
+     2048.0
+    ],
+    "scale": 1.0,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   },
+   "AvgHero1": {
+    "anchoredPos": [
+     -470.0,
+     -320.0
+    ],
+    "sizeDelta": [
+     768.0,
+     768.0
+    ],
+    "scale": 1.0,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   },
+   "AvgHero2": {
+    "anchoredPos": [
+     -400.0,
+     -320.0
+    ],
+    "sizeDelta": [
+     768.0,
+     768.0
+    ],
+    "scale": 1.0,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   },
+   "AvgHero3": {
+    "anchoredPos": [
+     0.0,
+     -320.0
+    ],
+    "sizeDelta": [
+     768.0,
+     768.0
+    ],
+    "scale": 1.0,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   },
+   "AvgHero4": {
+    "anchoredPos": [
+     400.0,
+     -320.0
+    ],
+    "sizeDelta": [
+     768.0,
+     768.0
+    ],
+    "scale": 1.0,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   },
+   "AvgHero5": {
+    "anchoredPos": [
+     475.0,
+     -320.0
+    ],
+    "sizeDelta": [
+     768.0,
+     768.0
+    ],
+    "scale": 1.0,
     "pivot": [
      0.5,
      0.5
@@ -229916,224 +230115,6 @@
    }
   }
  },
- "lpic_yanny0_avg": {
-  "bundle": "yanny0_avg/lpic_yanny0_avg.ab",
-  "texture": [
-   2048,
-   2048
-  ],
-  "posData": {
-   "HeroList": {
-    "anchoredPos": [
-     19.0,
-     -340.0
-    ],
-    "sizeDelta": [
-     1553.1103515625,
-     1553.1103515625
-    ],
-    "scale": 1.0,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     0.5,
-     0.5
-    ]
-   },
-   "BattleInfo": {
-    "anchoredPos": [
-     124.87994384765625,
-     34.279972076416016
-    ],
-    "sizeDelta": [
-     768.0,
-     768.0
-    ],
-    "scale": 1.0,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     0.5,
-     0.5
-    ]
-   },
-   "HeroStarUp": {
-    "anchoredPos": [
-     -130.0,
-     -11.0
-    ],
-    "sizeDelta": [
-     1024.0,
-     1024.0
-    ],
-    "scale": 1.0,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     0.5,
-     0.5
-    ]
-   },
-   "Guide1": {
-    "anchoredPos": [
-     373.9999694824219,
-     -142.54998779296875
-    ],
-    "sizeDelta": [
-     734.2000122070312,
-     734.2000122070312
-    ],
-    "scale": 1.8499999046325684,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     1.0,
-     0.5
-    ]
-   },
-   "HeroDungeon": {
-    "anchoredPos": [
-     -78.0199966430664,
-     -499.5
-    ],
-    "sizeDelta": [
-     2048.0,
-     2048.0
-    ],
-    "scale": 1.0,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     0.5,
-     0.5
-    ]
-   },
-   "AvgHero3": {
-    "anchoredPos": [
-     0.0,
-     -350.0
-    ],
-    "sizeDelta": [
-     768.0,
-     768.0
-    ],
-    "scale": 1.0,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     0.5,
-     0.5
-    ]
-   },
-   "AvgHero1": {
-    "anchoredPos": [
-     -475.0,
-     -350.0
-    ],
-    "sizeDelta": [
-     768.0,
-     768.0
-    ],
-    "scale": 1.0,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     0.5,
-     0.5
-    ]
-   },
-   "AvgHero2": {
-    "anchoredPos": [
-     -400.0,
-     -350.0
-    ],
-    "sizeDelta": [
-     768.0,
-     768.0
-    ],
-    "scale": 1.0,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     0.5,
-     0.5
-    ]
-   },
-   "AvgHero4": {
-    "anchoredPos": [
-     450.0,
-     -350.0
-    ],
-    "sizeDelta": [
-     768.0,
-     768.0
-    ],
-    "scale": -1.0,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     0.5,
-     0.5
-    ]
-   },
-   "AvgHero5": {
-    "anchoredPos": [
-     475.0,
-     -350.0
-    ],
-    "sizeDelta": [
-     768.0,
-     768.0
-    ],
-    "scale": -1.0,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     0.5,
-     0.5
-    ]
-   },
-   "GetHero": {
-    "anchoredPos": [
-     19.0,
-     -340.0
-    ],
-    "sizeDelta": [
-     1553.1103515625,
-     1553.1103515625
-    ],
-    "scale": 1.0,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     0.5,
-     0.5
-    ]
-   }
-  }
- },
  "lpic_yanny": {
   "bundle": "yanny/lpic_yanny.ab",
   "texture": [
@@ -230339,6 +230320,224 @@
     "sizeDelta": [
      1039.7252197265625,
      1047.359619140625
+    ],
+    "scale": 1.0,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   }
+  }
+ },
+ "lpic_yanny0_avg": {
+  "bundle": "yanny0_avg/lpic_yanny0_avg.ab",
+  "texture": [
+   2048,
+   2048
+  ],
+  "posData": {
+   "HeroList": {
+    "anchoredPos": [
+     19.0,
+     -340.0
+    ],
+    "sizeDelta": [
+     1553.1103515625,
+     1553.1103515625
+    ],
+    "scale": 1.0,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   },
+   "BattleInfo": {
+    "anchoredPos": [
+     124.87994384765625,
+     34.279972076416016
+    ],
+    "sizeDelta": [
+     768.0,
+     768.0
+    ],
+    "scale": 1.0,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   },
+   "HeroStarUp": {
+    "anchoredPos": [
+     -130.0,
+     -11.0
+    ],
+    "sizeDelta": [
+     1024.0,
+     1024.0
+    ],
+    "scale": 1.0,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   },
+   "Guide1": {
+    "anchoredPos": [
+     373.9999694824219,
+     -142.54998779296875
+    ],
+    "sizeDelta": [
+     734.2000122070312,
+     734.2000122070312
+    ],
+    "scale": 1.8499999046325684,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     1.0,
+     0.5
+    ]
+   },
+   "HeroDungeon": {
+    "anchoredPos": [
+     -78.0199966430664,
+     -499.5
+    ],
+    "sizeDelta": [
+     2048.0,
+     2048.0
+    ],
+    "scale": 1.0,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   },
+   "AvgHero3": {
+    "anchoredPos": [
+     0.0,
+     -350.0
+    ],
+    "sizeDelta": [
+     768.0,
+     768.0
+    ],
+    "scale": 1.0,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   },
+   "AvgHero1": {
+    "anchoredPos": [
+     -475.0,
+     -350.0
+    ],
+    "sizeDelta": [
+     768.0,
+     768.0
+    ],
+    "scale": 1.0,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   },
+   "AvgHero2": {
+    "anchoredPos": [
+     -400.0,
+     -350.0
+    ],
+    "sizeDelta": [
+     768.0,
+     768.0
+    ],
+    "scale": 1.0,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   },
+   "AvgHero4": {
+    "anchoredPos": [
+     450.0,
+     -350.0
+    ],
+    "sizeDelta": [
+     768.0,
+     768.0
+    ],
+    "scale": -1.0,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   },
+   "AvgHero5": {
+    "anchoredPos": [
+     475.0,
+     -350.0
+    ],
+    "sizeDelta": [
+     768.0,
+     768.0
+    ],
+    "scale": -1.0,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   },
+   "GetHero": {
+    "anchoredPos": [
+     19.0,
+     -340.0
+    ],
+    "sizeDelta": [
+     1553.1103515625,
+     1553.1103515625
     ],
     "scale": 1.0,
     "pivot": [
@@ -233319,186 +233518,6 @@
    }
   }
  },
- "lpic_yuwang2_avg": {
-  "bundle": "yuwang2_avg/lpic_yuwang2_avg.ab",
-  "texture": [
-   2048,
-   2048
-  ],
-  "posData": {
-   "HeroList": {
-    "anchoredPos": [
-     19.0,
-     -340.0
-    ],
-    "sizeDelta": [
-     1553.1103515625,
-     1553.1103515625
-    ],
-    "scale": 1.0,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     0.5,
-     0.5
-    ]
-   },
-   "BattleInfo": {
-    "anchoredPos": [
-     124.87994384765625,
-     34.279972076416016
-    ],
-    "sizeDelta": [
-     768.0,
-     768.0
-    ],
-    "scale": 1.0,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     0.5,
-     0.5
-    ]
-   },
-   "HeroStarUp": {
-    "anchoredPos": [
-     -130.0,
-     -11.0
-    ],
-    "sizeDelta": [
-     1024.0,
-     1024.0
-    ],
-    "scale": 1.0,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     0.5,
-     0.5
-    ]
-   },
-   "Guide1": {
-    "anchoredPos": [
-     373.9999694824219,
-     -142.54998779296875
-    ],
-    "sizeDelta": [
-     734.2000122070312,
-     734.2000122070312
-    ],
-    "scale": 1.8499999046325684,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     1.0,
-     0.5
-    ]
-   },
-   "AvgHero3": {
-    "anchoredPos": [
-     0.0,
-     -490.0
-    ],
-    "sizeDelta": [
-     1024.0,
-     1024.0
-    ],
-    "scale": 1.0,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     0.5,
-     0.5
-    ]
-   },
-   "AvgHero4": {
-    "anchoredPos": [
-     400.0,
-     -490.0
-    ],
-    "sizeDelta": [
-     1024.0,
-     1024.0
-    ],
-    "scale": 1.0,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     0.5,
-     0.5
-    ]
-   },
-   "AvgHero2": {
-    "anchoredPos": [
-     -400.0,
-     -490.0
-    ],
-    "sizeDelta": [
-     1024.0,
-     1024.0
-    ],
-    "scale": 1.0,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     0.5,
-     0.5
-    ]
-   },
-   "AvgHero1": {
-    "anchoredPos": [
-     -470.0,
-     -490.0
-    ],
-    "sizeDelta": [
-     1024.0,
-     1024.0
-    ],
-    "scale": 1.0,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     0.5,
-     0.5
-    ]
-   },
-   "AvgHero5": {
-    "anchoredPos": [
-     470.0,
-     -490.0
-    ],
-    "sizeDelta": [
-     1024.0,
-     1024.0
-    ],
-    "scale": 1.0,
-    "pivot": [
-     0.5,
-     0.5
-    ],
-    "anchor": [
-     0.5,
-     0.5
-    ]
-   }
-  }
- },
  "lpic_yuwang": {
   "bundle": "yuwang/lpic_yuwang.ab",
   "texture": [
@@ -233723,6 +233742,186 @@
     "sizeDelta": [
      1082.2486572265625,
      1090.1953125
+    ],
+    "scale": 1.0,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   }
+  }
+ },
+ "lpic_yuwang2_avg": {
+  "bundle": "yuwang2_avg/lpic_yuwang2_avg.ab",
+  "texture": [
+   2048,
+   2048
+  ],
+  "posData": {
+   "HeroList": {
+    "anchoredPos": [
+     19.0,
+     -340.0
+    ],
+    "sizeDelta": [
+     1553.1103515625,
+     1553.1103515625
+    ],
+    "scale": 1.0,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   },
+   "BattleInfo": {
+    "anchoredPos": [
+     124.87994384765625,
+     34.279972076416016
+    ],
+    "sizeDelta": [
+     768.0,
+     768.0
+    ],
+    "scale": 1.0,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   },
+   "HeroStarUp": {
+    "anchoredPos": [
+     -130.0,
+     -11.0
+    ],
+    "sizeDelta": [
+     1024.0,
+     1024.0
+    ],
+    "scale": 1.0,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   },
+   "Guide1": {
+    "anchoredPos": [
+     373.9999694824219,
+     -142.54998779296875
+    ],
+    "sizeDelta": [
+     734.2000122070312,
+     734.2000122070312
+    ],
+    "scale": 1.8499999046325684,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     1.0,
+     0.5
+    ]
+   },
+   "AvgHero3": {
+    "anchoredPos": [
+     0.0,
+     -490.0
+    ],
+    "sizeDelta": [
+     1024.0,
+     1024.0
+    ],
+    "scale": 1.0,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   },
+   "AvgHero4": {
+    "anchoredPos": [
+     400.0,
+     -490.0
+    ],
+    "sizeDelta": [
+     1024.0,
+     1024.0
+    ],
+    "scale": 1.0,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   },
+   "AvgHero2": {
+    "anchoredPos": [
+     -400.0,
+     -490.0
+    ],
+    "sizeDelta": [
+     1024.0,
+     1024.0
+    ],
+    "scale": 1.0,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   },
+   "AvgHero1": {
+    "anchoredPos": [
+     -470.0,
+     -490.0
+    ],
+    "sizeDelta": [
+     1024.0,
+     1024.0
+    ],
+    "scale": 1.0,
+    "pivot": [
+     0.5,
+     0.5
+    ],
+    "anchor": [
+     0.5,
+     0.5
+    ]
+   },
+   "AvgHero5": {
+    "anchoredPos": [
+     470.0,
+     -490.0
+    ],
+    "sizeDelta": [
+     1024.0,
+     1024.0
     ],
     "scale": 1.0,
     "pivot": [
