@@ -87,8 +87,51 @@ def main():
             elif t == 'Texture2D':
                 tx = o.read()
                 rec.setdefault('textures', []).append({'name': tx.m_Name, 'w': tx.m_Width, 'h': tx.m_Height})
-    json.dump(out, sys.stdout, ensure_ascii=False, indent=1)
+    return out
+
+
+def compact(args, dest):
+    """lpic_*.ab 만 · CommonPicController.posData 만 → dest (UTF-8 JSON)
+    { "lpic_sueyoi": { "texture": [2048, 2048], "bundle": "...", "posData": { "HeroList": {anchoredPos, sizeDelta, scale, pivot, anchor}, ... } } }"""
+    out = {}
+    fs = [f for f in files(args) if os.path.basename(f).startswith('lpic_')]
+    for i, f in enumerate(sorted(fs), 1):
+        raw = open(f, 'rb').read()
+        if raw[:8] == b'\0' * 8 and raw[8:15] == b'UnityFS':
+            raw = raw[8:]
+        try:
+            env = UnityPy.load(raw)
+        except Exception as e:
+            print('건너뜀', f, e, file=sys.stderr)
+            continue
+        name = os.path.basename(f)[:-3]
+        rec = {'bundle': os.path.relpath(f, args[0]) if os.path.isdir(args[0]) else os.path.basename(f), 'texture': None, 'posData': {}}
+        for o in env.objects:
+            if o.type.name == 'Texture2D':
+                tx = o.read()
+                rec['texture'] = [tx.m_Width, tx.m_Height]
+            elif o.type.name == 'MonoBehaviour':
+                try:
+                    tt = o.read_typetree()
+                except Exception:
+                    continue
+                for p in tt.get('posData') or []:
+                    rec['posData'][p['name']] = {'anchoredPos': [p['anchoredPos']['x'], p['anchoredPos']['y']],
+                                                 'sizeDelta': [p['sizeDelta']['x'], p['sizeDelta']['y']],
+                                                 'scale': p['scale']['x'], 'pivot': [p['pivot']['x'], p['pivot']['y']],
+                                                 'anchor': [p['anchorsMin']['x'], p['anchorsMin']['y']]}
+        out[name] = rec
+        if i % 50 == 0:
+            print(i, '/', len(fs), file=sys.stderr)
+    with open(dest, 'w', encoding='utf-8') as w:
+        json.dump(out, w, ensure_ascii=False, indent=1)
+    print('끝:', len(out), '개 →', dest, '· HeroList 있는 것', sum(1 for v in out.values() if 'HeroList' in v['posData']), file=sys.stderr)
 
 
 if __name__ == '__main__':
-    main()
+    # 전체 값:  python illust_pos.py <폴더 · .ab ...> > 파일          (모든 정보, 큼)
+    # 위치만:   python illust_pos.py --compact <out.json> <res\character 폴더>   (lpic_*.ab 의 posData 만)
+    if sys.argv[1:2] == ['--compact']:
+        compact(sys.argv[3:], sys.argv[2])
+    else:
+        json.dump(main(), sys.stdout, ensure_ascii=False, indent=1)
