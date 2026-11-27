@@ -859,7 +859,7 @@ function renderArchiveMenu(){
  host.append(foldRow('지휘 스킬',go(()=>showCommander()),lazyFill(loadCommander,(box,d)=>{for(const f of d.families||[])subLink(box,f.name,()=>{cmdFocus=f.key;showCommander()})}),'archive-menu-top'));
  // v1.8.5 큰 분류 「게임」: 육성(인형 · 성령) — 나중에 오아시스 건축 등
  {const sec=el('button','archive-menu-section archive-menu-section-link','게임');sec.type='button';sec.onclick=go(()=>showGame());host.append(sec)}
- host.append(foldRow('육성',go(()=>showGrowth()),box=>{subLink(box,'인형',()=>showGrowth({cat:'doll'}));subLink(box,'성령',()=>showGrowth({cat:'sprite'}))},'archive-menu-top'));
+ host.append(foldRow('육성 · 계산기',go(()=>showGrowth()),box=>{subLink(box,'인형',()=>showGrowth({cat:'doll'}));subLink(box,'성령',()=>showGrowth({cat:'sprite'}))},'archive-menu-top'));
  host.append(foldRow('오아시스 건축',go(()=>showOasis()),box=>{subLink(box,'오아시스 건물',()=>showOasis({cat:'oasis'}));subLink(box,'섹터 건물',()=>showOasis({cat:'sector'}));subLink(box,'가공소',()=>showOasis({cat:'factory'}))},'archive-menu-top'));
  host.append(foldRow('업적',go(()=>showProgress('achieve')),lazyFill(loadProgress,(box,d)=>{for(const c of d.achievements||[])subLink(box,c.name,()=>showProgress('achieve',{cat:String(c.id)}));subLink(box,'업적 레벨',()=>showProgress('achieve',{cat:'level'}))}),'archive-menu-top'));
  host.append(foldRow('클라우드 이정표',go(()=>showProgress('mile')),lazyFill(loadProgress,(box,d)=>{for(const m of d.milestones||[])subLink(box,m.name,()=>showProgress('mile',{cat:String(m.id)}))}),'archive-menu-top'));
@@ -1820,20 +1820,20 @@ async function showGame({push=true}={}){
  const card=(eyebrow,name,desc,go,chips)=>{const c=el('section','arc-card');const b=el('button','arc-main');b.type='button';b.onclick=go;
   const tx=el('span','arc-text');tx.append(el('span','eyebrow',eyebrow),el('strong','arc-name',name),el('span','arc-desc',desc));b.append(tx,el('span','arc-n'),ic('right','tri'));c.append(b);
   if(chips){const sub=el('div','arc-sub');for(const [n,g] of chips){const x=el('button','arc-chip',n);x.type='button';x.onclick=g;sub.append(x)}c.append(sub)}grid.append(c);return c};
- card('GROWTH','육성','인형 · 성령 육성 재료 계산',()=>showGrowth(),[['인형',()=>showGrowth({cat:'doll'})],['성령',()=>showGrowth({cat:'sprite'})]]);
+ card('GROWTH','육성 · 계산기','인형 능력치 · 작전능력 · 육성 재료 / 성령',()=>showGrowth(),[['인형',()=>showGrowth({cat:'doll'})],['성령',()=>showGrowth({cat:'sprite'})]]);
  card('ACHIEVEMENTS','업적','분류별 업적 · 업적 레벨 보상',()=>showProgress('achieve'));
  card('CLOUD MILESTONES','클라우드 이정표','모듈별 할 일 · 단계 보상',()=>showProgress('mile'));
  card('OASIS','오아시스 건축','건물 · 레벨별 강화 재료 · 가공소',()=>showOasis(),[['오아시스 건물',()=>showOasis({cat:'oasis'})],['섹터 건물',()=>showOasis({cat:'sector'})],['가공소',()=>showOasis({cat:'factory'})]]);
 }
 let growTab=get('growTab','doll'),growDoll=get('growDoll','');
 async function showGrowth({push=true,cat=null}={}){
- const tok=++routeToken;showOnly('dollView');bgmLeave();voiceStop();closeArchiveMenu();$('#crumb').textContent='육성';
+ const tok=++routeToken;showOnly('dollView');bgmLeave();voiceStop();closeArchiveMenu();$('#crumb').textContent='육성 · 계산기';
  let sub=null;if(cat){const [a,b]=cat.split('/');if(a==='doll'||a==='sprite'){growTab=a;set('growTab',a)}if(a==='doll'&&b){growDoll=b;set('growDoll',b)}if(a==='sprite'&&(b==='info'||b==='sim'))fairyTab=b}
  if(push)saveRoute({type:'grow',cat:growTab==='doll'?('doll'+(growDoll?'/'+growDoll:'')):('sprite/'+fairyTab)});
  const host=$('#dollView');host.replaceChildren(el('p','loading-note','불러오는 중…'));window.scrollTo(0,0);
  try{await Promise.all([loadGrowth(),loadDollIndex(),loadFairy(),loadEffects().catch(()=>null),loadStats().catch(()=>null),loadArma().catch(()=>null),window.siteReady?.catch(()=>{})])}catch(e){if(tok===routeToken)host.replaceChildren(error('불러오지 못했어요. ('+e.message+')'));return}
  if(tok!==routeToken)return;host.replaceChildren();
- const head=el('div','doll-list-head');const t=el('div');t.append(el('div','eyebrow','GAME / GROWTH'),el('h2','','육성'));head.append(t);host.append(head);
+ const head=el('div','doll-list-head');const t=el('div');t.append(el('div','eyebrow','GAME / GROWTH'),el('h2','','육성 · 계산기'));head.append(t);host.append(head);
  const bar=el('div','doll-controls wr-controls');const tabs=el('div','wr-tabs');
  for(const [k,n] of [['doll','인형'],['sprite','성령']]){const b=el('button','cat-tab wr-tab'+(k===growTab?' selected':''),n);b.type='button';b.onclick=()=>showGrowth({cat:k});tabs.append(b)}
  bar.append(tabs);host.append(bar);
@@ -2525,7 +2525,6 @@ function statsPanel(p){
  for(const a of order){if(!st.cols.some(c=>c.v[a]!=null))continue;const tr=el('tr');const td=el('td','algo-td-stat');td.append(attrLbl(icons[a],names[a]||a));tr.append(td);
   for(const c of st.cols){const v=c.v[a];tr.append(el('td','',v==null?'-':typeof v==='number'?v.toLocaleString(window.UI_LOCALE||'ko-KR'):v))}tb.append(tr)}
  const tw=el('div','algo-table-wrap');tw.append(tb);left.append(tw,el('p','load-note','Lv.60 · Lv.70 은 그 레벨에 필요한 마인드 확장을 포함한 값이에요. 알고리즘 · 무장각인 · 친밀도는 빼고 계산했어요.'));
- if(p.voiceKey&&growthData?.potential?.[String(p.heroId)]){const g=el('button','fy-link');g.type='button';g.append(document.createTextNode('육성 계산 '),ic('right'));g.onclick=()=>showGrowth({cat:'doll/'+p.voiceKey});left.append(g)}
  // 오른쪽: 친밀도 보너스
  const right=el('section','stats-card');const rh=el('div','stats-head');rh.append(document.createTextNode('친밀도 보너스'));right.append(rh);
  const bar=el('div','arma-lvbar stats-fbar');const dn=icBtn('down','arma-step'),up=icBtn('up','arma-step');
@@ -2820,7 +2819,7 @@ function renderDoll(p,startPart){
  parts.push(['affinity','친밀도','',box=>{if(affBox.childNodes.length)box.append(affBox);box.append(storyPanel(p))}]);
  if(vc)parts.push(['voice','보이스',vc+'개',box=>box.append(voicePanel(p))]);
  if(skins.length)parts.push(['skin','스킨',skins.length+'벌',box=>{box.append(el('p','load-note',LOAD_NOTE),gallery(p,skins,{label:'스킨',cls:'gal-skin'}))}]);
- // v1.9 육성은 인형 프로필에서 빼고 「육성」 페이지(#grow)로만. 프로필에는 능력치 표 + 육성 페이지로 가는 버튼
+ // v1.9 육성은 인형 프로필에서 빼고 메뉴의 「육성 · 계산기」(#grow)로만
  if(p.stats?.cols?.length)parts.unshift(['stats','능력치','',box=>box.append(statsPanel(p))]);
  if(startPart==='growth'){showGrowth({cat:'doll/'+p.voiceKey});return}   // 예전 주소(#doll/…/growth) → 육성 페이지
  parts.unshift(['profile','프로필','',box=>box.append(hero)]);
