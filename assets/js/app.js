@@ -1831,7 +1831,7 @@ async function showGrowth({push=true,cat=null}={}){
  let sub=null;if(cat){const [a,b]=cat.split('/');if(a==='doll'||a==='sprite'){growTab=a;set('growTab',a)}if(a==='doll'&&b){growDoll=b;set('growDoll',b)}if(a==='sprite'&&(b==='info'||b==='sim'))fairyTab=b}
  if(push)saveRoute({type:'grow',cat:growTab==='doll'?('doll'+(growDoll?'/'+growDoll:'')):('sprite/'+fairyTab)});
  const host=$('#dollView');host.replaceChildren(el('p','loading-note','불러오는 중…'));window.scrollTo(0,0);
- try{await Promise.all([loadGrowth(),loadDollIndex(),loadFairy(),loadEffects().catch(()=>null),window.siteReady?.catch(()=>{})])}catch(e){if(tok===routeToken)host.replaceChildren(error('불러오지 못했어요. ('+e.message+')'));return}
+ try{await Promise.all([loadGrowth(),loadDollIndex(),loadFairy(),loadEffects().catch(()=>null),loadStats().catch(()=>null),loadArma().catch(()=>null),window.siteReady?.catch(()=>{})])}catch(e){if(tok===routeToken)host.replaceChildren(error('불러오지 못했어요. ('+e.message+')'));return}
  if(tok!==routeToken)return;host.replaceChildren();
  const head=el('div','doll-list-head');const t=el('div');t.append(el('div','eyebrow','GAME / GROWTH'),el('h2','','육성'));head.append(t);host.append(head);
  const bar=el('div','doll-controls wr-controls');const tabs=el('div','wr-tabs');
@@ -2405,12 +2405,84 @@ const loadStats=()=>statsData?Promise.resolve(statsData):fetchJSON(dataPath('sta
 let growthData=null,growArma=get('growArma','off');
 const loadGrowth=()=>growthData?Promise.resolve(growthData):fetchJSON(dataPath('growth.json')).then(d=>growthData=d);
 const growState=new Map();
+// ----- v1.9 육성 탭: 지금 상태(옵션 칸) → 작전능력 · 능력치(pnc-dps 인형 계산기 기준) · 친밀도 보너스 · 계산기로 이동 · 목표까지 재료 -----
+// 능력치는 42LAB 이 따로 계산하지 않고 pnc-dps 계산 모듈 · 데이터를 그대로 씀 (두 사이트 숫자 같음). 못 불러오면 고정 표(stats.json)로
+const DPS='https://pnc-dps.pages.dev/';
+let dpsLoad=null,growEw=get('growEw','max');
+const loadDps=()=>dpsLoad||(dpsLoad=(async()=>{
+ const [{assemble,armaReplace},{fightingPower},{ewMax},{encodeBuild}]=await Promise.all(['assemble','power','maxstate','buildcode'].map(n=>import(DPS+'src/'+n+'.js')));
+ const j=n=>fetch(DPS+'data/all/'+n+'.json').then(r=>{if(!r.ok)throw new Error(n+' '+r.status);return r.json()});
+ const [G,A,EW,HP,AR,GC]=await Promise.all(['hero_growth','attribute','ew_buildings','hero_power','arma','growth_cost'].map(j));
+ const calc=(hid,s)=>{const hasA=!!AR.heroes[hid];
+  const input={heroId:hid,rank:s.r,level:s.lv,potential:s.pt,friendship:s.fl,ewLevels:s.ew==='max'?ewMax(EW,G.heroes[hid].career):{},arma:AR,armaLevel:hasA?s.al:0,bonus:{}};
+  const tab=assemble(G,A,EW,input),hero=HP.heroes[hid],levels={};hero.skills.forEach((k,i)=>{if(i>0)levels[k.id]=[null,s.s2,s.s1,s.u][i]||1});
+  return {tab,base:tab.base||{},power:fightingPower({tab,hero,levels,rank:s.r,replace:armaReplace(AR,hid,input.armaLevel)}).total}};
+ return {calc,GC,encodeBuild,has:hid=>!!(G.heroes[hid]&&HP.heroes[hid])};
+})().catch(e=>{dpsLoad=null;throw e}));
+const DPS_ROWS=[2,3,26,4,27,5,9,10,12,28,7,15,23,14,24,19,20,21],DPS_PCT=new Set([7,9,10,17,18,19,20,21,22,23,24,25]);
+const dpsFmt=(id,v)=>DPS_PCT.has(+id)||+id>200?((v||0)/10).toFixed(1).replace(/\.0$/,'')+'%':Math.round(v||0).toLocaleString(window.UI_LOCALE||'ko-KR');
 function growthPanel(p){
+ const G=growthData,hid=String(p.heroId),arma=G.arma?.[hid];
+ const d0=(dollIndex?.dolls||[]).find(d=>+d.heroId===+p.heroId);const rank0=Math.max(1,(d0?.stars||p.stars||1)*2);
+ const st=growState.get(hid)||{r:[rank0,10],lv:[1,70],s1:[1,10],s2:[1,10],al:[0,30],pt:0,u:0};st.pt??=0;st.u??=0;growState.set(hid,st);
+ const wrap=el('div','grow-wrap grow2');wrap.append(el('p','loading-note','능력치 계산기를 불러오는 중…'));
+ const starTxt=r=>(r%2?Math.floor(r/2)+'.5':String(r/2))+'★';
+ const sel=(vals,label,v,on)=>{const s=el('select','grow-sel');for(const x of vals){const o=el('option','',label(x));o.value=x;if(String(x)===String(v))o.selected=true;s.append(o)}s.onchange=()=>on(s.value);return s};
+ const range=(a,b)=>Array.from({length:b-a+1},(_,i)=>a+i);
+ const build=D=>{
+  const ultMax=r=>!D||r<6?0:(D.GC.ranks[r-1]?.ultMax||0);
+  const fix=()=>{st.r[0]=Math.min(Math.max(st.r[0],rank0),10);st.pt=Math.min(Math.max(st.pt,Math.ceil(st.lv[0]/10)-1),6);st.lv[0]=Math.min(Math.max(st.lv[0],1),(st.pt+1)*10);st.u=Math.min(st.u,ultMax(st.r[0]));
+   for(const k of ['r','lv','s1','s2','al'])if(st[k][1]<st[k][0])st[k][1]=st[k][0]};
+  fix();wrap.replaceChildren();
+  // 1) 지금 상태 (옵션 칸)
+  const now=el('div','grow-now');const opt=(name,s)=>{const o=el('label','grow-opt');o.append(el('span','grow-opt-name',name),s);now.append(o)};
+  const re=()=>{fix();build(D)};
+  opt('성급',sel(range(rank0,10),starTxt,st.r[0],v=>{st.r[0]=+v;re()}));
+  opt('레벨',sel(range(1,70),x=>'Lv.'+x,st.lv[0],v=>{st.lv[0]=+v;st.pt=Math.max(st.pt,Math.ceil(+v/10)-1);re()}));
+  opt('재능돌파',sel(range(0,6),String,st.pt,v=>{st.pt=+v;re()}));
+  opt('패시브 스킬',sel(range(1,10),x=>'Lv.'+x,st.s2[0],v=>{st.s2[0]=+v;re()}));
+  opt('자동 스킬',sel(range(1,10),x=>'Lv.'+x,st.s1[0],v=>{st.s1[0]=+v;re()}));
+  opt('궁극기',ultMax(st.r[0])?sel(range(1,ultMax(st.r[0])),x=>'Lv.'+x,Math.max(st.u,1),v=>{st.u=+v;re()}):el('span','grow-nowv','미해금'));
+  opt('친밀도',sel(range(1,20),x=>x>15?x+' · 서약':String(x),friendLv,v=>{friendLv=+v;set('friendLv',friendLv);re()}));
+  if(arma)opt('무장각인',sel(range(0,30),x=>x?'Lv.'+x:'없음',st.al[0],v=>{st.al[0]=+v;re()}));
+  opt('전자대항',sel(['none','max'],x=>x==='max'?'MAX':'없음',growEw,v=>{growEw=v;set('growEw',v);re()}));
+  wrap.append(el('h3','grow-h','지금 상태'),now);
+  // 2) 작전능력 · 능력치
+  const s={r:st.r[0],lv:st.lv[0],pt:st.pt,s1:st.s1[0],s2:st.s2[0],u:st.u||(ultMax(st.r[0])?1:0),fl:friendLv,al:arma?st.al[0]:0,ew:growEw};
+  const res=el('div','stats-wrap');
+  if(D&&D.has(hid)){const R=D.calc(hid,s),names=armaData?.attrs||{},icons=armaData?.attrIcons||{};
+   const card=el('section','stats-card');const ph=el('div','grow-power');ph.append(el('span','grow-power-l','작전능력'),el('b','grow-power-v',R.power.toLocaleString(window.UI_LOCALE||'ko-KR')));
+   const half=Math.ceil(DPS_ROWS.length/2),tbl=ids=>{const t=el('table','algo-table stats-table grow-stats');const h=el('tr');for(const x of ['','기본','추가','최종'])h.append(el('th','',x));t.append(h);
+    for(const id of ids){const v=R.tab[id]||0,b=R.base[id]||0,tr=el('tr');const td=el('td','algo-td-stat');td.append(attrLbl(icons[id],names[id]||String(id)));tr.append(td,el('td','',dpsFmt(id,b)),el('td','grow-plus',v-b?'+'+dpsFmt(id,v-b):''),el('td','',dpsFmt(id,v)));t.append(tr)}return t};
+   const tw=el('div','grow-stats-2');for(const ids of [DPS_ROWS.slice(0,half),DPS_ROWS.slice(half)]){const w=el('div','algo-table-wrap');w.append(tbl(ids));tw.append(w)}
+   card.append(ph,tw,el('p','load-note','알고리즘은 빼고 계산했어요 · 계산: pnc-dps 인형 계산기 (게임 식 그대로)'));res.append(card)}
+  else if(p.stats?.cols?.length){res.append(statsPanel(p))}
+  else res.append(el('p','load-note','능력치 계산기에 연결하지 못했어요.'));
+  // 3) 친밀도 보너스 (친밀도 = 위 옵션 칸)
+  const bonus=p.stats?.bonus||statsData?.heroes?.[hid]?.bonus;
+  if(bonus?.length&&D){const names=armaData?.attrs||{},icons=armaData?.attrIcons||{};const right=el('section','stats-card');right.append(el('div','stats-head','친밀도 보너스'));const list=el('div','stats-bonus');
+   for(const b of bonus){const got=b.steps.filter(x=>x.fl<=friendLv);const cur=got[got.length-1],next=b.steps[got.length];
+    const row=el('div','stats-brow'+(cur?'':' locked'));const ic=el('span','stats-fic');if(b.icon){const im=el('img');im.alt='';im.decoding='async';im.src='/assets/img/friend/'+b.icon+'.webp';im.onerror=()=>im.remove();ic.append(im)}row.append(ic);
+    const body=el('div','stats-bbody');const t=el('div','stats-btop');t.append(el('strong','stats-bname',b.name),el('span','stats-bstep','LV'+got.length+' / '+b.steps.length));body.append(t);
+    const line=el('div','stats-bline');line.append(attrLbl(icons[b.attr],names[b.attr]||''),el('b','stats-bval',cur?'+'+(typeof cur.v==='number'?cur.v.toLocaleString(window.UI_LOCALE||'ko-KR'):cur.v):'-'));body.append(line);
+    const req=el('div','stats-breq');if(cur)req.append(el('span','skill-chip','인형 Lv.'+cur.hl+' 필요'));if(next)req.append(el('span','skill-chip stats-next','다음: 친밀도 '+next.fl+' · +'+next.v));body.append(req);row.append(body);list.append(row)}
+   right.append(list);res.append(right)}
+  wrap.append(res);
+  // 4) 계산기로 이동 (지금 상태를 빌드 코드로 넘김 · 새 탭)
+  if(D){const go=el('div','grow-go');const btn=(name,tab)=>{const b=el('button','fy-link');b.type='button';b.append(document.createTextNode(name+' '),ic('right'));
+    b.onclick=async()=>{const code=await D.encodeBuild({v:1,h:hid,s:[s.r,s.lv,s.pt,s.s2,s.s1,s.u,s.fl,s.al],e:11,w:growEw==='max'?'x':'n'});
+     window.open(DPS+'app/?b='+code+'&tab='+tab+'&lang='+(window.UI_LANG||'ko'),'_blank','noopener')};go.append(b)};
+   btn('인형 화면','power');btn('알고리즘 · 추천 빌드','build');btn('육성 계산기','growth');wrap.append(go)}
+  // 5) 목표까지 재료
+  wrap.append(growthCost(p,st))};
+ loadDps().then(build,()=>build(null));
+ return wrap}
+// 지금 → 목표 재료 (지금 = 위 옵션 칸 값, 여기서는 목표만 고름)
+function growthCost(p,st){
  const G=growthData,hid=String(p.heroId),pot=G.potential?.[hid]||[],arma=G.arma?.[hid],frag=String(G.fragBase+(+p.heroId));
  const d0=(dollIndex?.dolls||[]).find(d=>+d.heroId===+p.heroId);const rank0=Math.max(1,(d0?.stars||p.stars||1)*2);
- const st=growState.get(hid)||{r:[rank0,10],lv:[1,70],s1:[1,10],s2:[1,10],al:[0,30]};growState.set(hid,st);
  const wrap=el('div','grow-wrap');
- const itemName=i=>i===frag?(p.name+' 조각'):(G.items?.[i]?.[0]||i);
+ const itemName=i=>i===frag?(window.L?window.L(p.name+' 조각'):p.name+' 조각'):(G.items?.[i]?.[0]||i);
  const fmt=n=>n.toLocaleString(window.UI_LOCALE||'ko-KR');
  const starTxt=r=>(r%2?Math.floor(r/2)+'.5':String(r/2))+'★';
  const sel=(vals,label,v,on)=>{const s=el('select','grow-sel');for(const x of vals){const o=el('option','',label(x));o.value=x;if(+x===+v)o.selected=true;s.append(o)}s.onchange=()=>on(+s.value);return s};
@@ -2419,7 +2491,7 @@ function growthPanel(p){
  const form=el('div','grow-form');const out=el('div','grow-out');
  const draw=()=>{form.replaceChildren(el('span',''),el('span','fy-label','지금'),el('span','fy-label','목표'));
   for(const [name,vals,lab,k] of rows){if(k==='al'&&growArma!=='on')continue;
-   form.append(el('span','grow-name',name),sel(vals,lab,st[k][0],v=>{st[k][0]=v;if(st[k][1]<v)st[k][1]=v;draw()}),sel(vals,lab,st[k][1],v=>{st[k][1]=v;if(st[k][0]>v)st[k][0]=v;draw()}))}
+   form.append(el('span','grow-name',name),el('span','grow-nowv',lab(st[k][0])),sel(vals,lab,st[k][1],v=>{st[k][1]=v;if(st[k][0]>v)st[k][0]=v;draw()}))}
   // 합계
   const tot={},add=(c,m=1)=>{for(const [i,n] of Object.entries(c||{}))tot[i]=(tot[i]||0)+n*m};
   const parts=[];const sect=(label,c)=>{const n=Object.keys(c).length;if(n)parts.push([label,c])};
@@ -2744,11 +2816,13 @@ function renderDoll(p,startPart){
  const parts=[];
  if(p.skills?.length&&typeof skillPanel==='function')parts.push(['skill','스킬',p.skills.length+'개',box=>box.append(skillPanel(p))]);
  if(p.arma?.steps?.length)parts.push(['arma','무장각인','',box=>box.append(armaPanel(p))]);
- if(growthData&&p.heroId)parts.push(['growth','육성','',box=>box.append(growthPanel(p))]);
  parts.push(['affinity','친밀도','',box=>{if(affBox.childNodes.length)box.append(affBox);box.append(storyPanel(p))}]);
  if(vc)parts.push(['voice','보이스',vc+'개',box=>box.append(voicePanel(p))]);
  if(skins.length)parts.push(['skin','스킨',skins.length+'벌',box=>{box.append(el('p','load-note',LOAD_NOTE),gallery(p,skins,{label:'스킨',cls:'gal-skin'}))}]);
- if(p.stats?.cols?.length)parts.unshift(['stats','능력치','',box=>box.append(statsPanel(p))]);
+ // v1.9 능력치 · 육성 → 「육성」 한 칸 (지금 상태 옵션 → 능력치 · 작전능력 · 재료). 육성 데이터가 없을 때만 예전 능력치 표
+ if(growthData&&p.heroId)parts.unshift(['growth','육성','',box=>box.append(growthPanel(p))]);
+ else if(p.stats?.cols?.length)parts.unshift(['stats','능력치','',box=>box.append(statsPanel(p))]);
+ if(startPart==='stats')startPart='growth';   // 예전 주소(#…/stats)
  parts.unshift(['profile','프로필','',box=>box.append(hero)]);
  // 프로필 칸이 아닐 때 위에 작은 이름 줄
  const mini=el('div','doll-mini');mini.append(el('span','eyebrow',[p.company,p.role].filter(Boolean).join(' / ').toUpperCase()||'DOLL RECORD'),el('strong','doll-mini-name',p.name));
