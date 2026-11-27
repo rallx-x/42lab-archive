@@ -105,6 +105,11 @@ def compact(args, dest):
             print('건너뜀', f, e, file=sys.stderr)
             continue
         name = os.path.basename(f)[:-3]
+        # 같은 파일 이름이 다른 폴더에도 있음 (예 hubble\lpic_hubble.ab · hubble_avg\lpic_hubble.ab)
+        # 게임 경로는 <그림이름>\lpic_<그림이름> 이라 폴더 이름이 맞는 쪽을 씀
+        right = os.path.basename(os.path.dirname(f)) == name[5:]
+        if name in out and not right:
+            continue
         rec = {'bundle': os.path.relpath(f, args[0]) if os.path.isdir(args[0]) else os.path.basename(f), 'texture': None, 'posData': {}}
         for o in env.objects:
             if o.type.name == 'Texture2D':
