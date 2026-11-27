@@ -2525,6 +2525,7 @@ function statsPanel(p){
  for(const a of order){if(!st.cols.some(c=>c.v[a]!=null))continue;const tr=el('tr');const td=el('td','algo-td-stat');td.append(attrLbl(icons[a],names[a]||a));tr.append(td);
   for(const c of st.cols){const v=c.v[a];tr.append(el('td','',v==null?'-':typeof v==='number'?v.toLocaleString(window.UI_LOCALE||'ko-KR'):v))}tb.append(tr)}
  const tw=el('div','algo-table-wrap');tw.append(tb);left.append(tw,el('p','load-note','Lv.60 · Lv.70 은 그 레벨에 필요한 마인드 확장을 포함한 값이에요. 알고리즘 · 무장각인 · 친밀도는 빼고 계산했어요.'));
+ if(p.voiceKey&&growthData?.potential?.[String(p.heroId)]){const g=el('button','fy-link');g.type='button';g.append(document.createTextNode('육성 계산 '),ic('right'));g.onclick=()=>showGrowth({cat:'doll/'+p.voiceKey});left.append(g)}
  // 오른쪽: 친밀도 보너스
  const right=el('section','stats-card');const rh=el('div','stats-head');rh.append(document.createTextNode('친밀도 보너스'));right.append(rh);
  const bar=el('div','arma-lvbar stats-fbar');const dn=icBtn('down','arma-step'),up=icBtn('up','arma-step');
@@ -2819,10 +2820,9 @@ function renderDoll(p,startPart){
  parts.push(['affinity','친밀도','',box=>{if(affBox.childNodes.length)box.append(affBox);box.append(storyPanel(p))}]);
  if(vc)parts.push(['voice','보이스',vc+'개',box=>box.append(voicePanel(p))]);
  if(skins.length)parts.push(['skin','스킨',skins.length+'벌',box=>{box.append(el('p','load-note',LOAD_NOTE),gallery(p,skins,{label:'스킨',cls:'gal-skin'}))}]);
- // v1.9 능력치 · 육성 → 「육성」 한 칸 (지금 상태 옵션 → 능력치 · 작전능력 · 재료). 육성 데이터가 없을 때만 예전 능력치 표
- if(growthData&&p.heroId)parts.unshift(['growth','육성','',box=>box.append(growthPanel(p))]);
- else if(p.stats?.cols?.length)parts.unshift(['stats','능력치','',box=>box.append(statsPanel(p))]);
- if(startPart==='stats')startPart='growth';   // 예전 주소(#…/stats)
+ // v1.9 육성은 인형 프로필에서 빼고 「육성」 페이지(#grow)로만. 프로필에는 능력치 표 + 육성 페이지로 가는 버튼
+ if(p.stats?.cols?.length)parts.unshift(['stats','능력치','',box=>box.append(statsPanel(p))]);
+ if(startPart==='growth'){showGrowth({cat:'doll/'+p.voiceKey});return}   // 예전 주소(#doll/…/growth) → 육성 페이지
  parts.unshift(['profile','프로필','',box=>box.append(hero)]);
  // 프로필 칸이 아닐 때 위에 작은 이름 줄
  const mini=el('div','doll-mini');mini.append(el('span','eyebrow',[p.company,p.role].filter(Boolean).join(' / ').toUpperCase()||'DOLL RECORD'),el('strong','doll-mini-name',p.name));
