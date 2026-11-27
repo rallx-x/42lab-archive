@@ -39,8 +39,11 @@ def files(args):
 def main():
     out = {}
     for f in files(sys.argv[1:]):
+        raw = open(f, 'rb').read()
+        if raw[:8] == b'\0' * 8 and raw[8:15] == b'UnityFS':   # 뉴럴 클라우드 번들은 앞에 0 바이트 8개가 붙어 있음
+            raw = raw[8:]
         try:
-            env = UnityPy.load(f)
+            env = UnityPy.load(raw)
         except Exception:
             continue
         objs = {o.path_id: o for o in env.objects}
